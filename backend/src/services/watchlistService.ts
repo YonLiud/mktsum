@@ -9,6 +9,18 @@ export const watchlistService = {
             }
         })
     },
+    getAllUniqueTickers: async () => {
+        return await prisma.watchlist.findMany({
+            distinct: ['ticker'],
+            select: { ticker: true }
+        })
+    },
+    getUsersByTicker: async (ticker: string) => {
+        return await prisma.watchlist.findMany({
+            where: {ticker},
+            include: {user: true}
+        })
+    },
     addTicker: async (userId: string, ticker: string) => {
         const watchlistId = generateId()
 
