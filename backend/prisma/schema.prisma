@@ -17,16 +17,17 @@ model User {
 }
 
 model Watchlist {
-  id            Int       @id @default(autoincrement())
-  user_id       Int       
+  watchlist_id  Int       @id @default(autoincrement())
+  user_id       Int
   ticker        String
 
   user          User      @relation(fields: [user_id], references: [user_id])
 }
 
 model Briefing {
-  id            Int       @id @default(autoincrement())
+  briefing_id   Int       @id @default(autoincrement())
   user_id       Int
+  identifier    String    @unique @default(uuid())
   full_summary  String
   short_summary String
   created_at    DateTime  @default(now())
