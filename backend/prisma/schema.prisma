@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  user_id       Int       @id @default(autoincrement())
+  name          String
+  ntfy_topic    String
+  created_at    DateTime  @default(now())
+
+  watchlist     Watchlist[]
+  briefing      Briefing[]
+}
+
+model Watchlist {
+  id            Int       @id @default(autoincrement())
+  user_id       Int       
+  ticker        String
+
+  user          User      @relation(fields: [user_id], references: [user_id])
+}
+
+model Briefing {
+  id            Int       @id @default(autoincrement())
+  user_id       Int
+  full_summary  String
+  short_summary String
+  created_at    DateTime  @default(now())
+
+  user          User      @relation(fields: [user_id], references: [user_id])
+}
+
