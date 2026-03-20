@@ -6,7 +6,7 @@
 npm run dev
 ```
 
-Server runs on port 8000.
+Server runs on port 5000.
 
 ## Migrate
 
