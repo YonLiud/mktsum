@@ -1,39 +1,40 @@
-import { prisma } from '../lib/prisma.js'
+import type { Request, Response } from 'express'
+import { watchlistService } from "../services/watchlistService.ts";
 
 export const watchlistController = {
-  getAll: async () => {
-    return await prisma.watchlist.findMany({
-      include: {
-        user: true,
-      },
-    })
+  getByUser: async (req: Request, res: Response) => {
+    const {user_id} = req.body
+    const result = await watchlistService.getByUser(user_id)
+    return res.json(result)
+
   },
 
-  getOne: async (watchlistId: number) => {
-    return await prisma.watchlist.findUnique({
-      where: { watchlist_id: watchlistId },
-      include: {
-        user: true,
-      },
-    })
+  getAllTickers: async (req: Request, res: Response) => {
+    const result = await watchlistService.getAllUniqueTickers()
+    return res.json(result)
   },
 
-  create: async (data: { user_id: number; ticker: string }) => {
-    return await prisma.watchlist.create({
-      data,
-    })
+  getUsersByTickers: async (req: Request, res: Response) => {
+    const { ticker } = req.body
+    const result = await watchlistService.getUsersByTicker(ticker)
+    return res.json(result)
   },
 
-  update: async (watchlistId: number, data: Partial<{ ticker: string }>) => {
-    return await prisma.watchlist.update({
-      where: { watchlist_id: watchlistId },
-      data,
-    })
+  create: async (req: Request, res: Response) => {
+    const {user_id, ticker} = req.body
+    const result = await watchlistService.addTicker(user_id, ticker)
+    return res.json(result)
   },
 
-  delete: async (watchlistId: number) => {
-    return await prisma.watchlist.delete({
-      where: { watchlist_id: watchlistId },
-    })
+  delete: async (req: Request, res: Response) => {
+    const {user_id, ticker} = req.body
+    const result = await watchlistService.removeTicker(user_id, ticker)
+    return res.json(result)
   },
+
+  hasTicker: async (req: Request, res: Response) => {
+    const {user_id, ticker} = req.body
+    const result = watchlistService.hasTicker(user_id, ticker)
+    return res.json(result)
+  }
 }
