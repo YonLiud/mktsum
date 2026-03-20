@@ -29,7 +29,6 @@ model Watchlist {
 model Briefing {
   briefing_id   String    @id
   user_id       String
-  identifier    String    @unique
   full_summary  String
   short_summary String
   created_at    DateTime  @default(now())
