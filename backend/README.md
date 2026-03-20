@@ -1,5 +1,11 @@
 # Backend
 
+## Architecture
+
+```
+Routes → Controller → Service → Prisma → Database
+```
+
 ## Run
 
 ```bash
@@ -13,3 +19,4 @@ Server runs on port 5000.
 ```bash
 npx prisma migrate deploy
 ```
+

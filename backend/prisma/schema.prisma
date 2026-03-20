@@ -7,7 +7,7 @@ datasource db {
 }
 
 model User {
-  user_id       Int       @id @default(autoincrement())
+  user_id       String    @id
   name          String
   ntfy_topic    String
   created_at    DateTime  @default(now())
@@ -17,17 +17,19 @@ model User {
 }
 
 model Watchlist {
-  watchlist_id  Int       @id @default(autoincrement())
-  user_id       Int
+  watchlist_id  String    @id
+  user_id       String
   ticker        String
 
   user          User      @relation(fields: [user_id], references: [user_id])
+
+  @@unique([user_id, ticker])
 }
 
 model Briefing {
-  briefing_id   Int       @id @default(autoincrement())
-  user_id       Int
-  identifier    String    @unique @default(uuid())
+  briefing_id   String    @id
+  user_id       String
+  identifier    String    @unique
   full_summary  String
   short_summary String
   created_at    DateTime  @default(now())
