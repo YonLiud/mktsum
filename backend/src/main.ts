@@ -1,14 +1,22 @@
 import express from 'express'
+import { loadRoutes } from './utils/loadRoutes.ts'
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 const app = express()
 const PORT = 5000
 
 app.use(express.json())
 
-app.get('/', (req, res) => {
-  res.json({ message: 'hello world' })
-})
+async function start() {
+  await loadRoutes(app, join(__dirname, 'routes'))
 
-app.listen(PORT, () => {
-  console.log(`server running on port ${PORT}`)
-})
+  app.listen(PORT, () => {
+    console.log(`server running on port ${PORT}`)
+  })
+}
+
+start()
