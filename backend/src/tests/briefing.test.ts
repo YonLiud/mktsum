@@ -117,6 +117,23 @@ describe('briefingService', () => {
     const found = await briefingService.getById(created.briefing_id)
     expect(found).toBeNull()
   })
+
+  it('getLatestByUser — returns most recent briefing', async () => {
+    await briefingService.create({
+      user_id: testUserId,
+      full_summary: 'First',
+      short_summary: 'F1',
+    })
+    await new Promise(resolve => setTimeout(resolve, 10))
+    const latest = await briefingService.create({
+      user_id: testUserId,
+      full_summary: 'Latest',
+      short_summary: 'L1',
+    })
+    const result = await briefingService.getLatestByUser(testUserId)
+    expect(result?.briefing_id).toBe(latest.briefing_id)
+    expect(result?.full_summary).toBe('Latest')
+  })
 })
 
 describe('briefingController (HTTP)', () => {
@@ -181,6 +198,24 @@ describe('briefingController (HTTP)', () => {
     expect(res.status).toBe(200)
     expect(res.body.full_summary).toBe('Test_Patch_New')
     expect(res.body.short_summary).toBe('Old')
+  })
+
+  it('GET /user/:userId/latest — returns latest briefing', async () => {
+    await briefingService.create({
+      user_id: testUserId,
+      full_summary: 'First_Brief',
+      short_summary: 'FB',
+    })
+    await new Promise(resolve => setTimeout(resolve, 10))
+    const latest = await briefingService.create({
+      user_id: testUserId,
+      full_summary: 'Latest_Brief',
+      short_summary: 'LB',
+    })
+    const res = await request(app).get(`/user/${testUserId}/latest`)
+    expect(res.status).toBe(200)
+    expect(res.body.briefing_id).toBe(latest.briefing_id)
+    expect(res.body.full_summary).toBe('Latest_Brief')
   })
 
   it('DELETE /:briefingId — removes briefing', async () => {

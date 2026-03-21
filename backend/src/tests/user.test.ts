@@ -39,11 +39,14 @@ describe('userService', () => {
     expect(result.ntfy_topic).toBe('test')
   })
 
-  it('getById — returns correct user', async () => {
+  it('getById — returns correct user with briefings and tickers', async () => {
     const created = await userService.create({ name: 'Test_GetById', ntfy_topic: 'topic' })
     createdIds.push(created.user_id)
     const found = await userService.getById(created.user_id)
-    expect(found).toEqual(created)
+    expect(found?.user_id).toBe(created.user_id)
+    expect(found?.name).toBe('Test_GetById')
+    expect(Array.isArray(found?.briefing)).toBe(true)
+    expect(Array.isArray(found?.watchlist)).toBe(true)
   })
 
   it('getAll — includes created users', async () => {
@@ -69,6 +72,19 @@ describe('userService', () => {
     await userService.delete(created.user_id)
     const found = await userService.getById(created.user_id)
     expect(found).toBeNull()
+  })
+
+  it('getTickers — returns user tickers only', async () => {
+    const created = await userService.create({ name: 'Test_GetTickers', ntfy_topic: 'tickers' })
+    createdIds.push(created.user_id)
+    const { watchlistService } = await import('../services/watchlistService.ts')
+    await watchlistService.addTicker(created.user_id, 'AAPL')
+    await watchlistService.addTicker(created.user_id, 'GOOGL')
+    const tickers = await userService.getTickers(created.user_id)
+    expect(Array.isArray(tickers)).toBe(true)
+    expect(tickers.length).toBe(2)
+    expect(tickers.map((t: any) => t.ticker)).toContain('AAPL')
+    expect(tickers.map((t: any) => t.ticker)).toContain('GOOGL')
   })
 })
 
@@ -115,5 +131,16 @@ describe('userController (HTTP)', () => {
     expect(res.status).toBe(200)
     const found = await userService.getById(created.user_id)
     expect(found).toBeNull()
+  })
+
+  it('GET /:userId/tickers — returns user tickers', async () => {
+    const created = await userService.create({ name: 'Test_HTTP_Tickers', ntfy_topic: 'tickers' })
+    createdIds.push(created.user_id)
+    const { watchlistService } = await import('../services/watchlistService.ts')
+    await watchlistService.addTicker(created.user_id, 'MSFT')
+    const res = await request(app).get(`/${created.user_id}/tickers`)
+    expect(res.status).toBe(200)
+    expect(Array.isArray(res.body)).toBe(true)
+    expect(res.body.some((t: any) => t.ticker === 'MSFT')).toBe(true)
   })
 })
