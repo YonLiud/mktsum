@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import express from 'express'
 import { loadRoutes } from './utils/loadRoutes.ts'
 import { fileURLToPath } from 'url'
