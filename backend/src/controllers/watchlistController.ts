@@ -9,7 +9,7 @@ export const watchlistController = {
 
   },
 
-  getAllTickers: async (req: Request, res: Response) => {
+  getAllTickers: async (_req: Request, res: Response) => {
     const result = await watchlistService.getAllUniqueTickers()
     return res.json(result)
   },
