@@ -28,7 +28,8 @@ export const briefingController = {
   create: async (req: Request, res: Response) => {
     const { user_id, full_summary, short_summary, sources, notif_sent } = req.body
     const sourcesString = Array.isArray(sources) ? JSON.stringify(sources) : sources
-    const result = await briefingService.create({ user_id, full_summary, short_summary, sources: sourcesString, notif_sent })
+    const notif_sentBool = typeof notif_sent === 'string' ? notif_sent === 'true' : notif_sent
+    const result = await briefingService.create({ user_id, full_summary, short_summary, sources: sourcesString, notif_sent: notif_sentBool })
     res.status(201).json(result)
   },
 
@@ -37,6 +38,9 @@ export const briefingController = {
     const data = { ...req.body }
     if (data.sources && Array.isArray(data.sources)) {
       data.sources = JSON.stringify(data.sources)
+    }
+    if (data.notif_sent !== undefined) {
+      data.notif_sent = typeof data.notif_sent === 'string' ? data.notif_sent === 'true' : data.notif_sent
     }
     const result = await briefingService.update(briefingId, data)
     res.json(result)
