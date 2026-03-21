@@ -6,6 +6,20 @@ export const userService = {
         return await prisma.user.findFirst({
             where: {
                 user_id: userId
+            },
+            include: {
+                briefing: true,
+                watchlist: true
+            }
+        })
+    },
+    getTickers: async (userId: string) => {
+        return await prisma.watchlist.findMany({
+            where: {
+                user_id: userId
+            },
+            select: {
+                ticker: true
             }
         })
     },

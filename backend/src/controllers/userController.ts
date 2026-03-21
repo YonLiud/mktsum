@@ -13,6 +13,12 @@ export const userController = {
     res.json(result)
   },
 
+  getTickers: async (req: Request, res: Response) => {
+    const { userId } = req.params as { userId: string }
+    const result = await userService.getTickers(userId)
+    res.json(result)
+  },
+
   create: async (req: Request, res: Response) => {
     const { name, ntfy_topic } = req.body
     const result = await userService.create({ name, ntfy_topic })

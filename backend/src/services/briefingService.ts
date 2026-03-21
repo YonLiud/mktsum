@@ -17,6 +17,12 @@ export const briefingService = {
             where: {user_id: userId}
         })
     },
+    getLatestByUser: async (userId: string) => {
+        return await prisma.briefing.findFirst({
+            where: {user_id: userId},
+            orderBy: {created_at: 'desc'}
+        })
+    },
     create: async (data: { user_id: string, full_summary: string, short_summary: string }) => {
         const briefingId = generateId()
 

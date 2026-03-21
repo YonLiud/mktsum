@@ -19,6 +19,12 @@ export const briefingController = {
     res.json(result)
   },
 
+  getLatestByUser: async (req: Request, res: Response) => {
+    const { userId } = req.params as { userId: string }
+    const result = await briefingService.getLatestByUser(userId)
+    res.json(result)
+  },
+
   create: async (req: Request, res: Response) => {
     const { user_id, full_summary, short_summary } = req.body
     const result = await briefingService.create({ user_id, full_summary, short_summary })

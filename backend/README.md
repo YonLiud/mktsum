@@ -35,15 +35,17 @@ npx prisma migrate deploy
 
 #### Users (`/internal/users`)
 - `GET /` - List all users
-- `GET /:userId` - Get user by ID
+- `GET /:userId` - Get user by ID (includes all briefings and tickers)
+- `GET /:userId/tickers` - Get user's tickers only (fast, no briefings)
 - `POST /` - Create user
 - `PATCH /:userId` - Update user
 - `DELETE /:userId` - Delete user
 
 #### Briefings (`/internal/briefings`)
 - `GET /` - List all briefings
+- `GET /user/:userId/latest` - Get user's latest briefing
+- `GET /user/:userId` - Get all briefings for user
 - `GET /:briefingId` - Get briefing by ID
-- `GET /user/:userId` - Get briefings for user
 - `POST /` - Create briefing
 - `PATCH /:briefingId` - Update briefing
 - `DELETE /:briefingId` - Delete briefing
