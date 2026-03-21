@@ -8,6 +8,11 @@ export const userController = {
     res.json(result)
   },
 
+  getAllWithTickers: async (_req: Request, res: Response) => {
+    const result = await userService.getAllWithTickers()
+    res.json(result)
+  },
+
   getById: async (req: Request, res: Response) => {
     const { userId } = req.params as { userId: string }
     const result = await userService.getById(userId)

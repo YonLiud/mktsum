@@ -4,6 +4,7 @@ import { userController } from '../../controllers/userController.ts'
 const router = Router()
 
 router.get('/', userController.getAll)
+router.get('/with-tickers', userController.getAllWithTickers)
 router.get('/:userId/tickers', userController.getTickers)
 router.get('/:userId/briefings', userController.getBriefings)
 router.get('/:userId', userController.getById)

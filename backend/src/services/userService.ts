@@ -26,6 +26,17 @@ export const userService = {
     getAll: async () => {
         return await prisma.user.findMany()
     },
+    getAllWithTickers: async () => {
+        return await prisma.user.findMany({
+            include: {
+                watchlist: {
+                    select: {
+                        ticker: true
+                    }
+                }
+            }
+        })
+    },
     create: async (data: { name: string; ntfy_topic: string}) => {
         const userId = generateId()
         return await prisma.user.create({

@@ -35,6 +35,7 @@ npx prisma migrate deploy
 
 #### Users (`/internal/users`)
 - `GET /` - List all users
+- `GET /with-tickers` - Get all users with their tickers
 - `GET /:userId` - Get user by ID (includes all briefings and tickers)
 - `GET /:userId/tickers` - Get user's tickers only (fast, no briefings)
 - `POST /` - Create user
