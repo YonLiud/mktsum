@@ -77,6 +77,7 @@ npx prisma migrate deploy
 | `full_summary` | String | Complete briefing summary |
 | `short_summary` | String | Condensed briefing summary |
 | `sources` | String (optional) | Sources used for the briefing |
+| `notif_sent` | Boolean | Whether notification has been sent (default: false) |
 | `created_at` | DateTime | Timestamp of creation |
 
 ### Watchlist
