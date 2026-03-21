@@ -31,6 +31,7 @@ model Briefing {
   user_id       String
   full_summary  String
   short_summary String
+  sources       String?
   created_at    DateTime  @default(now())
 
   user          User      @relation(fields: [user_id], references: [user_id])
