@@ -20,3 +20,39 @@ Server runs on port 5000.
 npx prisma migrate deploy
 ```
 
+## API Routes
+
+### Public API (`/api`)
+
+#### Briefings (`/api/briefings`)
+- `GET /` - List all briefings
+- `GET /:briefingId` - Get briefing by ID
+
+#### Watchlists (`/api/watchlists`)
+- `GET /tickers` - Get all unique tickers
+
+### Internal API (`/internal`) - Engine Only
+
+#### Users (`/internal/users`)
+- `GET /` - List all users
+- `GET /:userId` - Get user by ID
+- `POST /` - Create user
+- `PATCH /:userId` - Update user
+- `DELETE /:userId` - Delete user
+
+#### Briefings (`/internal/briefings`)
+- `GET /` - List all briefings
+- `GET /:briefingId` - Get briefing by ID
+- `GET /user/:userId` - Get briefings for user
+- `POST /` - Create briefing
+- `PATCH /:briefingId` - Update briefing
+- `DELETE /:briefingId` - Delete briefing
+
+#### Watchlists (`/internal/watchlists`)
+- `GET /tickers` - Get all unique tickers
+- `POST /users` - Get users by ticker (body: `{ticker}`)
+- `POST /check` - Check if user has ticker (body: `{user_id, ticker}`)
+- `POST /` - Add ticker to watchlist (body: `{user_id, ticker}`)
+- `POST /list` - Get user's watchlist (body: `{user_id}`)
+- `DELETE /` - Remove ticker from watchlist (body: `{user_id, ticker}`)
+
