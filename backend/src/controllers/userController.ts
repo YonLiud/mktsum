@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express'
 import { userService } from '../services/userService.ts'
+import { briefingService } from '../services/briefingService.ts'
 
 export const userController = {
   getAll: async (_req: Request, res: Response) => {
@@ -16,6 +17,12 @@ export const userController = {
   getTickers: async (req: Request, res: Response) => {
     const { userId } = req.params as { userId: string }
     const result = await userService.getTickers(userId)
+    res.json(result)
+  },
+
+  getBriefings: async (req: Request, res: Response) => {
+    const { userId } = req.params as { userId: string }
+    const result = await briefingService.getByUser(userId)
     res.json(result)
   },
 

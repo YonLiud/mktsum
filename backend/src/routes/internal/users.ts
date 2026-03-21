@@ -5,6 +5,7 @@ const router = Router()
 
 router.get('/', userController.getAll)
 router.get('/:userId/tickers', userController.getTickers)
+router.get('/:userId/briefings', userController.getBriefings)
 router.get('/:userId', userController.getById)
 router.post('/', userController.create)
 router.patch('/:userId', userController.update)

@@ -58,3 +58,27 @@ npx prisma migrate deploy
 - `POST /list` - Get user's watchlist (body: `{user_id}`)
 - `DELETE /` - Remove ticker from watchlist (body: `{user_id, ticker}`)
 
+## Database Schema
+
+### User
+- `user_id` (String, Primary Key) — 12-character unique identifier
+- `name` (String) — User's display name
+- `ntfy_topic` (String) — Topic for notifications
+- `created_at` (DateTime) — Timestamp of creation
+- Relations: `briefing[]`, `watchlist[]`
+
+### Briefing
+- `briefing_id` (String, Primary Key) — 12-character unique identifier
+- `user_id` (String, Foreign Key) — Reference to User
+- `full_summary` (String) — Complete briefing summary
+- `short_summary` (String) — Condensed briefing summary
+- `created_at` (DateTime) — Timestamp of creation
+- Relations: `user` (User)
+
+### Watchlist
+- `watchlist_id` (String, Primary Key) — 12-character unique identifier
+- `user_id` (String, Foreign Key) — Reference to User
+- `ticker` (String) — Stock ticker symbol (e.g., "AAPL", "GOOGL")
+- `created_at` (DateTime) — Timestamp of creation
+- Relations: `user` (User)
+

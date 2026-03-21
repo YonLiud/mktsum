@@ -143,4 +143,25 @@ describe('userController (HTTP)', () => {
     expect(Array.isArray(res.body)).toBe(true)
     expect(res.body.some((t: any) => t.ticker === 'MSFT')).toBe(true)
   })
+
+  it('GET /:userId/briefings — returns user briefings', async () => {
+    const created = await userService.create({ name: 'Test_HTTP_Briefings', ntfy_topic: 'briefings' })
+    createdIds.push(created.user_id)
+    const { briefingService } = await import('../services/briefingService.ts')
+    await briefingService.create({
+      user_id: created.user_id,
+      full_summary: 'Test_Briefing_1',
+      short_summary: 'TB1',
+    })
+    await briefingService.create({
+      user_id: created.user_id,
+      full_summary: 'Test_Briefing_2',
+      short_summary: 'TB2',
+    })
+    const res = await request(app).get(`/${created.user_id}/briefings`)
+    expect(res.status).toBe(200)
+    expect(Array.isArray(res.body)).toBe(true)
+    expect(res.body.length).toBe(2)
+    expect(res.body.every((b: any) => b.user_id === created.user_id)).toBe(true)
+  })
 })
