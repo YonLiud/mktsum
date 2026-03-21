@@ -76,6 +76,7 @@ npx prisma migrate deploy
 | `user_id` | String (FK) | Reference to User |
 | `full_summary` | String | Complete briefing summary |
 | `short_summary` | String | Condensed briefing summary |
+| `sources` | String (optional) | Sources used for the briefing |
 | `created_at` | DateTime | Timestamp of creation |
 
 ### Watchlist
