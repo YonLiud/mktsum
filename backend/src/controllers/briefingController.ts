@@ -27,13 +27,17 @@ export const briefingController = {
 
   create: async (req: Request, res: Response) => {
     const { user_id, full_summary, short_summary, sources, notif_sent } = req.body
-    const result = await briefingService.create({ user_id, full_summary, short_summary, sources, notif_sent })
+    const sourcesString = Array.isArray(sources) ? JSON.stringify(sources) : sources
+    const result = await briefingService.create({ user_id, full_summary, short_summary, sources: sourcesString, notif_sent })
     res.status(201).json(result)
   },
 
   update: async (req: Request, res: Response) => {
     const { briefingId } = req.params as { briefingId: string }
-    const data = req.body
+    const data = { ...req.body }
+    if (data.sources && Array.isArray(data.sources)) {
+      data.sources = JSON.stringify(data.sources)
+    }
     const result = await briefingService.update(briefingId, data)
     res.json(result)
   },
