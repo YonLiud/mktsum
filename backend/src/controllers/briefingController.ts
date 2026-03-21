@@ -26,8 +26,8 @@ export const briefingController = {
   },
 
   create: async (req: Request, res: Response) => {
-    const { user_id, full_summary, short_summary } = req.body
-    const result = await briefingService.create({ user_id, full_summary, short_summary })
+    const { user_id, full_summary, short_summary, sources } = req.body
+    const result = await briefingService.create({ user_id, full_summary, short_summary, sources })
     res.status(201).json(result)
   },
 

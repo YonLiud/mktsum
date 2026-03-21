@@ -23,7 +23,7 @@ export const briefingService = {
             orderBy: {created_at: 'desc'}
         })
     },
-    create: async (data: { user_id: string, full_summary: string, short_summary: string }) => {
+    create: async (data: { user_id: string, full_summary: string, short_summary: string, sources?: string }) => {
         const briefingId = generateId()
 
         return await prisma.briefing.create({
@@ -33,7 +33,7 @@ export const briefingService = {
             }
         })
     },
-    update: async (briefingId: string, data: Partial<{ full_summary: string; short_summary: string }>) => {
+    update: async (briefingId: string, data: Partial<{ full_summary: string; short_summary: string; sources: string }>) => {
         return await prisma.briefing.update({
             where: { briefing_id: briefingId },
             data
