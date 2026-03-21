@@ -1,41 +1,34 @@
-import { prisma } from '../lib/prisma.js'
+import type { Request, Response } from 'express'
+import { userService } from '../services/userService.ts'
 
 export const userController = {
-  getAll: async () => {
-    return await prisma.user.findMany({
-      include: {
-        watchlist: true,
-        briefing: true,
-      },
-    })
+  getAll: async (_req: Request, res: Response) => {
+    const result = await userService.getAll()
+    res.json(result)
   },
 
-  getOne: async (userId: number) => {
-    return await prisma.user.findUnique({
-      where: { user_id: userId },
-      include: {
-        watchlist: true,
-        briefing: true,
-      },
-    })
+  getById: async (req: Request, res: Response) => {
+    const { userId } = req.params as { userId: string }
+    const result = await userService.getById(userId)
+    res.json(result)
   },
 
-  create: async (data: { name: string; ntfy_topic: string }) => {
-    return await prisma.user.create({
-      data,
-    })
+  create: async (req: Request, res: Response) => {
+    const { name, ntfy_topic } = req.body
+    const result = await userService.create({ name, ntfy_topic })
+    res.status(201).json(result)
   },
 
-  update: async (userId: number, data: Partial<{ name: string; ntfy_topic: string }>) => {
-    return await prisma.user.update({
-      where: { user_id: userId },
-      data,
-    })
+  update: async (req: Request, res: Response) => {
+    const { userId } = req.params as { userId: string }
+    const data = req.body
+    const result = await userService.update(userId, data)
+    res.json(result)
   },
 
-  delete: async (userId: number) => {
-    return await prisma.user.delete({
-      where: { user_id: userId },
-    })
+  delete: async (req: Request, res: Response) => {
+    const { userId } = req.params as { userId: string }
+    const result = await userService.delete(userId)
+    res.json(result)
   },
 }

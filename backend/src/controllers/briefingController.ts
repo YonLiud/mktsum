@@ -1,48 +1,40 @@
-import { prisma } from '../lib/prisma.js'
+import type { Request, Response } from 'express'
+import { briefingService } from '../services/briefingService.ts'
 
 export const briefingController = {
-  getAll: async () => {
-    return await prisma.briefing.findMany({
-      include: {
-        user: true,
-      },
-    })
+  getAll: async (_req: Request, res: Response) => {
+    const result = await briefingService.getAll()
+    res.json(result)
   },
 
-  getOne: async (briefingId: number) => {
-    return await prisma.briefing.findUnique({
-      where: { briefing_id: briefingId },
-      include: {
-        user: true,
-      },
-    })
+  getById: async (req: Request, res: Response) => {
+    const { briefingId } = req.params as { briefingId: string }
+    const result = await briefingService.getById(briefingId)
+    res.json(result)
   },
 
-  getByIdentifier: async (identifier: string) => {
-    return await prisma.briefing.findUnique({
-      where: { identifier },
-      include: {
-        user: true,
-      },
-    })
+  getByUser: async (req: Request, res: Response) => {
+    const { userId } = req.params as { userId: string }
+    const result = await briefingService.getByUser(userId)
+    res.json(result)
   },
 
-  create: async (data: { user_id: number; full_summary: string; short_summary: string }) => {
-    return await prisma.briefing.create({
-      data,
-    })
+  create: async (req: Request, res: Response) => {
+    const { user_id, full_summary, short_summary } = req.body
+    const result = await briefingService.create({ user_id, full_summary, short_summary })
+    res.status(201).json(result)
   },
 
-  update: async (briefingId: number, data: Partial<{ full_summary: string; short_summary: string }>) => {
-    return await prisma.briefing.update({
-      where: { briefing_id: briefingId },
-      data,
-    })
+  update: async (req: Request, res: Response) => {
+    const { briefingId } = req.params as { briefingId: string }
+    const data = req.body
+    const result = await briefingService.update(briefingId, data)
+    res.json(result)
   },
 
-  delete: async (briefingId: number) => {
-    return await prisma.briefing.delete({
-      where: { briefing_id: briefingId },
-    })
+  delete: async (req: Request, res: Response) => {
+    const { briefingId } = req.params as { briefingId: string }
+    const result = await briefingService.delete(briefingId)
+    res.json(result)
   },
 }
