@@ -123,7 +123,7 @@ describe('briefingService', () => {
     })
     const userBriefings = await briefingService.getByUser(testUserId)
     expect(userBriefings.length).toBe(1)
-    expect(userBriefings[0].user_id).toBe(testUserId)
+    expect(userBriefings[0]!.user_id).toBe(testUserId)
   })
 
   it('update — modifies briefing', async () => {
@@ -202,8 +202,9 @@ describe('briefingService', () => {
       short_summary: 'L1',
     })
     const result = await briefingService.getLatestByUser(testUserId)
-    expect(result?.briefing_id).toBe(latest.briefing_id)
-    expect(result?.full_summary).toBe('Latest')
+    expect(result).toBeTruthy()
+    expect(result!.briefing_id).toBe(latest.briefing_id)
+    expect(result!.full_summary).toBe('Latest')
   })
 })
 
