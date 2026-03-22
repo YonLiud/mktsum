@@ -2,6 +2,7 @@ import 'dotenv/config'
 import express from 'express'
 import { loadRoutes } from './utils/loadRoutes.ts'
 import { errorHandler } from './middleware/errorHandler.ts'
+import { corsMiddleware } from './middleware/cors.ts'
 import { prisma } from './lib/prisma.ts'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
@@ -12,6 +13,7 @@ const __dirname = dirname(__filename)
 const app = express()
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 5000
 
+app.use(corsMiddleware)
 app.use(express.json({ limit: '10mb' }))
 
 async function start() {
