@@ -49,6 +49,38 @@ describe('briefingService', () => {
     expect(result.user_id).toBe(testUserId)
     expect(result.full_summary).toBe('Test_Full')
     expect(result.short_summary).toBe('Test_Short')
+    expect(result.notif_sent).toBe(false)
+  })
+
+  it('create — handles notif_sent as true', async () => {
+    const result = await briefingService.create({
+      user_id: testUserId,
+      full_summary: 'Test_Full',
+      short_summary: 'Test_Short',
+      notif_sent: true,
+    })
+    expect(result.notif_sent).toBe(true)
+  })
+
+  it('create — handles notif_sent as false', async () => {
+    const result = await briefingService.create({
+      user_id: testUserId,
+      full_summary: 'Test_Full',
+      short_summary: 'Test_Short',
+      notif_sent: false,
+    })
+    expect(result.notif_sent).toBe(false)
+  })
+
+  it('create — stores sources as JSON string', async () => {
+    const sources = ['Source1', 'Source2', 'Source3']
+    const result = await briefingService.create({
+      user_id: testUserId,
+      full_summary: 'Test_Full',
+      short_summary: 'Test_Short',
+      sources: JSON.stringify(sources),
+    })
+    expect(result.sources).toBe(JSON.stringify(sources))
   })
 
   it('getById — returns correct briefing', async () => {
@@ -107,6 +139,45 @@ describe('briefingService', () => {
     expect(updated.short_summary).toBe('Old_Short')
   })
 
+  it('update — updates notif_sent to true', async () => {
+    const created = await briefingService.create({
+      user_id: testUserId,
+      full_summary: 'Test_Full',
+      short_summary: 'Test_Short',
+      notif_sent: false,
+    })
+    const updated = await briefingService.update(created.briefing_id, {
+      notif_sent: true,
+    })
+    expect(updated.notif_sent).toBe(true)
+  })
+
+  it('update — updates notif_sent to false', async () => {
+    const created = await briefingService.create({
+      user_id: testUserId,
+      full_summary: 'Test_Full',
+      short_summary: 'Test_Short',
+      notif_sent: true,
+    })
+    const updated = await briefingService.update(created.briefing_id, {
+      notif_sent: false,
+    })
+    expect(updated.notif_sent).toBe(false)
+  })
+
+  it('update — updates sources', async () => {
+    const created = await briefingService.create({
+      user_id: testUserId,
+      full_summary: 'Test_Full',
+      short_summary: 'Test_Short',
+    })
+    const newSources = ['NewSource1', 'NewSource2']
+    const updated = await briefingService.update(created.briefing_id, {
+      sources: JSON.stringify(newSources),
+    })
+    expect(updated.sources).toBe(JSON.stringify(newSources))
+  })
+
   it('delete — removes briefing', async () => {
     const created = await briefingService.create({
       user_id: testUserId,
@@ -148,6 +219,62 @@ describe('briefingController (HTTP)', () => {
     expect(res.status).toBe(201)
     expect(res.body.briefing_id).toBeTruthy()
     expect(res.body.full_summary).toBe('Test_HTTP_Full')
+    expect(res.body.notif_sent).toBe(false)
+  })
+
+  it('POST / — creates briefing with notif_sent boolean', async () => {
+    const res = await request(app)
+      .post('/')
+      .send({
+        user_id: testUserId,
+        full_summary: 'Test_HTTP_Full',
+        short_summary: 'Test_HTTP_Short',
+        notif_sent: true,
+      })
+    expect(res.status).toBe(201)
+    expect(res.body.notif_sent).toBe(true)
+  })
+
+  it('POST / — creates briefing with notif_sent string conversion', async () => {
+    const res = await request(app)
+      .post('/')
+      .send({
+        user_id: testUserId,
+        full_summary: 'Test_HTTP_Full',
+        short_summary: 'Test_HTTP_Short',
+        notif_sent: 'true',
+      })
+    expect(res.status).toBe(201)
+    expect(res.body.notif_sent).toBe(true)
+  })
+
+  it('POST / — creates briefing with sources array', async () => {
+    const sources = ['Source1', 'Source2']
+    const res = await request(app)
+      .post('/')
+      .send({
+        user_id: testUserId,
+        full_summary: 'Test_HTTP_Full',
+        short_summary: 'Test_HTTP_Short',
+        sources: sources,
+      })
+    expect(res.status).toBe(201)
+    expect(res.body.sources).toBe(JSON.stringify(sources))
+  })
+
+  it('POST / — creates briefing with sources string', async () => {
+    const sources = ['Source1', 'Source2']
+    const sourceString = JSON.stringify(sources)
+    const res = await request(app)
+      .post('/')
+      .send({
+        user_id: testUserId,
+        full_summary: 'Test_HTTP_Full',
+        short_summary: 'Test_HTTP_Short',
+        sources: sourceString,
+      })
+    expect(res.status).toBe(201)
+    expect(res.body.sources).toBe(sourceString)
   })
 
   it('GET / — returns briefings array', async () => {
@@ -198,6 +325,48 @@ describe('briefingController (HTTP)', () => {
     expect(res.status).toBe(200)
     expect(res.body.full_summary).toBe('Test_Patch_New')
     expect(res.body.short_summary).toBe('Old')
+  })
+
+  it('PATCH /:briefingId — updates notif_sent boolean', async () => {
+    const created = await briefingService.create({
+      user_id: testUserId,
+      full_summary: 'Test_Patch_Full',
+      short_summary: 'TP',
+      notif_sent: false,
+    })
+    const res = await request(app)
+      .patch(`/${created.briefing_id}`)
+      .send({ notif_sent: true })
+    expect(res.status).toBe(200)
+    expect(res.body.notif_sent).toBe(true)
+  })
+
+  it('PATCH /:briefingId — updates notif_sent string conversion', async () => {
+    const created = await briefingService.create({
+      user_id: testUserId,
+      full_summary: 'Test_Patch_Full',
+      short_summary: 'TP',
+      notif_sent: false,
+    })
+    const res = await request(app)
+      .patch(`/${created.briefing_id}`)
+      .send({ notif_sent: 'true' })
+    expect(res.status).toBe(200)
+    expect(res.body.notif_sent).toBe(true)
+  })
+
+  it('PATCH /:briefingId — updates sources array', async () => {
+    const created = await briefingService.create({
+      user_id: testUserId,
+      full_summary: 'Test_Patch_Full',
+      short_summary: 'TP',
+    })
+    const newSources = ['NewSource1', 'NewSource2']
+    const res = await request(app)
+      .patch(`/${created.briefing_id}`)
+      .send({ sources: newSources })
+    expect(res.status).toBe(200)
+    expect(res.body.sources).toBe(JSON.stringify(newSources))
   })
 
   it('GET /user/:userId/latest — returns latest briefing', async () => {
