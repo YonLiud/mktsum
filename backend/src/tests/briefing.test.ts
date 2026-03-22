@@ -6,13 +6,12 @@ import { userService } from '../services/userService.ts'
 import express from 'express'
 import request from 'supertest'
 import briefingRouter from '../routes/internal/briefings.ts'
+import { errorHandler } from '../middleware/errorHandler.ts'
 
 const app = express()
 app.use(express.json())
 app.use(briefingRouter)
-app.use((err: any, _req: any, res: any, _next: any) => {
-  res.status(500).json({ error: err.message })
-})
+app.use(errorHandler)
 
 let testUserId: string
 const createdUserIds: string[] = []

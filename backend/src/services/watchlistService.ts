@@ -1,7 +1,42 @@
 import { prisma } from "../lib/prisma.ts"
 import { generateId } from "../lib/nanoid.ts"
 
+class ValidationError extends Error {
+  constructor(public statusCode: number, message: string) {
+    super(message)
+  }
+}
+
 export const watchlistService = {
+    validateAddTicker: (userId: string, ticker: string) => {
+        if (!userId || typeof userId !== 'string' || userId.trim().length === 0) {
+            throw new ValidationError(400, 'Invalid or missing user_id')
+        }
+
+        if (!ticker || typeof ticker !== 'string' || ticker.trim().length === 0) {
+            throw new ValidationError(400, 'Invalid or missing ticker')
+        }
+
+        return {
+            user_id: userId.trim(),
+            ticker: ticker.trim().toUpperCase(),
+        }
+    },
+
+    validateRemoveTicker: (userId: string, ticker: string) => {
+        if (!userId || typeof userId !== 'string' || userId.trim().length === 0) {
+            throw new ValidationError(400, 'Invalid or missing user_id')
+        }
+
+        if (!ticker || typeof ticker !== 'string' || ticker.trim().length === 0) {
+            throw new ValidationError(400, 'Invalid or missing ticker')
+        }
+
+        return {
+            user_id: userId.trim(),
+            ticker: ticker.trim().toUpperCase(),
+        }
+    },
     getByUser: async (userId: string) => {
         return prisma.watchlist.findMany({
             where: {

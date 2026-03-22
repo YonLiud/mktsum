@@ -1,54 +1,110 @@
-import type { Request, Response } from 'express'
+import type { Request, Response, NextFunction } from 'express'
 import { briefingService } from '../services/briefingService.ts'
+import { AppError } from '../middleware/errorHandler.ts'
 
 export const briefingController = {
-  getAll: async (_req: Request, res: Response) => {
-    const result = await briefingService.getAll()
-    res.json(result)
-  },
-
-  getById: async (req: Request, res: Response) => {
-    const { briefingId } = req.params as { briefingId: string }
-    const result = await briefingService.getById(briefingId)
-    res.json(result)
-  },
-
-  getByUser: async (req: Request, res: Response) => {
-    const { userId } = req.params as { userId: string }
-    const result = await briefingService.getByUser(userId)
-    res.json(result)
-  },
-
-  getLatestByUser: async (req: Request, res: Response) => {
-    const { userId } = req.params as { userId: string }
-    const result = await briefingService.getLatestByUser(userId)
-    res.json(result)
-  },
-
-  create: async (req: Request, res: Response) => {
-    const { user_id, full_summary, short_summary, sources, notif_sent } = req.body
-    const sourcesString = Array.isArray(sources) ? JSON.stringify(sources) : sources
-    const notif_sentBool = typeof notif_sent === 'string' ? notif_sent === 'true' : notif_sent
-    const result = await briefingService.create({ user_id, full_summary, short_summary, sources: sourcesString, notif_sent: notif_sentBool })
-    res.status(201).json(result)
-  },
-
-  update: async (req: Request, res: Response) => {
-    const { briefingId } = req.params as { briefingId: string }
-    const data = { ...req.body }
-    if (data.sources && Array.isArray(data.sources)) {
-      data.sources = JSON.stringify(data.sources)
+  getAll: async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await briefingService.getAll()
+      res.status(200).json(result)
+    } catch (error) {
+      next(error)
     }
-    if (data.notif_sent !== undefined) {
-      data.notif_sent = typeof data.notif_sent === 'string' ? data.notif_sent === 'true' : data.notif_sent
-    }
-    const result = await briefingService.update(briefingId, data)
-    res.json(result)
   },
 
-  delete: async (req: Request, res: Response) => {
-    const { briefingId } = req.params as { briefingId: string }
-    const result = await briefingService.delete(briefingId)
-    res.json(result)
+  getById: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { briefingId } = req.params as { briefingId: string }
+
+      if (!briefingId || typeof briefingId !== 'string' || briefingId.trim().length === 0) {
+        throw new AppError('Invalid briefing_id', 400)
+      }
+
+      const result = await briefingService.getById(briefingId)
+
+      if (!result) {
+        throw new AppError('Briefing not found', 404)
+      }
+
+      res.status(200).json(result)
+    } catch (error) {
+      next(error)
+    }
+  },
+
+  getByUser: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { userId } = req.params as { userId: string }
+
+      if (!userId || typeof userId !== 'string' || userId.trim().length === 0) {
+        throw new AppError('Invalid user_id', 400)
+      }
+
+      const result = await briefingService.getByUser(userId)
+      res.status(200).json(result)
+    } catch (error) {
+      next(error)
+    }
+  },
+
+  getLatestByUser: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { userId } = req.params as { userId: string }
+
+      if (!userId || typeof userId !== 'string' || userId.trim().length === 0) {
+        throw new AppError('Invalid user_id', 400)
+      }
+
+      const result = await briefingService.getLatestByUser(userId)
+
+      if (!result) {
+        throw new AppError('No briefings found for user', 404)
+      }
+
+      res.status(200).json(result)
+    } catch (error) {
+      next(error)
+    }
+  },
+
+  create: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const validated = briefingService.validateCreate(req.body)
+      const result = await briefingService.create(validated)
+      res.status(201).json(result)
+    } catch (error) {
+      next(error)
+    }
+  },
+
+  update: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { briefingId } = req.params as { briefingId: string }
+
+      if (!briefingId || typeof briefingId !== 'string' || briefingId.trim().length === 0) {
+        throw new AppError('Invalid briefing_id', 400)
+      }
+
+      const validated = briefingService.validateUpdate(req.body)
+      const result = await briefingService.update(briefingId, validated)
+      res.status(200).json(result)
+    } catch (error) {
+      next(error)
+    }
+  },
+
+  delete: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { briefingId } = req.params as { briefingId: string }
+
+      if (!briefingId || typeof briefingId !== 'string' || briefingId.trim().length === 0) {
+        throw new AppError('Invalid briefing_id', 400)
+      }
+
+      const result = await briefingService.delete(briefingId)
+      res.status(200).json(result)
+    } catch (error) {
+      next(error)
+    }
   },
 }
