@@ -2,6 +2,7 @@ import 'dotenv/config'
 import express from 'express'
 import { loadRoutes } from './utils/loadRoutes.ts'
 import { errorHandler } from './middleware/errorHandler.ts'
+import { prisma } from './lib/prisma.ts'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 
@@ -23,9 +24,34 @@ async function start() {
 
     app.use(errorHandler)
 
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
       console.log(`server running on port ${PORT}`)
     })
+
+    // Graceful shutdown handler
+    const gracefulShutdown = async (signal: string) => {
+      console.log(`\nReceived ${signal}, starting graceful shutdown...`)
+
+      server.close(async () => {
+        try {
+          await prisma.$disconnect()
+          console.log('Database connection closed')
+          process.exit(0)
+        } catch (error) {
+          console.error('Error during shutdown:', error)
+          process.exit(1)
+        }
+      })
+
+      // Force shutdown after 30 seconds
+      setTimeout(() => {
+        console.error('Graceful shutdown timeout, force exiting...')
+        process.exit(1)
+      }, 30000)
+    }
+
+    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'))
+    process.on('SIGINT', () => gracefulShutdown('SIGINT'))
   } catch (error) {
     console.error('Failed to start server:', error)
     process.exit(1)
