@@ -1,5 +1,6 @@
 import type { Context } from 'hono'
 import { briefingService } from '../services/briefings'
+import { createBriefingSchema, bulkCreateBriefingSchema } from '../validators/briefings'
 
 export const briefingController = {
   getByUserId: async (c: Context) => {
@@ -22,13 +23,17 @@ export const briefingController = {
 
   create: async (c: Context) => {
     const body = await c.req.json()
-    const briefing = await briefingService.create(body)
+    const result = createBriefingSchema.safeParse(body)
+    if (!result.success) return c.json({ error: result.error.flatten() }, 400)
+    const briefing = await briefingService.create(result.data)
     return c.json(briefing, 201)
   },
 
   bulkCreate: async (c: Context) => {
     const body = await c.req.json()
-    const briefings = await briefingService.bulkCreate(body)
+    const result = bulkCreateBriefingSchema.safeParse(body)
+    if (!result.success) return c.json({ error: result.error.flatten() }, 400)
+    const briefings = await briefingService.bulkCreate(result.data)
     return c.json(briefings, 201)
   },
 
