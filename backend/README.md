@@ -61,11 +61,7 @@ TEST_DATABASE_URL=
 ### Internal API (`/internal`) - Engine Only
 
 #### Users (`/internal/users`)
-- `GET /` - List all users
-- `GET /:id` - Get user by ID
-- `POST /` - Create user
-- `PATCH /:id` - Update user
-- `DELETE /:id` - Delete user
+
 
 #### Briefings (`/internal/briefings`)
 - `GET /pending` - Get all unsent briefings
