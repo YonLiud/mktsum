@@ -1,5 +1,5 @@
 {
-  "id": "3993bb6b-87c5-465a-8c95-bcb7b3043cec",
+  "id": "00c5eea8-3c52-4246-ba88-286d7e5f35f9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -143,7 +143,29 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "user_ticker_unique": {
+          "name": "user_ticker_unique",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "ticker",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "watchlist_user_id_users_user_id_fk": {
           "name": "watchlist_user_id_users_user_id_fk",
