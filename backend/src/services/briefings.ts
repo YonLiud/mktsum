@@ -25,7 +25,7 @@ export const briefingService = {
     user_id: string
     full_summary: string
     short_summary: string
-    sources?: string[]
+    sources?: { ticker: string; title: string; url: string }[]
   }) => {
     const briefing_id = generateId()
     const [briefing] = await db.insert(briefings).values({ briefing_id, ...data }).returning()
@@ -36,7 +36,7 @@ export const briefingService = {
     user_id: string
     full_summary: string
     short_summary: string
-    sources?: string[]
+    sources?: { ticker: string; title: string; url: string }[]
   }[]) => {
     const values = data.map(d => ({ briefing_id: generateId(), ...d }))
     return await db.insert(briefings).values(values).returning()
