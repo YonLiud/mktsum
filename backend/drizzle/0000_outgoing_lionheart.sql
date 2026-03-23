@@ -3,7 +3,7 @@ CREATE TABLE "briefings" (
 	"user_id" text NOT NULL,
 	"full_summary" text NOT NULL,
 	"short_summary" text NOT NULL,
-	"sources" text[],
+	"sources" jsonb,
 	"notif_sent" boolean DEFAULT false NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
 );

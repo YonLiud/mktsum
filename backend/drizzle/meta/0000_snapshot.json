@@ -1,5 +1,5 @@
 {
-  "id": "00c5eea8-3c52-4246-ba88-286d7e5f35f9",
+  "id": "2517655d-d995-4e9f-8636-0a290a9b2f5c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -34,7 +34,7 @@
         },
         "sources": {
           "name": "sources",
-          "type": "text[]",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },
