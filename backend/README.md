@@ -1,5 +1,9 @@
 # Backend
 
+```
+Request → Middleware → Route → Controller → Service → DB
+```
+
 ## Run
 
 
