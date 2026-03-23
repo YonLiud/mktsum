@@ -17,7 +17,7 @@ Request → Middleware → Route → Controller → Service → DB
 bun dev
 ```
 
-Server runs on port 3000 (configurable via `PORT` in `.env`).
+Server runs on port 5000 (configurable via `PORT` in `.env`).
 
 ## Migrations
 ```bash
@@ -26,10 +26,13 @@ bun db:migrate    # run migrations against the DB
 bun db:studio     # open Drizzle visual DB browser
 ```
 
+> Note: migrations run automatically on container startup in Docker.
+
 ## Environment Variables
 ```
 DATABASE_URL=
-PORT=3000
+PORT=5000
+TEST_DATABASE_URL=
 ```
 
 ## API Routes
@@ -39,19 +42,19 @@ PORT=3000
 #### Users (`/v1/users`)
 - `GET /` - List all users
 - `GET /:id` - Get user by ID (includes briefings and watchlist)
-- `POST /` - Create user
-- `PATCH /:id` - Update user
+- `POST /` - Create user (body: `{ name, ntfy_topic }`)
+- `PATCH /:id` - Update user (body: `{ name?, ntfy_topic? }`)
 - `DELETE /:id` - Delete user
 
 #### Briefings (`/v1/briefings`)
 - `GET /user/:userId` - Get all briefings for user
 - `GET /user/:userId/latest` - Get user's latest briefing
-- `POST /` - Create briefing
+- `POST /` - Create briefing (body: `{ user_id, full_summary, short_summary, sources? }`)
 - `DELETE /:id` - Delete briefing
 
 #### Watchlist (`/v1/watchlist`)
 - `GET /user/:userId` - Get user's watchlist
-- `POST /user/:userId` - Add ticker to watchlist (body: `{ ticker }`)
+- `POST /user/:userId` - Add ticker (body: `{ ticker }`)
 - `DELETE /:id` - Remove watchlist entry by ID
 - `DELETE /user/:userId/ticker` - Remove ticker by name (body: `{ ticker }`)
 
@@ -66,7 +69,7 @@ PORT=3000
 
 #### Briefings (`/internal/briefings`)
 - `GET /pending` - Get all unsent briefings
-- `POST /bulk` - Bulk create briefings
+- `POST /bulk` - Bulk create briefings (body: array of briefings)
 - `PATCH /:id/sent` - Mark briefing as sent
 
 #### Watchlist (`/internal/watchlist`)
@@ -98,5 +101,5 @@ PORT=3000
 |-------|------|-------------|
 | `watchlist_id` | String (PK) | 12-character nanoid |
 | `user_id` | String (FK) | Reference to User |
-| `ticker` | String | Stock ticker symbol (e.g., "AAPL", "GOOGL") |
+| `ticker` | String | Stock ticker symbol (e.g., "AAPL", "GOOGL") — unique per user |
 | `created_at` | DateTime | Timestamp of creation |
