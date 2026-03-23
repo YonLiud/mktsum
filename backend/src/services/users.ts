@@ -15,7 +15,11 @@ export const userService = {
   },
 
   getAll: async () => {
-    return await db.select().from(users)
+    return await db.query.users.findMany({
+      with: {
+        watchlist: true,
+      },
+    })
   },
 
   getAllWithTickers: async () => {

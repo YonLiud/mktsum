@@ -40,7 +40,7 @@ TEST_DATABASE_URL=
 ### Public API (`/v1`)
 
 #### Users (`/v1/users`)
-- `GET /` - List all users
+- `GET /` - List all users with their watchlist
 - `GET /:id` - Get user by ID (includes briefings and watchlist)
 - `POST /` - Create user (body: `{ name, ntfy_topic }`)
 - `PATCH /:id` - Update user (body: `{ name?, ntfy_topic? }`)
