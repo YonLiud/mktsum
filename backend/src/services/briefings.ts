@@ -4,6 +4,12 @@ import { briefings } from '../db/schema'
 import { generateId } from '../lib/nanoid'
 
 export const briefingService = {
+  getById: async (briefingId: string) => {
+    return await db.query.briefings.findFirst({
+      where: eq(briefings.briefing_id, briefingId),
+    })
+  },
+
   getByUserId: async (userId: string) => {
     return await db.query.briefings.findMany({
       where: eq(briefings.user_id, userId),

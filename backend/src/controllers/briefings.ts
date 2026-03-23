@@ -3,6 +3,13 @@ import { briefingService } from '../services/briefings'
 import { createBriefingSchema, bulkCreateBriefingSchema } from '../validators/briefings'
 
 export const briefingController = {
+  getById: async (c: Context) => {
+    const id = c.req.param('id')!
+    const briefing = await briefingService.getById(id)
+    if (!briefing) return c.json({ error: 'Briefing not found' }, 404)
+    return c.json(briefing)
+  },
+
   getByUserId: async (c: Context) => {
     const userId = c.req.param('userId')!
     const briefings = await briefingService.getByUserId(userId)
