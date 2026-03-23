@@ -1,9 +1,4 @@
-import { Hono } from 'hono'
-import router from './routes'
-
-const app = new Hono()
-
-app.route('/', router)
+import app from './app'
 
 export default {
   port: process.env.PORT ?? 3000,
