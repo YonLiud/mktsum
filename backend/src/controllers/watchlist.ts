@@ -1,5 +1,6 @@
 import type { Context } from 'hono'
 import { watchlistService } from '../services/watchlist'
+import { addTickerSchema, removeTickerSchema } from '../validators/watchlist'
 
 export const watchlistController = {
   getByUserId: async (c: Context) => {
@@ -15,8 +16,10 @@ export const watchlistController = {
 
   add: async (c: Context) => {
     const userId = c.req.param('userId')!
-    const { ticker } = await c.req.json()
-    const entry = await watchlistService.add(userId, ticker)
+    const body = await c.req.json()
+    const result = addTickerSchema.safeParse(body)
+    if (!result.success) return c.json({ error: result.error.flatten() }, 400)
+    const entry = await watchlistService.add(userId, result.data.ticker)
     return c.json(entry, 201)
   },
 
@@ -29,8 +32,10 @@ export const watchlistController = {
 
   removeByTicker: async (c: Context) => {
     const userId = c.req.param('userId')!
-    const { ticker } = await c.req.json()
-    const entry = await watchlistService.removeByTicker(userId, ticker)
+    const body = await c.req.json()
+    const result = removeTickerSchema.safeParse(body)
+    if (!result.success) return c.json({ error: result.error.flatten() }, 400)
+    const entry = await watchlistService.removeByTicker(userId, result.data.ticker)
     if (!entry) return c.json({ error: 'Entry not found' }, 404)
     return c.json({ success: true })
   },
