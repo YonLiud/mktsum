@@ -42,15 +42,18 @@ describe('POST /v1/briefings', () => {
         user_id: user.user_id,
         full_summary: 'Full text.',
         short_summary: 'Short.',
-        sources: ['https://example.com/article1', 'https://example.com/article2'],
+        sources: [
+          { ticker: 'AAPL', title: 'Article 1', url: 'https://example.com/article1' },
+          { ticker: 'GOOG', title: 'Article 2', url: 'https://example.com/article2' },
+        ],
       }),
     })
 
     expect(res.status).toBe(201)
     const briefing = (await res.json()) as any
     expect(briefing.sources).toEqual([
-      'https://example.com/article1',
-      'https://example.com/article2',
+      { ticker: 'AAPL', title: 'Article 1', url: 'https://example.com/article1' },
+      { ticker: 'GOOG', title: 'Article 2', url: 'https://example.com/article2' },
     ])
   })
 })
@@ -174,6 +177,65 @@ describe('GET /internal/briefings/pending', () => {
     const res = await app.request('/internal/briefings/pending')
     expect(res.status).toBe(200)
     expect(await res.json()).toEqual([])
+  })
+})
+
+// ---------------------------------------------------------------------------
+// POST /internal/briefings
+// ---------------------------------------------------------------------------
+describe('POST /internal/briefings', () => {
+  test('creates a briefing and returns 201', async () => {
+    const user = await insertUser()
+
+    const res = await app.request('/internal/briefings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: user.user_id,
+        full_summary: 'Internal full summary.',
+        short_summary: 'Internal short.',
+      }),
+    })
+
+    expect(res.status).toBe(201)
+    const briefing = (await res.json()) as any
+    expect(briefing.briefing_id).toBeDefined()
+    expect(briefing.user_id).toBe(user.user_id)
+    expect(briefing.full_summary).toBe('Internal full summary.')
+    expect(briefing.short_summary).toBe('Internal short.')
+    expect(briefing.notif_sent).toBe(false)
+  })
+
+  test('creates a briefing with sources and returns 201', async () => {
+    const user = await insertUser()
+
+    const res = await app.request('/internal/briefings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: user.user_id,
+        full_summary: 'Full with sources.',
+        short_summary: 'Short.',
+        sources: [{ ticker: 'AAPL', title: 'Apple news', url: 'https://example.com' }],
+      }),
+    })
+
+    expect(res.status).toBe(201)
+    const briefing = (await res.json()) as any
+    expect(briefing.sources).toEqual([
+      { ticker: 'AAPL', title: 'Apple news', url: 'https://example.com' },
+    ])
+  })
+
+  test('returns 400 when required fields are missing', async () => {
+    const res = await app.request('/internal/briefings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: 'someuser' }),
+    })
+
+    expect(res.status).toBe(400)
+    expect((await res.json() as any).error).toBeDefined()
   })
 })
 
