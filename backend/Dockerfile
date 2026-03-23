@@ -11,4 +11,4 @@ COPY . .
 
 EXPOSE 5000
 
-CMD bun db:migrate && bun src/index.ts
+CMD bun /app/src/migrate.ts && bun /app/src/index.ts
