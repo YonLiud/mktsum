@@ -65,6 +65,7 @@ TEST_DATABASE_URL=
 
 #### Briefings (`/internal/briefings`)
 - `GET /pending` - Get all unsent briefings
+- `POST /` - Create single briefing (body: `{ user_id, full_summary, short_summary, sources? }`)
 - `POST /bulk` - Bulk create briefings (body: array of briefings)
 - `PATCH /:id/sent` - Mark briefing as sent
 
