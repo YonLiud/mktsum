@@ -47,6 +47,7 @@ TEST_DATABASE_URL=
 - `DELETE /:id` - Delete user
 
 #### Briefings (`/v1/briefings`)
+- `GET /:id` - Get briefing by ID
 - `GET /user/:userId` - Get all briefings for user
 - `GET /user/:userId/latest` - Get user's latest briefing
 - `POST /` - Create briefing (body: `{ user_id, full_summary, short_summary, sources? }`)

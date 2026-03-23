@@ -59,6 +59,29 @@ describe('POST /v1/briefings', () => {
 })
 
 // ---------------------------------------------------------------------------
+// GET /v1/briefings/:id
+// ---------------------------------------------------------------------------
+describe('GET /v1/briefings/:id', () => {
+  test('returns the briefing for a valid id', async () => {
+    const user = await insertUser()
+    const briefing = await insertBriefing(user.user_id)
+
+    const res = await app.request(`/v1/briefings/${briefing.briefing_id}`)
+    expect(res.status).toBe(200)
+
+    const data = (await res.json()) as any
+    expect(data.briefing_id).toBe(briefing.briefing_id)
+    expect(data.user_id).toBe(user.user_id)
+  })
+
+  test('returns 404 for a nonexistent briefing id', async () => {
+    const res = await app.request('/v1/briefings/doesnotexist')
+    expect(res.status).toBe(404)
+    expect((await res.json() as any).error).toBe('Briefing not found')
+  })
+})
+
+// ---------------------------------------------------------------------------
 // GET /v1/briefings/user/:userId
 // ---------------------------------------------------------------------------
 describe('GET /v1/briefings/user/:userId', () => {
