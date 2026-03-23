@@ -1,4 +1,4 @@
-import { pgTable, text, boolean, timestamp } from 'drizzle-orm/pg-core'
+import { pgTable, text, boolean, timestamp, uniqueIndex } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 
 export const users = pgTable('users', {
@@ -23,7 +23,9 @@ export const watchlist = pgTable('watchlist', {
   user_id: text('user_id').notNull().references(() => users.user_id),
   ticker: text('ticker').notNull(),
   created_at: timestamp('created_at').defaultNow().notNull(),
-})
+}, (table) => [
+  uniqueIndex('user_ticker_unique').on(table.user_id, table.ticker)
+])
 
 export const usersRelations = relations(users, ({ many }) => ({
   briefings: many(briefings),
