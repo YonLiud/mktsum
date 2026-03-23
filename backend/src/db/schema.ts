@@ -1,4 +1,4 @@
-import { pgTable, text, boolean, timestamp, uniqueIndex } from 'drizzle-orm/pg-core'
+import { pgTable, text, boolean, timestamp, uniqueIndex, jsonb } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 
 export const users = pgTable('users', {
@@ -13,7 +13,7 @@ export const briefings = pgTable('briefings', {
   user_id: text('user_id').notNull().references(() => users.user_id),
   full_summary: text('full_summary').notNull(),
   short_summary: text('short_summary').notNull(),
-  sources: text('sources').array(),
+  sources: jsonb('sources'),
   notif_sent: boolean('notif_sent').default(false).notNull(),
   created_at: timestamp('created_at').defaultNow().notNull(),
 })

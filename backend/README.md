@@ -88,7 +88,7 @@ TEST_DATABASE_URL=
 | `user_id` | String (FK) | Reference to User |
 | `full_summary` | String | Complete briefing summary |
 | `short_summary` | String | Condensed briefing summary |
-| `sources` | String[] (optional) | Sources used for the briefing |
+| `sources` | JSONB (optional) | Sources used for the briefing `[{ ticker, title, url }]` |
 | `notif_sent` | Boolean | Whether notification has been sent (default: false) |
 | `created_at` | DateTime | Timestamp of creation |
 

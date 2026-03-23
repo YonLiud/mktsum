@@ -1,0 +1,1 @@
+ALTER TABLE "briefings" ALTER COLUMN "sources" SET DATA TYPE jsonb;
