@@ -8,6 +8,12 @@ CREATE TABLE "briefings" (
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "tickers" (
+	"symbol" text PRIMARY KEY NOT NULL,
+	"name" text NOT NULL,
+	"description" text
+);
+--> statement-breakpoint
 CREATE TABLE "users" (
 	"user_id" text PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
@@ -24,4 +30,5 @@ CREATE TABLE "watchlist" (
 --> statement-breakpoint
 ALTER TABLE "briefings" ADD CONSTRAINT "briefings_user_id_users_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("user_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "watchlist" ADD CONSTRAINT "watchlist_user_id_users_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("user_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "watchlist" ADD CONSTRAINT "watchlist_ticker_tickers_symbol_fk" FOREIGN KEY ("ticker") REFERENCES "public"."tickers"("symbol") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 CREATE UNIQUE INDEX "user_ticker_unique" ON "watchlist" USING btree ("user_id","ticker");

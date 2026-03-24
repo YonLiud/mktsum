@@ -1,5 +1,5 @@
 {
-  "id": "2517655d-d995-4e9f-8636-0a290a9b2f5c",
+  "id": "74d208b7-e52e-4c16-85ae-b9cea46d1039",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -69,6 +69,37 @@
           "onUpdate": "no action"
         }
       },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.tickers": {
+      "name": "tickers",
+      "schema": "",
+      "columns": {
+        "symbol": {
+          "name": "symbol",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -176,6 +207,19 @@
           ],
           "columnsTo": [
             "user_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "watchlist_ticker_tickers_symbol_fk": {
+          "name": "watchlist_ticker_tickers_symbol_fk",
+          "tableFrom": "watchlist",
+          "tableTo": "tickers",
+          "columnsFrom": [
+            "ticker"
+          ],
+          "columnsTo": [
+            "symbol"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
