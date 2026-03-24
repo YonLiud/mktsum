@@ -1,5 +1,5 @@
 import { db } from '../db'
-import { users, briefings, watchlist } from '../db/schema'
+import { users, briefings, watchlist, tickers } from '../db/schema'
 import { generateId } from '../lib/nanoid'
 
 /** Delete all rows in FK-safe order (children before parents). */
@@ -7,6 +7,7 @@ export async function cleanDb() {
   await db.delete(watchlist)
   await db.delete(briefings)
   await db.delete(users)
+  await db.delete(tickers)
 }
 
 export async function insertUser(data?: { name?: string; ntfy_topic?: string }) {
@@ -44,7 +45,17 @@ export async function insertBriefing(
   return briefing
 }
 
+export async function insertTicker(symbol: string, name?: string) {
+  const [ticker] = await db
+    .insert(tickers)
+    .values({ symbol: symbol.toUpperCase(), name: name ?? symbol.toUpperCase() })
+    .onConflictDoNothing()
+    .returning()
+  return ticker
+}
+
 export async function insertWatchlistEntry(userId: string, ticker: string) {
+  await insertTicker(ticker)
   const [entry] = await db
     .insert(watchlist)
     .values({
