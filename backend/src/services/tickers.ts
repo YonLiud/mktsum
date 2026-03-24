@@ -1,0 +1,54 @@
+import yahooFinance from 'yahoo-finance2'
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const yf = yahooFinance as any
+import { eq } from 'drizzle-orm'
+import { db } from '../db'
+import { tickers } from '../db/schema'
+
+export const tickersService = {
+  getAll: async () => {
+    return await db.select().from(tickers)
+  },
+
+  getBySymbol: async (symbol: string) => {
+    const [ticker] = await db.select().from(tickers).where(eq(tickers.symbol, symbol)).limit(1)
+    return ticker ?? null
+  },
+
+  getOrCreate: async (symbol: string) => {
+    const existing = await db.select().from(tickers).where(eq(tickers.symbol, symbol)).limit(1)
+    if (existing.length > 0) return existing[0]
+
+    const quote = await yf.quoteSummary(symbol)
+    const name = quote.shortName ?? quote.longName
+
+    if (!name) throw new Error(`Invalid ticker: ${symbol}`)
+
+    const [ticker] = await db
+      .insert(tickers)
+      .values({ symbol, name, description: null })
+      .returning()
+
+    return ticker
+  },
+
+  refresh: async (symbol: string) => {
+    const quote = await yf.quoteSummary(symbol)
+    const name = quote.shortName ?? quote.longName
+
+    if (!name) throw new Error(`Invalid ticker: ${symbol}`)
+
+    const [ticker] = await db
+      .update(tickers)
+      .set({ name })
+      .where(eq(tickers.symbol, symbol))
+      .returning()
+
+    return ticker
+  },
+
+  refreshAll: async () => {
+    const all = await db.select().from(tickers)
+    return await Promise.all(all.map(t => tickersService.refresh(t.symbol)))
+  },
+}

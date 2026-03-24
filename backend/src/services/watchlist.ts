@@ -2,6 +2,7 @@ import { eq } from 'drizzle-orm'
 import { db } from '../db'
 import { watchlist } from '../db/schema'
 import { generateId } from '../lib/nanoid'
+import { tickersService } from './tickers'
 
 export const watchlistService = {
   getByUserId: async (userId: string) => {
@@ -14,10 +15,12 @@ export const watchlistService = {
   },
 
   add: async (userId: string, ticker: string) => {
+    const symbol = ticker.toUpperCase()
+    await tickersService.getOrCreate(symbol)
     const watchlist_id = generateId()
     const [entry] = await db
       .insert(watchlist)
-      .values({ watchlist_id, user_id: userId, ticker: ticker.toUpperCase() })
+      .values({ watchlist_id, user_id: userId, ticker: symbol })
       .returning()
     return entry
   },
