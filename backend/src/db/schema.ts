@@ -21,11 +21,17 @@ export const briefings = pgTable('briefings', {
 export const watchlist = pgTable('watchlist', {
   watchlist_id: text('watchlist_id').primaryKey(),
   user_id: text('user_id').notNull().references(() => users.user_id),
-  ticker: text('ticker').notNull(),
+  ticker: text('ticker').notNull().references(() => tickers.symbol),
   created_at: timestamp('created_at').defaultNow().notNull(),
 }, (table) => [
   uniqueIndex('user_ticker_unique').on(table.user_id, table.ticker)
 ])
+
+export const tickers = pgTable('tickers', {
+  symbol: text('symbol').primaryKey(),
+  name: text('name').notNull(),
+  description: text('description'),
+})
 
 export const usersRelations = relations(users, ({ many }) => ({
   briefings: many(briefings),
@@ -39,9 +45,17 @@ export const briefingsRelations = relations(briefings, ({ one }) => ({
   }),
 }))
 
+export const tickersRelations = relations(tickers, ({ many }) => ({
+  watchlist: many(watchlist),
+}))
+
 export const watchlistRelations = relations(watchlist, ({ one }) => ({
   user: one(users, {
     fields: [watchlist.user_id],
     references: [users.user_id],
+  }),
+  ticker: one(tickers, {
+    fields: [watchlist.ticker],
+    references: [tickers.symbol],
   }),
 }))
