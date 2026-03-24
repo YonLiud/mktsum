@@ -61,8 +61,6 @@ TEST_DATABASE_URL=
 
 #### Tickers (`/v1/tickers`)
 - `GET /:symbol` - Get ticker by symbol
-- `POST /:symbol/refresh` - Refresh ticker name from Yahoo Finance
-- `POST /refresh-all` - Refresh all tickers from Yahoo Finance
 
 ### Internal API (`/internal`) - Engine Only
 
@@ -80,6 +78,8 @@ TEST_DATABASE_URL=
 
 #### Tickers (`/internal/tickers`)
 - `GET /` - List all cached tickers
+- `POST /:symbol/refresh` - Refresh ticker name from Yahoo Finance
+- `POST /refresh-all` - Refresh all tickers from Yahoo Finance
 
 ## Database Schema
 

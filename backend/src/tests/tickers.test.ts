@@ -72,11 +72,11 @@ describe('GET /v1/tickers/:symbol', () => {
 // ---------------------------------------------------------------------------
 // POST /v1/tickers/:symbol/refresh — real Yahoo Finance calls
 // ---------------------------------------------------------------------------
-describe('POST /v1/tickers/:symbol/refresh', () => {
+describe('POST /internal/tickers/:symbol/refresh', () => {
   test('refreshes an existing ticker and returns updated data for NVDA', async () => {
     await insertTicker('NVDA', 'Old Name')
 
-    const res = await app.request('/v1/tickers/NVDA/refresh', { method: 'POST' })
+    const res = await app.request('/internal/tickers/NVDA/refresh', { method: 'POST' })
     expect(res.status).toBe(200)
 
     const ticker = (await res.json()) as any
@@ -88,7 +88,7 @@ describe('POST /v1/tickers/:symbol/refresh', () => {
   test('returns 404 for a fake ticker', async () => {
     await insertTicker('FAKETICKER', 'Fake')
 
-    const res = await app.request('/v1/tickers/FAKETICKER/refresh', { method: 'POST' })
+    const res = await app.request('/internal/tickers/FAKETICKER/refresh', { method: 'POST' })
     expect(res.status).toBe(404)
   }, 15000)
 })
@@ -96,9 +96,9 @@ describe('POST /v1/tickers/:symbol/refresh', () => {
 // ---------------------------------------------------------------------------
 // POST /v1/tickers/refresh-all
 // ---------------------------------------------------------------------------
-describe('POST /v1/tickers/refresh-all', () => {
+describe('POST /internal/tickers/refresh-all', () => {
   test('returns an empty array when no tickers exist', async () => {
-    const res = await app.request('/v1/tickers/refresh-all', { method: 'POST' })
+    const res = await app.request('/internal/tickers/refresh-all', { method: 'POST' })
     expect(res.status).toBe(200)
     expect(await res.json()).toEqual([])
   })
