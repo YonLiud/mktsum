@@ -32,10 +32,14 @@ export const tickersService = {
   },
 
   refresh: async (symbol: string) => {
-    const quote = await yf.quoteSummary(symbol, { modules: ['price'] })
+    let quote
+    try {
+      quote = await yf.quoteSummary(symbol, { modules: ['price'] })
+    } catch {
+      return null
+    }
     const name = quote.price?.shortName ?? quote.price?.longName
-
-    if (!name) throw new Error(`Invalid ticker: ${symbol}`)
+    if (!name) return null
 
     const [ticker] = await db
       .update(tickers)
@@ -43,7 +47,7 @@ export const tickersService = {
       .where(eq(tickers.symbol, symbol))
       .returning()
 
-    return ticker
+    return ticker ?? null
   },
 
   refreshAll: async () => {

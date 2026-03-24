@@ -55,9 +55,14 @@ TEST_DATABASE_URL=
 
 #### Watchlist (`/v1/watchlist`)
 - `GET /user/:userId` - Get user's watchlist
-- `POST /user/:userId` - Add ticker (body: `{ ticker }`)
+- `POST /user/:userId` - Add ticker (body: `{ ticker }`) — creates ticker via Yahoo Finance if not cached
 - `DELETE /:id` - Remove watchlist entry by ID
 - `DELETE /user/:userId/ticker` - Remove ticker by name (body: `{ ticker }`)
+
+#### Tickers (`/v1/tickers`)
+- `GET /:symbol` - Get ticker by symbol
+- `POST /:symbol/refresh` - Refresh ticker name from Yahoo Finance
+- `POST /refresh-all` - Refresh all tickers from Yahoo Finance
 
 ### Internal API (`/internal`) - Engine Only
 
@@ -72,6 +77,9 @@ TEST_DATABASE_URL=
 
 #### Watchlist (`/internal/watchlist`)
 - `GET /tickers` - Get all unique tickers across all users
+
+#### Tickers (`/internal/tickers`)
+- `GET /` - List all cached tickers
 
 ## Database Schema
 
@@ -99,5 +107,12 @@ TEST_DATABASE_URL=
 |-------|------|-------------|
 | `watchlist_id` | String (PK) | 12-character nanoid |
 | `user_id` | String (FK) | Reference to User |
-| `ticker` | String | Stock ticker symbol (e.g., "AAPL", "GOOGL") — unique per user |
+| `ticker` | String (FK) | Reference to Ticker symbol — unique per user |
 | `created_at` | DateTime | Timestamp of creation |
+
+### Ticker
+| Field | Type | Description |
+|-------|------|-------------|
+| `symbol` | String (PK) | Ticker symbol (e.g., "AAPL", "NVDA") |
+| `name` | String | Company name from Yahoo Finance |
+| `description` | String (optional) | Additional description |
