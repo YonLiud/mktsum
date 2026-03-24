@@ -1,14 +1,15 @@
 import { drizzle } from 'drizzle-orm/node-postgres'
 import { migrate } from 'drizzle-orm/node-postgres/migrator'
-import { Pool } from 'pg'
+import { Client } from 'pg'
 
-const pool = new Pool({
+const client = new Client({
   connectionString: process.env.DATABASE_URL!,
 })
 
-const db = drizzle(pool)
+await client.connect()
+const db = drizzle(client)
 
 await migrate(db, { migrationsFolder: './drizzle' })
-await pool.end()
+await client.end()
 
 console.log('Migrations applied successfully')
