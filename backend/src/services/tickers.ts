@@ -1,6 +1,5 @@
-import yahooFinance from 'yahoo-finance2'
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const yf = yahooFinance as any
+import YahooFinance from 'yahoo-finance2'
+const yf = new YahooFinance({ suppressNotices: ['yahooSurvey'] })
 import { eq } from 'drizzle-orm'
 import { db } from '../db'
 import { tickers } from '../db/schema'
@@ -19,8 +18,8 @@ export const tickersService = {
     const existing = await db.select().from(tickers).where(eq(tickers.symbol, symbol)).limit(1)
     if (existing.length > 0) return existing[0]
 
-    const quote = await yf.quoteSummary(symbol)
-    const name = quote.shortName ?? quote.longName
+    const quote = await yf.quoteSummary(symbol, { modules: ['price'] })
+    const name = quote.price?.shortName ?? quote.price?.longName
 
     if (!name) throw new Error(`Invalid ticker: ${symbol}`)
 
@@ -33,8 +32,8 @@ export const tickersService = {
   },
 
   refresh: async (symbol: string) => {
-    const quote = await yf.quoteSummary(symbol)
-    const name = quote.shortName ?? quote.longName
+    const quote = await yf.quoteSummary(symbol, { modules: ['price'] })
+    const name = quote.price?.shortName ?? quote.price?.longName
 
     if (!name) throw new Error(`Invalid ticker: ${symbol}`)
 
