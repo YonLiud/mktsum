@@ -36,16 +36,18 @@ export const tickersService = {
   refresh: async (symbol: string) => {
     let quote
     try {
-      quote = await yf.quoteSummary(symbol, { modules: ['price'] })
+      quote = await yf.quoteSummary(symbol, { modules: ['price', 'assetProfile'] })
     } catch {
       return null
     }
     const name = quote.price?.shortName ?? quote.price?.longName
     if (!name) return null
 
+    const description = quote.assetProfile?.longBusinessSummary ?? null
+
     const [ticker] = await db
       .update(tickers)
-      .set({ name })
+      .set({ name, description })
       .where(eq(tickers.symbol, symbol))
       .returning()
 
