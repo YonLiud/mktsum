@@ -19,8 +19,8 @@ export const watchlistController = {
     const body = await c.req.json()
     const result = addTickerSchema.safeParse(body)
     if (!result.success) return c.json({ error: result.error.flatten() }, 400)
-    const entry = await watchlistService.add(userId, result.data.ticker)
-    return c.json(entry, 201)
+    const entries = await watchlistService.addMany(userId, result.data.tickers)
+    return c.json(entries.length === 1 ? entries[0] : entries, 201)
   },
 
   remove: async (c: Context) => {

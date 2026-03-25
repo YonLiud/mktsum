@@ -25,6 +25,14 @@ export const watchlistService = {
     return entry
   },
 
+  addMany: async (userId: string, tickers: string[]) => {
+    const entries = []
+    for (const ticker of tickers) {
+      entries.push(await watchlistService.add(userId, ticker))
+    }
+    return entries
+  },
+
   remove: async (watchlistId: string) => {
     const [entry] = await db
       .delete(watchlist)

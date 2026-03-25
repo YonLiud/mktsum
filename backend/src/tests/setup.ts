@@ -32,9 +32,14 @@ if (!rowCount) {
 }
 await adminClient.end()
 
-// --- 2. Run migrations (idempotent – safe to call on every test file load) ---
+// --- 2. Reset schema and run migrations fresh ---
 const pool = new Pool({ connectionString: process.env.TEST_DATABASE_URL })
 const db = drizzle(pool)
+// Drop and recreate the public schema so migrations always start from a clean slate.
+// This is necessary after migration consolidation: the old __drizzle_migrations
+// records don't match the new consolidated file, causing duplicate table errors.
+await pool.query('DROP SCHEMA public CASCADE')
+await pool.query('CREATE SCHEMA public')
 // import.meta.dir is the absolute path of this file's directory (Bun-specific)
 await migrate(db, { migrationsFolder: `${import.meta.dir}/../../drizzle` })
 await pool.end()
