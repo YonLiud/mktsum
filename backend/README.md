@@ -55,7 +55,7 @@ TEST_DATABASE_URL=
 
 #### Watchlist (`/v1/watchlist`)
 - `GET /user/:userId` - Get user's watchlist
-- `POST /user/:userId` - Add ticker (body: `{ ticker }`) — creates ticker via Yahoo Finance if not cached
+- `POST /user/:userId` - Add ticker(s) (body: `{ ticker }` or `{ tickers: [] }`) — creates tickers via Yahoo Finance if not cached
 - `DELETE /:id` - Remove watchlist entry by ID
 - `DELETE /user/:userId/ticker` - Remove ticker by name (body: `{ ticker }`)
 
