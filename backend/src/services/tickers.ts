@@ -18,14 +18,16 @@ export const tickersService = {
     const existing = await db.select().from(tickers).where(eq(tickers.symbol, symbol)).limit(1)
     if (existing.length > 0) return existing[0]
 
-    const quote = await yf.quoteSummary(symbol, { modules: ['price'] })
+    const quote = await yf.quoteSummary(symbol, { modules: ['price', 'assetProfile'] })
     const name = quote.price?.shortName ?? quote.price?.longName
 
     if (!name) throw new Error(`Invalid ticker: ${symbol}`)
 
+    const description = quote.assetProfile?.longBusinessSummary ?? null
+
     const [ticker] = await db
       .insert(tickers)
-      .values({ symbol, name, description: null })
+      .values({ symbol, name, description })
       .returning()
 
     return ticker
