@@ -1,5 +1,9 @@
 # Backend
 
+> [!NOTE]
+> TODO: add relevant tickers in breifings
+
+
 ## Architecture
 ```
 Request → Middleware → Route → Controller → Service → DB
