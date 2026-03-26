@@ -8,7 +8,13 @@ export const userService = {
     return await db.query.users.findFirst({
       where: eq(users.user_id, userId),
       with: {
-        briefings: true,
+        briefings: {
+          columns: {
+            briefing_id: true,
+            created_at: true,
+            short_summary: true,
+          },
+        },
         watchlist: true,
       },
     })
