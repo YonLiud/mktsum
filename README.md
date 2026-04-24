@@ -39,3 +39,57 @@ docker compose up -d --build
 | Backend API | 5000 |
 | n8n | 5678 |
 | PostgreSQL | internal only |
+
+## Development Workflow
+
+### Branching Strategy
+- `main` — production-ready, merges only from `dev`
+- `dev` — integration branch, merges from `feature/*`
+- `feature/*` — feature/fix branches off `dev`
+
+Always create a feature branch. Never commit directly to `main` or `dev`.
+
+### Implementing a Feature
+
+1. **Create feature branch**
+   ```bash
+   git checkout dev && git pull
+   git checkout -b feature/your-feature
+   ```
+
+2. **Implement & commit** (small logical commits)
+   ```bash
+   git commit -m "feat: add login endpoint"
+   ```
+   Commit format: `feat:` (feature), `fix:` (bug), `refactor:`, `docs:`
+
+3. **Test locally**
+   - Backend: `bun test`
+   - Start services: `docker compose up -d`
+   - Hit endpoints manually or via tests
+   - Don't push until it actually works
+
+4. **Push & create PR** (especially for security-sensitive features like auth)
+   ```bash
+   git push origin feature/your-feature
+   ```
+   Create PR on GitHub, request review for auth/core features
+
+5. **Merge to dev**
+   ```bash
+   git checkout dev && git pull
+   git merge feature/your-feature
+   git push origin dev
+   ```
+
+6. **Promote to main when stable**
+   ```bash
+   git checkout main && git pull
+   git merge dev
+   git push origin main
+   ```
+
+### PR Review
+- **Auth, security changes**: always get reviewed
+- **Other features**: can skip PR if confident, just test locally first
+- Use `/review` command for Claude Code review
