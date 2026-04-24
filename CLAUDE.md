@@ -1,0 +1,211 @@
+# mktsum - PRE-WIPE DESCRIPTION
+
+AI-powered market summarization service. Users maintain a watchlist of stock tickers and receive AI-generated briefings (full + short summaries) pushed via ntfy notifications. An n8n automation engine fetches data and triggers briefing creation on a schedule.
+
+## Architecture
+
+```
+ ┌─────────┐    ┌─────────┐    ┌──────────┐
+ │   n8n   │──▶ │ backend │──▶ │ postgres │
+ └─────────┘    └─────────┘    └──────────┘
+      │              │
+      │              └──▶ ntfy (push notifications)
+      └──▶ Yahoo Finance, news/LLM sources
+```
+
+- **backend** — REST API (Bun + Hono + Drizzle + PostgreSQL)
+- **n8n** — automation engine; fetches market data, calls LLM, posts briefings back to backend, triggers ntfy
+- **postgres** — shared DB for backend and n8n
+- **nginx** — reverse proxy in front of backend on `api.mktsum.yxnliu.net`; blocks `/internal/*` from the public internet, only `/v1/*` is exposed
+
+Request flow inside backend: `Request → Middleware → Route → Controller → Service → DB`.
+
+## Infra
+
+- App dir on server: `/opt/mktsum`
+- Persistent volumes: `/srv/mktsum_data/postgres`, `/srv/mktsum_data/n8n`
+- Ports: backend `5000`, n8n `5678`, postgres internal-only
+- Docker compose service name: `mktsum` (project-scoped)
+
+## Backend
+
+### Stack
+- Runtime: Bun
+- Framework: Hono
+- ORM: Drizzle (node-postgres driver)
+- DB: PostgreSQL 16
+- Validation: Zod
+- IDs: 12-char nanoid (custom alphabet, URL-safe)
+- External: `yahoo-finance2` for ticker metadata
+
+### Layout
+```
+backend/
+├── src/
+│   ├── index.ts              # entrypoint; Bun.serve via Hono; error + notFound handlers
+│   ├── app.ts                # (alternate app bootstrap, used by tests — cors + router)
+│   ├── migrate.ts            # runs drizzle migrations at container start
+│   ├── db/
+│   │   ├── index.ts          # drizzle client
+│   │   └── schema.ts         # tables + relations
+│   ├── routes/
+│   │   ├── index.ts          # mounts /v1 and /internal
+│   │   ├── v1/               # public routes (users, briefings, watchlist, tickers)
+│   │   └── internal/         # engine-only routes (briefings, watchlist, tickers)
+│   ├── controllers/          # parse request, call service, shape response
+│   ├── services/             # business logic + DB access
+│   ├── validators/           # Zod schemas per resource
+│   ├── lib/nanoid.ts         # id generator
+│   └── tests/                # bun:test suites + helpers
+└── drizzle/                  # generated SQL migrations
+```
+
+### Run
+```bash
+bun dev              # bun --watch src/index.ts, port 5000 (override via PORT)
+bun test
+bun db:generate      # generate migration SQL from schema
+bun db:migrate       # apply migrations
+bun db:studio        # drizzle-kit visual browser
+```
+
+Docker: migrations run on container start (`bun src/migrate.ts && bun src/index.ts`).
+
+### Environment
+```
+DATABASE_URL=postgresql://user:pass@host:5432/db
+PORT=5000
+TEST_DATABASE_URL=
+```
+
+Bun auto-loads `.env`; no `dotenv` dep.
+
+## Database schema
+
+All primary keys are 12-char nanoids (text), except `tickers.symbol` which is the ticker itself. All timestamps default to `now()`.
+
+### `users`
+| Field | Type | Notes |
+|---|---|---|
+| `user_id` | text PK | nanoid |
+| `name` | text | |
+| `ntfy_topic` | text | notification channel |
+| `created_at` | timestamp | |
+
+### `briefings`
+| Field | Type | Notes |
+|---|---|---|
+| `briefing_id` | text PK | nanoid |
+| `user_id` | text FK → users | |
+| `full_summary` | text | long-form |
+| `short_summary` | text | condensed |
+| `sources` | jsonb nullable | `[{ ticker, title, url }]` |
+| `notif_sent` | boolean | default false |
+| `created_at` | timestamp | |
+
+### `watchlist`
+| Field | Type | Notes |
+|---|---|---|
+| `watchlist_id` | text PK | nanoid |
+| `user_id` | text FK → users | |
+| `ticker` | text FK → tickers.symbol | |
+| `created_at` | timestamp | |
+| unique index | `(user_id, ticker)` | one ticker per user |
+
+### `tickers`
+| Field | Type | Notes |
+|---|---|---|
+| `symbol` | text PK | e.g. `AAPL` — always uppercased |
+| `name` | text | from Yahoo Finance |
+| `description` | text nullable | `longBusinessSummary` |
+
+## API routes
+
+Two surface areas, split at the router level:
+- `/v1/*` — public (exposed via nginx)
+- `/internal/*` — engine-only (403 at nginx)
+
+### Public — `/v1`
+
+#### `/v1/users`
+| Method | Path | Body | Returns |
+|---|---|---|---|
+| GET | `/` | — | all users + their watchlist |
+| GET | `/:id` | — | user + briefings (`id, date, short`) + watchlist |
+| POST | `/` | `{ name, ntfy_topic }` | created user |
+| PATCH | `/:id` | `{ name?, ntfy_topic? }` | updated user |
+| DELETE | `/:id` | — | `{ success: true }` |
+
+#### `/v1/briefings`
+| Method | Path | Body | Returns |
+|---|---|---|---|
+| GET | `/:id` | — | briefing |
+| GET | `/user/:userId` | — | all briefings for user |
+| GET | `/user/:userId/latest` | — | most recent briefing |
+| POST | `/` | `{ user_id, full_summary, short_summary, sources? }` | created |
+| DELETE | `/:id` | — | `{ success: true }` |
+
+#### `/v1/watchlist`
+| Method | Path | Body | Returns |
+|---|---|---|---|
+| GET | `/user/:userId` | — | watchlist entries |
+| POST | `/user/:userId` | `{ ticker }` or `{ tickers: [...] }` | single entry or array; auto-creates ticker via Yahoo if new |
+| DELETE | `/:id` | — | `{ success: true }` |
+| DELETE | `/user/:userId/ticker` | `{ ticker }` | `{ success: true }` |
+
+#### `/v1/tickers`
+| Method | Path | Returns |
+|---|---|---|
+| GET | `/:symbol` | ticker (404 if not cached) |
+
+### Internal — `/internal` (engine only)
+
+#### `/internal/briefings`
+| Method | Path | Body |
+|---|---|---|
+| GET | `/pending` | unsent briefings (`notif_sent = false`) |
+| POST | `/` | same as public create |
+| POST | `/bulk` | array of briefings |
+| PATCH | `/:id/sent` | mark `notif_sent = true` |
+
+#### `/internal/watchlist`
+| Method | Path | Returns |
+|---|---|---|
+| GET | `/tickers` | distinct tickers across all users (for engine fan-out) |
+
+#### `/internal/tickers`
+| Method | Path |
+|---|---|
+| GET | `/` — list all cached tickers |
+| POST | `/:symbol/refresh` — refetch from Yahoo Finance |
+| POST | `/refresh-all` — refresh all cached tickers |
+
+#### `/internal/users`
+Currently empty (router exists, no handlers).
+
+## Conventions
+
+- **Layering**: routes are dumb wiring, controllers do parse+validate+respond, services own business logic and all DB access. Don't reach into drizzle from a controller.
+- **Validation**: every `POST`/`PATCH` body goes through a Zod schema in `validators/`. `safeParse` + `400 { error: flatten() }` on failure.
+- **Tickers are uppercased** at every boundary (validators `toUpperCase`, controller normalizes param).
+- **IDs**: always generate via `generateId()` from `lib/nanoid.ts`. Don't use UUIDs.
+- **Errors**: throw HTTPException from Hono, or return `c.json({ error }, status)`. Global `onError` in `index.ts` handles the rest.
+- **DB**: use `db.query.*` for reads with relations, `db.select/insert/update/delete` for simple ops.
+
+## Deployment
+
+```bash
+git pull
+docker compose up -d --build
+```
+
+Compose builds backend from `./backend`, wires postgres with healthcheck, runs n8n on the same internal network. Migrations run on every backend container start.
+
+## Branching
+
+- `main` — production; merges only from `dev`
+- `dev` — integration; merges from `feature/*`
+- `feature/*` — off `dev`
+- `fix/*` — off `dev`
+
+Commit prefixes: `feat:`, `fix:`, `refactor:`, `docs:`, `misc:`, `docker:`, `git:`.
