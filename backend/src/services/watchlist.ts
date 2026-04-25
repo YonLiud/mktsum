@@ -26,7 +26,8 @@ export const watchlistService = {
 
   add: async (userId: string, ticker: string) => {
     const symbol = ticker.toUpperCase()
-    await tickersService.getOrCreate(symbol)
+    const resolved = await tickersService.getOrCreate(symbol)
+    if (!resolved) return null
     const watchlist_id = generateId()
     const [entry] = await db
       .insert(watchlist)

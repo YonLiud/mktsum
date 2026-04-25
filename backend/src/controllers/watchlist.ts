@@ -20,6 +20,8 @@ export const watchlistController = {
     const result = addTickerSchema.safeParse(body)
     if (!result.success) return c.json({ error: result.error.flatten() }, 400)
     const entries = await watchlistService.addMany(userId, result.data.tickers)
+    const failed = result.data.tickers.filter((_, i) => entries[i] === null)
+    if (failed.length > 0) return c.json({ error: `Ticker(s) not found: ${failed.join(', ')}` }, 404)
     return c.json(entries.length === 1 ? entries[0] : entries, 201)
   },
 

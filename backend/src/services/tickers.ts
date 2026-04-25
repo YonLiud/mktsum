@@ -18,10 +18,15 @@ export const tickersService = {
     const existing = await db.select().from(tickers).where(eq(tickers.symbol, symbol)).limit(1)
     if (existing.length > 0) return existing[0]
 
-    const quote = await yf.quoteSummary(symbol, { modules: ['price', 'assetProfile'] })
-    const name = quote.price?.shortName ?? quote.price?.longName
+    let quote
+    try {
+      quote = await yf.quoteSummary(symbol, { modules: ['price', 'assetProfile'] })
+    } catch {
+      return null
+    }
 
-    if (!name) throw new Error(`Invalid ticker: ${symbol}`)
+    const name = quote.price?.shortName ?? quote.price?.longName
+    if (!name) return null
 
     const description = quote.assetProfile?.longBusinessSummary ?? null
 
