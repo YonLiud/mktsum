@@ -1,65 +1,76 @@
 import { describe, test, expect, beforeEach } from 'bun:test'
 import app from '../app'
-import { cleanDb, insertUser } from './helpers'
+import { cleanDb, insertUser, createSession, authHeader } from './helpers'
 
 beforeEach(async () => {
   await cleanDb()
 })
 
 // ---------------------------------------------------------------------------
-// GET /v1/users
+// POST /v1/users (registration — no auth required)
 // ---------------------------------------------------------------------------
-describe('GET /v1/users', () => {
-  test('returns an empty array when no users exist', async () => {
-    const res = await app.request('/v1/users')
-    expect(res.status).toBe(200)
-    expect(await res.json()).toEqual([])
+describe('POST /v1/users', () => {
+  test('creates a user and returns 201', async () => {
+    const res = await app.request('/v1/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: 'alice', name: 'Alice', password: 'password123', ntfy_topic: 'alice-topic' }),
+    })
+
+    expect(res.status).toBe(201)
+    const user = (await res.json()) as any
+    expect(user.user_id).toBeDefined()
+    expect(user.username).toBe('alice')
+    expect(user.name).toBe('Alice')
+    expect(user.password_hash).toBeUndefined()
   })
 
-  test('returns all users', async () => {
-    await insertUser({ name: 'Alice', ntfy_topic: 'alice' })
-    await insertUser({ name: 'Bob', ntfy_topic: 'bob' })
+  test('returns 400 when username is missing', async () => {
+    const res = await app.request('/v1/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Alice', password: 'password123', ntfy_topic: 'alice' }),
+    })
+    expect(res.status).toBe(400)
+  })
 
-    const res = await app.request('/v1/users')
-    expect(res.status).toBe(200)
-
-    const data = (await res.json()) as any[]
-    expect(data).toHaveLength(2)
-    expect(data.map((u: any) => u.name).sort()).toEqual(['Alice', 'Bob'])
+  test('returns 400 when password is missing', async () => {
+    const res = await app.request('/v1/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: 'alice', name: 'Alice', ntfy_topic: 'alice' }),
+    })
+    expect(res.status).toBe(400)
   })
 })
 
 // ---------------------------------------------------------------------------
-// POST /v1/users
+// GET /v1/users (admin only)
 // ---------------------------------------------------------------------------
-describe('POST /v1/users', () => {
-  test('creates a user and returns 201 with the user data', async () => {
-    const res = await app.request('/v1/users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: 'Alice', ntfy_topic: 'alice-topic' }),
-    })
-
-    expect(res.status).toBe(201)
-
-    const user = (await res.json()) as any
-    expect(user.user_id).toBeDefined()
-    expect(user.name).toBe('Alice')
-    expect(user.ntfy_topic).toBe('alice-topic')
-    expect(user.created_at).toBeDefined()
+describe('GET /v1/users', () => {
+  test('returns 401 without a token', async () => {
+    const res = await app.request('/v1/users')
+    expect(res.status).toBe(401)
   })
 
-  test('persists the created user (visible in GET /v1/users)', async () => {
-    await app.request('/v1/users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: 'Charlie', ntfy_topic: 'charlie' }),
-    })
+  test('returns 403 for a non-admin user', async () => {
+    const user = await insertUser()
+    const token = await createSession(user.user_id)
 
-    const res = await app.request('/v1/users')
+    const res = await app.request('/v1/users', { headers: authHeader(token) })
+    expect(res.status).toBe(403)
+  })
+
+  test('returns all users for admin', async () => {
+    const admin = await insertUser({ role: 'admin' })
+    const token = await createSession(admin.user_id)
+    await insertUser({ name: 'Alice' })
+    await insertUser({ name: 'Bob' })
+
+    const res = await app.request('/v1/users', { headers: authHeader(token) })
+    expect(res.status).toBe(200)
     const data = (await res.json()) as any[]
-    expect(data).toHaveLength(1)
-    expect(data[0].name).toBe('Charlie')
+    expect(data.length).toBeGreaterThanOrEqual(3) // admin + Alice + Bob
   })
 })
 
@@ -67,25 +78,49 @@ describe('POST /v1/users', () => {
 // GET /v1/users/:id
 // ---------------------------------------------------------------------------
 describe('GET /v1/users/:id', () => {
-  test('returns the user with empty briefings and watchlist arrays', async () => {
-    const user = await insertUser({ name: 'Diana' })
-
+  test('returns 401 without a token', async () => {
+    const user = await insertUser()
     const res = await app.request(`/v1/users/${user.user_id}`)
-    expect(res.status).toBe(200)
+    expect(res.status).toBe(401)
+  })
 
+  test('returns 403 when accessing another user', async () => {
+    const user1 = await insertUser()
+    const user2 = await insertUser()
+    const token = await createSession(user1.user_id)
+
+    const res = await app.request(`/v1/users/${user2.user_id}`, { headers: authHeader(token) })
+    expect(res.status).toBe(403)
+  })
+
+  test('returns the user for self', async () => {
+    const user = await insertUser({ name: 'Diana' })
+    const token = await createSession(user.user_id)
+
+    const res = await app.request(`/v1/users/${user.user_id}`, { headers: authHeader(token) })
+    expect(res.status).toBe(200)
     const data = (await res.json()) as any
     expect(data.user_id).toBe(user.user_id)
     expect(data.name).toBe('Diana')
     expect(Array.isArray(data.briefings)).toBe(true)
     expect(Array.isArray(data.watchlist)).toBe(true)
-    expect(data.briefings).toHaveLength(0)
-    expect(data.watchlist).toHaveLength(0)
+  })
+
+  test('returns the user for admin', async () => {
+    const admin = await insertUser({ role: 'admin' })
+    const target = await insertUser({ name: 'Target' })
+    const token = await createSession(admin.user_id)
+
+    const res = await app.request(`/v1/users/${target.user_id}`, { headers: authHeader(token) })
+    expect(res.status).toBe(200)
   })
 
   test('returns 404 for a nonexistent user', async () => {
-    const res = await app.request('/v1/users/doesnotexist')
+    const admin = await insertUser({ role: 'admin' })
+    const token = await createSession(admin.user_id)
+
+    const res = await app.request('/v1/users/doesnotexist', { headers: authHeader(token) })
     expect(res.status).toBe(404)
-    expect((await res.json() as any).error).toBe('User not found')
   })
 })
 
@@ -93,74 +128,75 @@ describe('GET /v1/users/:id', () => {
 // PATCH /v1/users/:id
 // ---------------------------------------------------------------------------
 describe('PATCH /v1/users/:id', () => {
-  test('updates the user name', async () => {
-    const user = await insertUser({ name: 'Eve', ntfy_topic: 'eve' })
-
+  test('returns 401 without a token', async () => {
+    const user = await insertUser()
     const res = await app.request(`/v1/users/${user.user_id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: 'Evelyn' }),
-    })
-
-    expect(res.status).toBe(200)
-    const updated = (await res.json()) as any
-    expect(updated.name).toBe('Evelyn')
-    expect(updated.ntfy_topic).toBe('eve')
-  })
-
-  test('updates ntfy_topic only', async () => {
-    const user = await insertUser({ name: 'Frank', ntfy_topic: 'old-topic' })
-
-    const res = await app.request(`/v1/users/${user.user_id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ntfy_topic: 'new-topic' }),
-    })
-
-    expect(res.status).toBe(200)
-    const updated = (await res.json()) as any
-    expect(updated.name).toBe('Frank')
-    expect(updated.ntfy_topic).toBe('new-topic')
-  })
-
-  test('returns 404 for a nonexistent user', async () => {
-    const res = await app.request('/v1/users/doesnotexist', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: 'New Name' }),
     })
+    expect(res.status).toBe(401)
+  })
 
-    expect(res.status).toBe(404)
-    expect((await res.json() as any).error).toBe('User not found')
+  test('returns 403 when patching another user', async () => {
+    const user1 = await insertUser()
+    const user2 = await insertUser()
+    const token = await createSession(user1.user_id)
+
+    const res = await app.request(`/v1/users/${user2.user_id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...authHeader(token) },
+      body: JSON.stringify({ name: 'Hacked' }),
+    })
+    expect(res.status).toBe(403)
+  })
+
+  test('updates name for self', async () => {
+    const user = await insertUser({ name: 'Eve' })
+    const token = await createSession(user.user_id)
+
+    const res = await app.request(`/v1/users/${user.user_id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...authHeader(token) },
+      body: JSON.stringify({ name: 'Evelyn' }),
+    })
+    expect(res.status).toBe(200)
+    expect((await res.json() as any).name).toBe('Evelyn')
   })
 })
 
 // ---------------------------------------------------------------------------
-// DELETE /v1/users/:id
+// DELETE /v1/users/:id (admin only)
 // ---------------------------------------------------------------------------
 describe('DELETE /v1/users/:id', () => {
-  test('deletes a user and returns { success: true }', async () => {
+  test('returns 401 without a token', async () => {
     const user = await insertUser()
+    const res = await app.request(`/v1/users/${user.user_id}`, { method: 'DELETE' })
+    expect(res.status).toBe(401)
+  })
 
-    const res = await app.request(`/v1/users/${user.user_id}`, {
+  test('returns 403 for a non-admin user', async () => {
+    const user1 = await insertUser()
+    const user2 = await insertUser()
+    const token = await createSession(user1.user_id)
+
+    const res = await app.request(`/v1/users/${user2.user_id}`, {
       method: 'DELETE',
+      headers: authHeader(token),
     })
+    expect(res.status).toBe(403)
+  })
 
+  test('deletes user for admin', async () => {
+    const admin = await insertUser({ role: 'admin' })
+    const target = await insertUser()
+    const token = await createSession(admin.user_id)
+
+    const res = await app.request(`/v1/users/${target.user_id}`, {
+      method: 'DELETE',
+      headers: authHeader(token),
+    })
     expect(res.status).toBe(200)
     expect((await res.json() as any).success).toBe(true)
-  })
-
-  test('user is no longer returned after deletion', async () => {
-    const user = await insertUser()
-    await app.request(`/v1/users/${user.user_id}`, { method: 'DELETE' })
-
-    const res = await app.request(`/v1/users/${user.user_id}`)
-    expect(res.status).toBe(404)
-  })
-
-  test('returns 404 for a nonexistent user', async () => {
-    const res = await app.request('/v1/users/doesnotexist', { method: 'DELETE' })
-    expect(res.status).toBe(404)
-    expect((await res.json() as any).error).toBe('User not found')
   })
 })

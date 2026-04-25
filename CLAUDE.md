@@ -77,10 +77,28 @@ Docker: migrations run on container start (`bun src/migrate.ts && bun src/index.
 ```
 DATABASE_URL=postgresql://user:pass@host:5432/db
 PORT=5000
-TEST_DATABASE_URL=
+TEST_DATABASE_URL=postgresql://user:pass@host:5432/db_test
 ```
 
 Bun auto-loads `.env`; no `dotenv` dep.
+
+### Running tests locally
+
+Tests require a running postgres instance and a `.env` file in `backend/` with both `DATABASE_URL` and `TEST_DATABASE_URL`. The test DB is created and migrated automatically on each run.
+
+```bash
+# 1. Start postgres (dev compose, postgres service only)
+docker compose -f backend/docker-compose.dev.yml up -d postgres
+
+# 2. Create backend/.env
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/mktsum
+TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:5432/mktsum_test
+
+# 3. Run tests
+cd backend && bun test
+```
+
+`bunfig.toml` configures bun to preload `src/tests/setup.ts` before each test run — this creates the test DB if missing, drops and recreates the schema, and runs all migrations fresh.
 
 ## Database schema
 
