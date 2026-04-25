@@ -1,12 +1,22 @@
 import { eq } from 'drizzle-orm'
 import { db } from '../db'
-import { watchlist } from '../db/schema'
+import { watchlist, tickers } from '../db/schema'
 import { generateId } from '../lib/nanoid'
 import { tickersService } from './tickers'
 
 export const watchlistService = {
   getByUserId: async (userId: string) => {
-    return await db.select().from(watchlist).where(eq(watchlist.user_id, userId))
+    return await db
+      .select({
+        watchlist_id: watchlist.watchlist_id,
+        user_id: watchlist.user_id,
+        ticker: watchlist.ticker,
+        ticker_name: tickers.name,
+        created_at: watchlist.created_at,
+      })
+      .from(watchlist)
+      .leftJoin(tickers, eq(watchlist.ticker, tickers.symbol))
+      .where(eq(watchlist.user_id, userId))
   },
 
   getAllUniqueTickers: async () => {
