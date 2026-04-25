@@ -23,7 +23,7 @@ export default function Login({ onLogin }: Props) {
         const res = await fetch('/v1/users', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password, name, ntfy_topic: ntfyTopic }),
+          body: JSON.stringify({ username, password, name, ...(ntfyTopic ? { ntfy_topic: ntfyTopic } : {}) }),
         })
         const data = await res.json()
         if (!res.ok) { setError(data.error ?? 'Registration failed'); return }
