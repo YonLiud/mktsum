@@ -71,6 +71,7 @@ export default function Watchlist({ session }: Props) {
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
                 <th className="px-4 py-2.5 text-left text-gray-500 font-medium">Symbol</th>
+                <th className="px-4 py-2.5 text-left text-gray-500 font-medium">Name</th>
                 <th className="px-4 py-2.5 text-left text-gray-500 font-medium">Added</th>
                 <th className="px-4 py-2.5" />
               </tr>
@@ -79,6 +80,7 @@ export default function Watchlist({ session }: Props) {
               {entries.map(e => (
                 <tr key={e.watchlist_id} className="border-b border-gray-100 last:border-0">
                   <td className="px-4 py-2.5 font-mono font-semibold text-gray-900">{e.ticker}</td>
+                  <td className="px-4 py-2.5 text-gray-700">{e.ticker_name ?? '—'}</td>
                   <td className="px-4 py-2.5 text-gray-500">{new Date(e.created_at).toLocaleDateString()}</td>
                   <td className="px-4 py-2.5 text-right">
                     <button
