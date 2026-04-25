@@ -23,7 +23,7 @@ export const watchlist = pgTable('watchlist', {
   user_id: text('user_id').notNull().references(() => users.user_id),
   ticker: text('ticker').notNull().references(() => tickers.symbol),
   created_at: timestamp('created_at').defaultNow().notNull(),
-}, (table) => [
+}, (table: { user_id: any; ticker: any }) => [
   uniqueIndex('user_ticker_unique').on(table.user_id, table.ticker)
 ])
 

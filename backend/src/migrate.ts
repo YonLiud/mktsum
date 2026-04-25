@@ -1,15 +1,8 @@
-import { drizzle } from 'drizzle-orm/node-postgres'
-import { migrate } from 'drizzle-orm/node-postgres/migrator'
-import { Client } from 'pg'
+import { drizzle } from 'drizzle-orm/bun-sql'
+import { migrate } from 'drizzle-orm/bun-sql/migrator'
 
-const client = new Client({
-  connectionString: process.env.DATABASE_URL!,
-})
-
-await client.connect()
-const db = drizzle(client)
+const db = drizzle(process.env.DATABASE_URL!)
 
 await migrate(db, { migrationsFolder: './drizzle' })
-await client.end()
 
 console.log('Migrations applied successfully')

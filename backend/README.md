@@ -24,13 +24,38 @@ bun dev
 Server runs on port 5000 (configurable via `PORT` in `.env`).
 
 ## Migrations
+
+Migrations run automatically on every container start via `src/migrate.ts`.
+
+### Dev workflow (no bun on host — all commands run inside the container)
+
 ```bash
-bun db:generate   # generate migration files from schema
-bun db:migrate    # run migrations against the DB
-bun db:studio     # open Drizzle visual DB browser
+# 1. Start the dev stack
+docker compose -f docker-compose.dev.yml up -d --build
+
+# 2. After editing src/db/schema.ts, generate the migration
+#    The ./drizzle folder is volume-mounted, so the .sql file lands on your disk
+docker exec backend-backend-1 bun run db:generate
+
+# 3. Rebuild — the new migration is baked in and applied on start
+docker compose -f docker-compose.dev.yml up -d --build
 ```
 
-> Note: migrations run automatically on container startup in Docker.
+Commit both `schema.ts` and the generated `drizzle/*.sql` file.
+
+### Prod
+
+```bash
+# Migrations apply automatically on deploy
+git pull && docker compose up -d --build
+```
+
+### Other commands
+
+```bash
+# Run inside the container
+docker exec backend-backend-1 bun run db:studio   # Drizzle visual browser
+```
 
 ## Environment Variables
 ```
