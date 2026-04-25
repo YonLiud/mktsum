@@ -35,4 +35,10 @@ export const authController = {
     await sessionService.delete(token)
     return c.json({ success: true })
   },
+
+  logoutAll: async (c: Context) => {
+    const user = c.get('user') as { user_id: string }
+    await sessionService.deleteAllForUser(user.user_id)
+    return c.json({ success: true })
+  },
 }

@@ -27,7 +27,7 @@ export async function insertUser(data?: {
       ntfy_topic: data?.ntfy_topic ?? 'test-topic',
     })
     .returning()
-  return user
+  return user!
 }
 
 export async function createSession(userId: string) {

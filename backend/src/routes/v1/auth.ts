@@ -6,3 +6,4 @@ export const authRoutes = new Hono()
 
 authRoutes.post('/login', authController.login)
 authRoutes.post('/logout', requireAuth, authController.logout)
+authRoutes.post('/logout-all', requireAuth, authController.logoutAll)
