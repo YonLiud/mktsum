@@ -123,7 +123,7 @@ describe('POST /v1/watchlist/user/:userId (ticker validation via Yahoo Finance)'
     expect(entry.ticker).toBe('PLTR')
   }, 15000)
 
-  test('rejects a fake ticker and returns 500', async () => {
+  test('rejects a fake ticker and returns 404', async () => {
     const user = await insertUser()
     const token = await createSession(user.user_id)
 
@@ -133,6 +133,6 @@ describe('POST /v1/watchlist/user/:userId (ticker validation via Yahoo Finance)'
       body: JSON.stringify({ ticker: 'XYZFAKETICKER' }),
     })
 
-    expect(res.status).toBe(500)
+    expect(res.status).toBe(404)
   }, 15000)
 })
