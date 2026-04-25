@@ -7,7 +7,7 @@ export const users = pgTable('users', {
   name: text('name').notNull(),
   password_hash: text('password_hash').notNull(),
   role: text('role', { enum: ['user', 'admin'] }).notNull().default('user'),
-  ntfy_topic: text('ntfy_topic').notNull(),
+  ntfy_topic: text('ntfy_topic'),
   created_at: timestamp('created_at').defaultNow().notNull(),
 })
 
