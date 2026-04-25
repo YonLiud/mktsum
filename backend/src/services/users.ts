@@ -40,7 +40,7 @@ export const userService = {
     })
   },
 
-  create: async (data: { username: string; name: string; password: string; ntfy_topic: string }) => {
+  create: async (data: { username: string; name: string; password: string; ntfy_topic?: string }) => {
     const user_id = generateId()
     const password_hash = await Bun.password.hash(data.password)
     const { password, ...rest } = data

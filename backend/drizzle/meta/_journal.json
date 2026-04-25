@@ -15,6 +15,13 @@
       "when": 1777115792528,
       "tag": "0001_mysterious_kid_colt",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777132363178,
+      "tag": "0002_nasty_power_man",
+      "breakpoints": true
     }
   ]
 }
