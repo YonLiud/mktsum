@@ -8,6 +8,13 @@
       "when": 1774387829183,
       "tag": "0000_bumpy_harry_osborn",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1777115792528,
+      "tag": "0001_mysterious_kid_colt",
+      "breakpoints": true
     }
   ]
 }

@@ -59,42 +59,73 @@ docker exec backend-backend-1 bun run db:studio   # Drizzle visual browser
 
 ## Environment Variables
 ```
-DATABASE_URL=
+DATABASE_URL=postgresql://user:pass@host:5432/db
 PORT=5000
-TEST_DATABASE_URL=
+TEST_DATABASE_URL=postgresql://user:pass@host:5432/db_test
 ```
+
+## Auth
+
+All `/v1` routes except `POST /v1/users` and `POST /v1/auth/login` require a valid session token:
+
+```
+Authorization: Bearer <token>
+```
+
+Tokens are returned by `POST /v1/auth/login` and stored in the `sessions` table (30-day TTL). Passwords are hashed with argon2 via `Bun.password`.
+
+## Testing
+
+Tests require a running postgres instance and a `backend/.env` file.
+
+```bash
+# 1. Start postgres
+docker compose -f docker-compose.dev.yml up -d postgres
+
+# 2. Create .env
+echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/mktsum" >> .env
+echo "TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:5432/mktsum_test" >> .env
+
+# 3. Run tests
+bun test
+```
+
+The test DB is created, schema-reset, and migrated automatically on each run via `src/tests/setup.ts` (preloaded by `bunfig.toml`).
 
 ## API Routes
 
+### Auth (`/v1/auth`)
+- `POST /login` - Login (body: `{ username, password }`) → `{ token, user_id, username, name, role }`
+- `POST /logout` - Logout (Bearer token required)
+
 ### Public API (`/v1`)
 
+All routes below require `Authorization: Bearer <token>` unless noted.
+
 #### Users (`/v1/users`)
-- `GET /` - List all users with their watchlist
-- `GET /:id` - Get user by ID (includes briefings and watchlist)
-- `POST /` - Create user (body: `{ name, ntfy_topic }`)
-- `PATCH /:id` - Update user (body: `{ name?, ntfy_topic? }`)
-- `DELETE /:id` - Delete user
+- `GET /` - List all users — **admin only**
+- `GET /:id` - Get user by ID (briefings + watchlist) — self or admin
+- `POST /` - Register (body: `{ username, name, password, ntfy_topic }`) — **no auth**
+- `PATCH /:id` - Update user (body: `{ name?, ntfy_topic? }`) — self only
+- `DELETE /:id` - Delete user — **admin only**
 
 #### Briefings (`/v1/briefings`)
-- `GET /:id` - Get briefing by ID
-- `GET /user/:userId` - Get all briefings for user
-- `GET /user/:userId/latest` - Get user's latest briefing
+- `GET /:id` - Get briefing — public if `is_public`, otherwise self or admin
+- `GET /user/:userId` - Get all briefings for user — self or admin
+- `GET /user/:userId/latest` - Get latest briefing — self or admin
 - `POST /` - Create briefing (body: `{ user_id, full_summary, short_summary, sources? }`)
 - `DELETE /:id` - Delete briefing
 
 #### Watchlist (`/v1/watchlist`)
-- `GET /user/:userId` - Get user's watchlist
-- `POST /user/:userId` - Add ticker(s) (body: `{ ticker }` or `{ tickers: [] }`) — creates tickers via Yahoo Finance if not cached
+- `GET /user/:userId` - Get user's watchlist — self only
+- `POST /user/:userId` - Add ticker(s) (body: `{ ticker }` or `{ tickers: [] }`) — self only; auto-creates ticker via Yahoo Finance
 - `DELETE /:id` - Remove watchlist entry by ID
-- `DELETE /user/:userId/ticker` - Remove ticker by name (body: `{ ticker }`)
+- `DELETE /user/:userId/ticker` - Remove ticker by name (body: `{ ticker }`) — self only
 
 #### Tickers (`/v1/tickers`)
-- `GET /:symbol` - Get ticker by symbol
+- `GET /:symbol` - Get ticker by symbol — **no auth**
 
 ### Internal API (`/internal`) - Engine Only
-
-#### Users (`/internal/users`)
-
 
 #### Briefings (`/internal/briefings`)
 - `GET /pending` - Get all unsent briefings
@@ -107,29 +138,41 @@ TEST_DATABASE_URL=
 
 #### Tickers (`/internal/tickers`)
 - `GET /` - List all cached tickers
-- `POST /:symbol/refresh` - Refresh ticker name from Yahoo Finance
+- `POST /:symbol/refresh` - Refresh ticker from Yahoo Finance
 - `POST /refresh-all` - Refresh all tickers from Yahoo Finance
 
 ## Database Schema
 
-### User
+### Users
 | Field | Type | Description |
 |-------|------|-------------|
 | `user_id` | String (PK) | 12-character nanoid |
-| `name` | String | User's display name |
-| `ntfy_topic` | String | Topic for notifications |
-| `created_at` | DateTime | Timestamp of creation |
+| `username` | String (UNIQUE) | Login credential |
+| `name` | String | Display name |
+| `password_hash` | String | argon2 hash — never returned by API |
+| `role` | String | `user` or `admin` (default: `user`) |
+| `ntfy_topic` | String | ntfy notification channel |
+| `created_at` | DateTime | |
 
-### Briefing
+### Sessions
+| Field | Type | Description |
+|-------|------|-------------|
+| `session_id` | String (PK) | nanoid — used as the bearer token |
+| `user_id` | String (FK) | Reference to User, cascades on delete |
+| `expires_at` | DateTime | 30-day TTL from creation |
+| `created_at` | DateTime | |
+
+### Briefings
 | Field | Type | Description |
 |-------|------|-------------|
 | `briefing_id` | String (PK) | 12-character nanoid |
 | `user_id` | String (FK) | Reference to User |
 | `full_summary` | String | Complete briefing summary |
 | `short_summary` | String | Condensed briefing summary |
-| `sources` | JSONB (optional) | Sources used for the briefing `[{ ticker, title, url }]` |
+| `sources` | JSONB (optional) | `[{ ticker, title, url }]` |
 | `notif_sent` | Boolean | Whether notification has been sent (default: false) |
-| `created_at` | DateTime | Timestamp of creation |
+| `is_public` | Boolean | If true, accessible without auth via share link (default: false) |
+| `created_at` | DateTime | |
 
 ### Watchlist
 | Field | Type | Description |
@@ -137,11 +180,11 @@ TEST_DATABASE_URL=
 | `watchlist_id` | String (PK) | 12-character nanoid |
 | `user_id` | String (FK) | Reference to User |
 | `ticker` | String (FK) | Reference to Ticker symbol — unique per user |
-| `created_at` | DateTime | Timestamp of creation |
+| `created_at` | DateTime | |
 
-### Ticker
+### Tickers
 | Field | Type | Description |
 |-------|------|-------------|
-| `symbol` | String (PK) | Ticker symbol (e.g., "AAPL", "NVDA") |
+| `symbol` | String (PK) | Ticker symbol (e.g., `AAPL`) — always uppercased |
 | `name` | String | Company name from Yahoo Finance |
-| `description` | String (optional) | Additional description |
+| `description` | String (optional) | `longBusinessSummary` from Yahoo Finance |

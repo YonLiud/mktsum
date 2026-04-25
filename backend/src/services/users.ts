@@ -7,6 +7,7 @@ export const userService = {
   getById: async (userId: string) => {
     return await db.query.users.findFirst({
       where: eq(users.user_id, userId),
+      columns: { password_hash: false },
       with: {
         briefings: {
           columns: {
@@ -22,6 +23,7 @@ export const userService = {
 
   getAll: async () => {
     return await db.query.users.findMany({
+      columns: { password_hash: false },
       with: {
         watchlist: true,
       },
@@ -38,10 +40,13 @@ export const userService = {
     })
   },
 
-  create: async (data: { name: string; ntfy_topic: string }) => {
+  create: async (data: { username: string; name: string; password: string; ntfy_topic: string }) => {
     const user_id = generateId()
-    const [user] = await db.insert(users).values({ user_id, ...data }).returning()
-    return user
+    const password_hash = await Bun.password.hash(data.password)
+    const { password, ...rest } = data
+    const [user] = await db.insert(users).values({ user_id, ...rest, password_hash }).returning()
+    const { password_hash: _, ...safeUser } = user
+    return safeUser
   },
 
   update: async (userId: string, data: Partial<{ name: string; ntfy_topic: string }>) => {

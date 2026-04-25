@@ -3,8 +3,18 @@ import { relations } from 'drizzle-orm'
 
 export const users = pgTable('users', {
   user_id: text('user_id').primaryKey(),
+  username: text('username').notNull().unique(),
   name: text('name').notNull(),
+  password_hash: text('password_hash').notNull(),
+  role: text('role', { enum: ['user', 'admin'] }).notNull().default('user'),
   ntfy_topic: text('ntfy_topic').notNull(),
+  created_at: timestamp('created_at').defaultNow().notNull(),
+})
+
+export const sessions = pgTable('sessions', {
+  session_id: text('session_id').primaryKey(),
+  user_id: text('user_id').notNull().references(() => users.user_id, { onDelete: 'cascade' }),
+  expires_at: timestamp('expires_at').notNull(),
   created_at: timestamp('created_at').defaultNow().notNull(),
 })
 
@@ -15,6 +25,7 @@ export const briefings = pgTable('briefings', {
   short_summary: text('short_summary').notNull(),
   sources: jsonb('sources'),
   notif_sent: boolean('notif_sent').default(false).notNull(),
+  is_public: boolean('is_public').default(false).notNull(),
   created_at: timestamp('created_at').defaultNow().notNull(),
 })
 
@@ -36,6 +47,14 @@ export const tickers = pgTable('tickers', {
 export const usersRelations = relations(users, ({ many }) => ({
   briefings: many(briefings),
   watchlist: many(watchlist),
+  sessions: many(sessions),
+}))
+
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  user: one(users, {
+    fields: [sessions.user_id],
+    references: [users.user_id],
+  }),
 }))
 
 export const briefingsRelations = relations(briefings, ({ one }) => ({
