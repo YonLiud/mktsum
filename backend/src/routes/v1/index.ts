@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+import { authRoutes } from './auth'
 import usersRoutes from './users'
 import briefingsRoutes from './briefings'
 import watchlistRoutes from './watchlist'
@@ -6,6 +7,7 @@ import tickersRoutes from './tickers'
 
 const v1Routes = new Hono()
 
+v1Routes.route('/auth', authRoutes)
 v1Routes.route('/users', usersRoutes)
 v1Routes.route('/briefings', briefingsRoutes)
 v1Routes.route('/watchlist', watchlistRoutes)

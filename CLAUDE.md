@@ -50,10 +50,12 @@ backend/
 │   │   └── schema.ts         # tables + relations
 │   ├── routes/
 │   │   ├── index.ts          # mounts /v1 and /internal
-│   │   ├── v1/               # public routes (users, briefings, watchlist, tickers)
+│   │   ├── v1/               # public routes (auth, users, briefings, watchlist, tickers)
 │   │   └── internal/         # engine-only routes (briefings, watchlist, tickers)
 │   ├── controllers/          # parse request, call service, shape response
 │   ├── services/             # business logic + DB access
+│   ├── middleware/
+│   │   └── auth.ts           # requireAuth, requireAdmin, optionalAuth
 │   ├── validators/           # Zod schemas per resource
 │   ├── lib/nanoid.ts         # id generator
 │   └── tests/                # bun:test suites + helpers
@@ -88,8 +90,19 @@ All primary keys are 12-char nanoids (text), except `tickers.symbol` which is th
 | Field | Type | Notes |
 |---|---|---|
 | `user_id` | text PK | nanoid |
-| `name` | text | |
+| `username` | text UNIQUE | login credential |
+| `name` | text | display name |
+| `password_hash` | text | argon2 via `Bun.password` — never returned from service layer |
+| `role` | text | `'user'` or `'admin'`, default `'user'` |
 | `ntfy_topic` | text | notification channel |
+| `created_at` | timestamp | |
+
+### `sessions`
+| Field | Type | Notes |
+|---|---|---|
+| `session_id` | text PK | nanoid — used as the bearer token |
+| `user_id` | text FK → users | cascades on delete |
+| `expires_at` | timestamp | 30-day TTL set at creation |
 | `created_at` | timestamp | |
 
 ### `briefings`
@@ -101,6 +114,7 @@ All primary keys are 12-char nanoids (text), except `tickers.symbol` which is th
 | `short_summary` | text | condensed |
 | `sources` | jsonb nullable | `[{ ticker, title, url }]` |
 | `notif_sent` | boolean | default false |
+| `is_public` | boolean | default false; if true, accessible without auth (share link) |
 | `created_at` | timestamp | |
 
 ### `watchlist`
@@ -119,6 +133,25 @@ All primary keys are 12-char nanoids (text), except `tickers.symbol` which is th
 | `name` | text | from Yahoo Finance |
 | `description` | text nullable | `longBusinessSummary` |
 
+## Auth
+
+All `/v1` routes except `POST /v1/users` and `POST /v1/auth/login` require a valid session token in the `Authorization: Bearer <token>` header. Tokens are opaque nanoid strings stored in the `sessions` table (30-day TTL). Password hashing uses `Bun.password` (argon2).
+
+Three middleware variants in `middleware/auth.ts`:
+- `requireAuth` — valid session required; attaches `user` and `token` to Hono context
+- `requireAdmin` — valid session + `role === 'admin'` required
+- `optionalAuth` — attaches user if token present, passes through if not (used for share-link briefings)
+
+Access matrix:
+| Route | Access |
+|---|---|
+| `GET /v1/users` | admin only |
+| `GET /v1/users/:id` | self or admin |
+| `PATCH /v1/users/:id` | self only |
+| `DELETE /v1/users/:id` | admin only |
+| `GET /v1/briefings/:id` | public if `is_public`, else self or admin |
+| all other briefing/watchlist routes | self only |
+
 ## API routes
 
 Two surface areas, split at the router level:
@@ -127,36 +160,42 @@ Two surface areas, split at the router level:
 
 ### Public — `/v1`
 
-#### `/v1/users`
+#### `/v1/auth`
 | Method | Path | Body | Returns |
 |---|---|---|---|
-| GET | `/` | — | all users + their watchlist |
-| GET | `/:id` | — | user + briefings (`id, date, short`) + watchlist |
-| POST | `/` | `{ name, ntfy_topic }` | created user |
-| PATCH | `/:id` | `{ name?, ntfy_topic? }` | updated user |
-| DELETE | `/:id` | — | `{ success: true }` |
+| POST | `/login` | `{ username, password }` | `{ token, user_id, username, name, role }` |
+| POST | `/logout` | — (Bearer token) | `{ success: true }` |
+
+#### `/v1/users`
+| Method | Path | Auth | Body | Returns |
+|---|---|---|---|---|
+| GET | `/` | admin | — | all users + their watchlist |
+| GET | `/:id` | self or admin | — | user + briefings (`id, date, short`) + watchlist |
+| POST | `/` | none (registration) | `{ username, name, password, ntfy_topic }` | created user |
+| PATCH | `/:id` | self | `{ name?, ntfy_topic? }` | updated user |
+| DELETE | `/:id` | admin | — | `{ success: true }` |
 
 #### `/v1/briefings`
-| Method | Path | Body | Returns |
-|---|---|---|---|
-| GET | `/:id` | — | briefing |
-| GET | `/user/:userId` | — | all briefings for user |
-| GET | `/user/:userId/latest` | — | most recent briefing |
-| POST | `/` | `{ user_id, full_summary, short_summary, sources? }` | created |
-| DELETE | `/:id` | — | `{ success: true }` |
+| Method | Path | Auth | Body | Returns |
+|---|---|---|---|---|
+| GET | `/:id` | optional (public if `is_public`) | — | briefing |
+| GET | `/user/:userId` | self or admin | — | all briefings for user |
+| GET | `/user/:userId/latest` | self or admin | — | most recent briefing |
+| POST | `/` | self | `{ user_id, full_summary, short_summary, sources? }` | created |
+| DELETE | `/:id` | self | — | `{ success: true }` |
 
 #### `/v1/watchlist`
-| Method | Path | Body | Returns |
-|---|---|---|---|
-| GET | `/user/:userId` | — | watchlist entries |
-| POST | `/user/:userId` | `{ ticker }` or `{ tickers: [...] }` | single entry or array; auto-creates ticker via Yahoo if new |
-| DELETE | `/:id` | — | `{ success: true }` |
-| DELETE | `/user/:userId/ticker` | `{ ticker }` | `{ success: true }` |
+| Method | Path | Auth | Body | Returns |
+|---|---|---|---|---|
+| GET | `/user/:userId` | self | — | watchlist entries |
+| POST | `/user/:userId` | self | `{ ticker }` or `{ tickers: [...] }` | single entry or array; auto-creates ticker via Yahoo if new |
+| DELETE | `/:id` | self | — | `{ success: true }` |
+| DELETE | `/user/:userId/ticker` | self | `{ ticker }` | `{ success: true }` |
 
 #### `/v1/tickers`
-| Method | Path | Returns |
-|---|---|---|
-| GET | `/:symbol` | ticker (404 if not cached) |
+| Method | Path | Auth | Returns |
+|---|---|---|---|
+| GET | `/:symbol` | none | ticker (404 if not cached) |
 
 ### Internal — `/internal` (engine only)
 
@@ -191,6 +230,8 @@ Currently empty (router exists, no handlers).
 - **IDs**: always generate via `generateId()` from `lib/nanoid.ts`. Don't use UUIDs.
 - **Errors**: throw HTTPException from Hono, or return `c.json({ error }, status)`. Global `onError` in `index.ts` handles the rest.
 - **DB**: use `db.query.*` for reads with relations, `db.select/insert/update/delete` for simple ops.
+- **Auth**: apply middleware at the route level, not inside controllers. Ownership checks (self vs admin) happen in the controller using `c.get('user')`. Never return `password_hash` from any service method — strip it with `columns: { password_hash: false }` on reads or destructuring on writes.
+- **Passwords**: always use `Bun.password.hash` / `Bun.password.verify` (argon2). Never roll a custom hashing scheme.
 
 ## Deployment
 
