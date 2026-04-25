@@ -18,13 +18,11 @@ export default function App() {
   const [tab, setTab] = useState<Tab>('profile')
 
   async function logout() {
-    await api.post('/v1/auth/logout')
-    clearSession()
+    try { await api.post('/v1/auth/logout') } finally { clearSession() }
   }
 
   async function logoutAll() {
-    await api.post('/v1/auth/logout-all')
-    clearSession()
+    try { await api.post('/v1/auth/logout-all') } finally { clearSession() }
   }
 
   function clearSession() {

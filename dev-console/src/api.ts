@@ -10,6 +10,11 @@ async function request(method: string, path: string, body?: unknown) {
     },
     body: body !== undefined ? JSON.stringify(body) : undefined,
   })
+  if (res.status === 401) {
+    localStorage.removeItem('token')
+    localStorage.removeItem('session')
+    window.location.reload()
+  }
   return res
 }
 
