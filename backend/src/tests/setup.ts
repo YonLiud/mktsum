@@ -38,6 +38,7 @@ const db = drizzle(pool)
 // Drop and recreate the public schema so migrations always start from a clean slate.
 // This is necessary after migration consolidation: the old __drizzle_migrations
 // records don't match the new consolidated file, causing duplicate table errors.
+await pool.query('DROP SCHEMA IF EXISTS drizzle CASCADE')
 await pool.query('DROP SCHEMA public CASCADE')
 await pool.query('CREATE SCHEMA public')
 // import.meta.dir is the absolute path of this file's directory (Bun-specific)

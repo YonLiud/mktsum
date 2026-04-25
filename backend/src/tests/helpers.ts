@@ -1,25 +1,44 @@
 import { db } from '../db'
-import { users, briefings, watchlist, tickers } from '../db/schema'
+import { users, briefings, watchlist, tickers, sessions } from '../db/schema'
 import { generateId } from '../lib/nanoid'
 
-/** Delete all rows in FK-safe order (children before parents). */
 export async function cleanDb() {
   await db.delete(watchlist)
   await db.delete(briefings)
+  await db.delete(sessions)
   await db.delete(users)
   await db.delete(tickers)
 }
 
-export async function insertUser(data?: { name?: string; ntfy_topic?: string }) {
+export async function insertUser(data?: {
+  name?: string
+  ntfy_topic?: string
+  username?: string
+  role?: 'user' | 'admin'
+}) {
   const [user] = await db
     .insert(users)
     .values({
       user_id: generateId(),
+      username: data?.username ?? `u_${generateId()}`,
       name: data?.name ?? 'Test User',
+      password_hash: await Bun.password.hash('password123'),
+      role: data?.role ?? 'user',
       ntfy_topic: data?.ntfy_topic ?? 'test-topic',
     })
     .returning()
-  return user
+  return user!
+}
+
+export async function createSession(userId: string) {
+  const session_id = generateId()
+  const expires_at = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+  await db.insert(sessions).values({ session_id, user_id: userId, expires_at })
+  return session_id
+}
+
+export function authHeader(token: string) {
+  return { Authorization: `Bearer ${token}` }
 }
 
 export async function insertBriefing(
@@ -29,6 +48,7 @@ export async function insertBriefing(
     short_summary?: string
     sources?: string[]
     notif_sent?: boolean
+    is_public?: boolean
   }
 ) {
   const [briefing] = await db
@@ -40,6 +60,7 @@ export async function insertBriefing(
       short_summary: data?.short_summary ?? 'Short summary',
       sources: data?.sources,
       notif_sent: data?.notif_sent ?? false,
+      is_public: data?.is_public ?? false,
     })
     .returning()
   return briefing

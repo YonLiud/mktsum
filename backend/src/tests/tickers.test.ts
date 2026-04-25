@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach } from 'bun:test'
 import app from '../app'
-import { cleanDb, insertTicker, insertUser } from './helpers'
+import { cleanDb, insertTicker, insertUser, createSession, authHeader } from './helpers'
 
 beforeEach(async () => {
   await cleanDb()
@@ -110,11 +110,11 @@ describe('POST /internal/tickers/refresh-all', () => {
 describe('POST /v1/watchlist/user/:userId (ticker validation via Yahoo Finance)', () => {
   test('adds PLTR (real ticker) and returns 201', async () => {
     const user = await insertUser()
-    if (!user) throw new Error('insertUser failed')
+    const token = await createSession(user.user_id)
 
     const res = await app.request(`/v1/watchlist/user/${user.user_id}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...authHeader(token) },
       body: JSON.stringify({ ticker: 'PLTR' }),
     })
 
@@ -125,11 +125,11 @@ describe('POST /v1/watchlist/user/:userId (ticker validation via Yahoo Finance)'
 
   test('rejects a fake ticker and returns 500', async () => {
     const user = await insertUser()
-    if (!user) throw new Error('insertUser failed')
+    const token = await createSession(user.user_id)
 
     const res = await app.request(`/v1/watchlist/user/${user.user_id}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...authHeader(token) },
       body: JSON.stringify({ ticker: 'XYZFAKETICKER' }),
     })
 

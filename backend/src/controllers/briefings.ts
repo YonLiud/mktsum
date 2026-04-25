@@ -7,6 +7,15 @@ export const briefingController = {
     const id = c.req.param('id')!
     const briefing = await briefingService.getById(id)
     if (!briefing) return c.json({ error: 'Briefing not found' }, 404)
+
+    if (!briefing.is_public) {
+      const caller = c.get('user') as { user_id: string; role: string } | undefined
+      if (!caller) return c.json({ error: 'Unauthorized' }, 401)
+      if (caller.user_id !== briefing.user_id && caller.role !== 'admin') {
+        return c.json({ error: 'Forbidden' }, 403)
+      }
+    }
+
     return c.json(briefing)
   },
 
