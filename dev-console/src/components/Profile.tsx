@@ -19,7 +19,9 @@ export default function Profile({ session }: Props) {
   }, [session.user_id])
 
   async function save() {
-    const res = await api.patch(`/v1/users/${session.user_id}`, { name, ntfy_topic: ntfy || null })
+    const body: Record<string, string> = { name }
+    if (ntfy) body.ntfy_topic = ntfy
+    const res = await api.patch(`/v1/users/${session.user_id}`, body)
     if (res.ok) {
       setMsg({ text: 'Saved', ok: true })
       const updated: User = await res.json()
