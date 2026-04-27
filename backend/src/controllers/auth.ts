@@ -1,9 +1,13 @@
 import type { Context } from 'hono'
+import { setCookie, deleteCookie } from 'hono/cookie'
 import { eq } from 'drizzle-orm'
 import { db } from '../db'
 import { users } from '../db/schema'
 import { sessionService } from '../services/sessions'
 import { loginSchema } from '../validators/auth'
+
+const COOKIE_NAME = 'session'
+const COOKIE_TTL = 30 * 24 * 60 * 60
 
 export const authController = {
   login: async (c: Context) => {
@@ -21,8 +25,15 @@ export const authController = {
 
     const session = await sessionService.create(user.user_id)
 
+    setCookie(c, COOKIE_NAME, session.session_id, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'Strict',
+      path: '/',
+      maxAge: COOKIE_TTL,
+    })
+
     return c.json({
-      token: session.session_id,
       user_id: user.user_id,
       username: user.username,
       name: user.name,
@@ -33,6 +44,7 @@ export const authController = {
   logout: async (c: Context) => {
     const token = c.get('token') as string
     await sessionService.delete(token)
+    deleteCookie(c, COOKIE_NAME, { path: '/' })
     return c.json({ success: true })
   },
 

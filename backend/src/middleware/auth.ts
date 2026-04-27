@@ -1,10 +1,11 @@
 import type { Context, Next } from 'hono'
+import { getCookie } from 'hono/cookie'
 import { sessionService } from '../services/sessions'
 
 function extractToken(c: Context): string | null {
   const header = c.req.header('Authorization')
-  if (!header?.startsWith('Bearer ')) return null
-  return header.slice(7)
+  if (header?.startsWith('Bearer ')) return header.slice(7)
+  return getCookie(c, 'session') ?? null
 }
 
 export async function requireAuth(c: Context, next: Next) {
