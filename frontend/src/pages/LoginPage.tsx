@@ -6,12 +6,12 @@ export function LoginPage() {
         <input
           type="text"
           placeholder="Username"
-          className="border border-(--border) rounded px-3 py-2 bg-transparent outline-none focus:border-[var(--accent)]"
+          className="border border-(--border) rounded px-3 py-2 bg-transparent outline-none focus:border-(--accent)"
         />
         <input
           type="password"
           placeholder="Password"
-          className="border border-(--border) rounded px-3 py-2 bg-transparent outline-none focus:border-[var(--accent)]"
+          className="border border-(--border) rounded px-3 py-2 bg-transparent outline-none focus:border-(--accent)"
         />
         <button
           type="submit"
