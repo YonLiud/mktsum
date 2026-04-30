@@ -1,10 +1,5 @@
-import { Hono } from 'hono'
 import { HTTPException } from 'hono/http-exception'
-import router from './routes'
-
-const app = new Hono()
-
-app.route('/', router)
+import app from './app'
 
 app.onError((err, c) => {
   if (err instanceof HTTPException) {
@@ -19,6 +14,6 @@ app.notFound((c) => {
 })
 
 export default {
-  port: process.env.PORT ?? 3000,
+  port: Bun.env.PORT ?? 3000,
   fetch: app.fetch,
 }
