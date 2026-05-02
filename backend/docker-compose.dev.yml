@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:16-alpine
-    restart: unless-stopped
+    restart: "no"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -15,7 +15,7 @@ services:
       retries: 10
   backend:
     build: .
-    restart: unless-stopped
+    restart: "no"
     ports:
       - "5000:5000"
     environment:
