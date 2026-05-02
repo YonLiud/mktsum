@@ -9,6 +9,11 @@ export type AuthUser = {
 
 const AUTH_KEY = ['auth']
 
+export function clearAuthStorage() {
+  localStorage.removeItem('auth_user')
+  localStorage.removeItem('auth_token')
+}
+
 function getStoredUser(): AuthUser | null {
   try {
     const raw = localStorage.getItem('auth_user')
@@ -37,7 +42,7 @@ export function useSetAuth() {
 export function useClearAuth() {
   const queryClient = useQueryClient()
   return () => {
-    localStorage.removeItem('auth_user')
+    clearAuthStorage()
     queryClient.setQueryData(AUTH_KEY, null)
   }
 }
