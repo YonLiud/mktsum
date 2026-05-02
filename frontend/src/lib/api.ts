@@ -1,20 +1,22 @@
 import { queryClient } from './queryClient'
+import { clearAuthStorage } from '@/hooks/useAuth'
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000'
 
 async function request(path: string, options: RequestInit = {}) {
+  const token = localStorage.getItem('auth_token')
   const res = await fetch(`${BASE_URL}${path}`, {
     ...options,
-    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
   })
 
   if (res.status === 401) {
+    clearAuthStorage()
     queryClient.setQueryData(['auth'], null)
-    localStorage.removeItem('auth_user')
     window.location.href = '/login'
     return res
   }

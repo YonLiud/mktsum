@@ -34,7 +34,8 @@ export function useLogin() {
       return
     }
 
-    const user = await res.json()
+    const { token, ...user } = await res.json()
+    localStorage.setItem('auth_token', token)
     setAuth(user)
     navigate({ to: '/' })
   }
