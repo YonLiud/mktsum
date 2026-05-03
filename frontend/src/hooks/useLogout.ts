@@ -7,7 +7,7 @@ export function useLogout() {
   const clearAuth = useClearAuth()
 
   return async () => {
-    await api.post('/v1/auth/logout', {})
+    await api.post('/auth/logout', {})
     clearAuth()
     navigate({ to: '/login' })
   }

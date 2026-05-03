@@ -26,7 +26,7 @@ export function useLogin() {
     }
 
     setIsLoading(true)
-    const res = await api.post('/v1/auth/login', { username, password })
+    const res = await api.post('/auth/login', { username, password })
     setIsLoading(false)
 
     if (!res.ok) {
