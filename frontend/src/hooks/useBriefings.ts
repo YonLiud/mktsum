@@ -16,6 +16,18 @@ export function useBriefings() {
   })
 }
 
+export function useBriefing(id: string) {
+  return useQuery({
+    queryKey: ['briefings', id],
+    queryFn: async (): Promise<Briefing> => {
+      const res = await api.get(`/briefings/${id}`)
+      if(!res.ok) throw new Error('Failed to fetch briefing')
+      return res.json()
+    }
+  })
+}
+
+
 export function useLatestBriefing() {
   const { data: user } = useAuth()
   return useQuery({
