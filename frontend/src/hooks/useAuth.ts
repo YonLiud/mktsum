@@ -5,6 +5,7 @@ export type AuthUser = {
   username: string
   name: string
   role: string
+  ntfy_topic? :string
 }
 
 const AUTH_KEY = ['auth']
