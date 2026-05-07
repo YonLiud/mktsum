@@ -9,6 +9,6 @@ export function useLogout() {
   return async () => {
     await api.post('/auth/logout', {})
     clearAuth()
-    navigate({ to: '/login' })
+    navigate({ to: '/' })
   }
 }
