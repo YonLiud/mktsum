@@ -12,7 +12,6 @@ const AUTH_KEY = ['auth']
 
 export function clearAuthStorage() {
   localStorage.removeItem('auth_user')
-  localStorage.removeItem('auth_token')
 }
 
 function getStoredUser(): AuthUser | null {
