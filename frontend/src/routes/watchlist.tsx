@@ -1,11 +1,8 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { WatchlistPage } from '@/pages/WatchlistPage'
+import { requireAuth } from '@/lib/routeGuards'
 
 export const Route = createFileRoute('/watchlist')({
-  beforeLoad: () => {
-    if (!localStorage.getItem('auth_user')) {
-      throw redirect({ to: '/' })
-    }
-  },
+  beforeLoad: requireAuth,
   component: WatchlistPage,
 })

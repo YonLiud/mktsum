@@ -1,11 +1,8 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { DashboardPage } from '@/pages/DashboardPage'
+import { requireAuth } from '@/lib/routeGuards'
 
 export const Route = createFileRoute('/dashboard')({
-  beforeLoad: () => {
-    if (!localStorage.getItem('auth_user')) {
-      throw redirect({ to: '/'}) 
-    }
-  },
+  beforeLoad: requireAuth,
   component: DashboardPage,
 })
