@@ -16,14 +16,23 @@ export function useBriefings() {
   })
 }
 
+export class BriefingError extends Error {
+  status: number
+  constructor(status: number, message: string) {
+    super(message)
+    this.status = status
+  }
+}
+
 export function useBriefing(id: string) {
   return useQuery({
     queryKey: ['briefings', id],
     queryFn: async (): Promise<Briefing> => {
       const res = await api.get(`/briefings/${id}`)
-      if(!res.ok) throw new Error('Failed to fetch briefing')
+      if (!res.ok) throw new BriefingError(res.status, await res.text())
       return res.json()
-    }
+    },
+    retry: false,
   })
 }
 

@@ -1,11 +1,11 @@
 import { useNavigate } from '@tanstack/react-router'
 import { Route } from '@/routes/briefings/$briefingId'
-import { useBriefing, useSetBriefingPublic, useDeleteBriefing } from '@/hooks/useBriefings'
+import { useBriefing, useSetBriefingPublic, useDeleteBriefing, BriefingError } from '@/hooks/useBriefings'
 import { useAuth } from '@/hooks/useAuth'
 
 export function BriefingPage() {
   const { briefingId } = Route.useParams()
-  const { data: briefing, isLoading, isError } = useBriefing(briefingId)
+  const { data: briefing, isLoading, isError, error } = useBriefing(briefingId)
   const { mutate: setPublic, status: mutationStatus } = useSetBriefingPublic()
   const { mutate: deleteBriefing, isPending: isDeleting } = useDeleteBriefing()
   const { data: user } = useAuth()
@@ -13,8 +13,14 @@ export function BriefingPage() {
   const isUpdating = mutationStatus === 'pending'
   const isOwner = !!user && briefing?.user_id === user.user_id
 
-  if (isLoading) return <div>Loading...</div>
-  if (isError || !briefing) return <div>Briefing not found.</div>
+  if (isLoading) return <div>loading...</div>
+  if (isError) {
+    const status = error instanceof BriefingError ? error.status : 0
+    if (status === 403) return <div>you don't have access to this briefing.</div>
+    if (status === 404) return <div>briefing not found.</div>
+    return <div>something went wrong.</div>
+  }
+  if (!briefing) return null
 
   return (
     <div>
