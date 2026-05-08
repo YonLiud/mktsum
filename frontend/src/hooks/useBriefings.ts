@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/hooks/useAuth'
 import { api } from '@/lib/api'
 import type { Briefing } from '@/types'
@@ -27,6 +27,22 @@ export function useBriefing(id: string) {
   })
 }
 
+
+export function useSetBriefingPublic() {
+  const queryClient = useQueryClient()
+  const { data: user } = useAuth()
+  return useMutation({
+    mutationFn: async ({ id, isPublic }: { id: string; isPublic: boolean }) => {
+      const res = await api.patch(`/briefings/${id}/public`, { is_public: isPublic })
+      if (!res.ok) throw new Error('Failed to update briefing')
+      return res.json() as Promise<Briefing>
+    },
+    onSuccess: (updated) => {
+      queryClient.setQueryData(['briefings', updated.briefing_id], updated)
+      queryClient.setQueryData(['briefings', user?.user_id, 'latest'], updated)
+    },
+  })
+}
 
 export function useLatestBriefing() {
   const { data: user } = useAuth()
