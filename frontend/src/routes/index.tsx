@@ -3,7 +3,7 @@ import { HomePage } from '@/pages/HomePage'
 
 export const Route = createFileRoute('/')({
   beforeLoad: () => {
-    if (localStorage.getItem('auth_token')) {
+    if (localStorage.getItem('auth_user')) {
       throw redirect({ to: '/dashboard' })
     }
   },
