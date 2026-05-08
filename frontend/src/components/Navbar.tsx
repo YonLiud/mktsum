@@ -22,7 +22,11 @@ export function Navbar() {
         )}
       </div>
       <div className="flex items-center gap-4">
-        {user && <span className="text-sm opacity-60">{user.name}</span>}
+        {user && (
+          <Link to="/profile" className="text-sm opacity-60 hover:opacity-100 transition-opacity [&.active]:opacity-100 [&.active]:font-medium">
+            {user.name}
+          </Link>
+        )}
         {user && (
           <button onClick={logout} className="text-xs opacity-40 underline cursor-pointer">
             log out
