@@ -60,6 +60,19 @@ export const briefingController = {
     return c.json(briefing)
   },
 
+  setPublic: async (c: Context) => {
+    const id = c.req.param('id')!
+    const caller = c.get('user') as { user_id: string; role: string }
+    const existing = await briefingService.getById(id)
+    if (!existing) return c.json({ error: 'Briefing not found' }, 404)
+    if (existing.user_id !== caller.user_id && caller.role !== 'admin') {
+      return c.json({ error: 'Forbidden' }, 403)
+    }
+    const body = await c.req.json()
+    const briefing = await briefingService.setPublic(id, !!body.is_public)
+    return c.json(briefing)
+  },
+
   delete: async (c: Context) => {
     const id = c.req.param('id')!
     const briefing = await briefingService.delete(id)

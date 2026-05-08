@@ -57,6 +57,15 @@ export const briefingService = {
     return briefing
   },
 
+  setPublic: async (briefingId: string, isPublic: boolean) => {
+    const [briefing] = await db
+      .update(briefings)
+      .set({ is_public: isPublic })
+      .where(eq(briefings.briefing_id, briefingId))
+      .returning()
+    return briefing
+  },
+
   delete: async (briefingId: string) => {
     const [briefing] = await db.delete(briefings).where(eq(briefings.briefing_id, briefingId)).returning()
     return briefing

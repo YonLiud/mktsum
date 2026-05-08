@@ -8,6 +8,7 @@ router.get('/user/:userId/latest', requireAuth, requireSelf('userId'), briefingC
 router.get('/user/:userId', requireAuth, requireSelf('userId'), briefingController.getByUserId)
 router.get('/:id', optionalAuth, briefingController.getById)
 router.post('/', requireAuth, briefingController.create)
+router.patch('/:id/public', requireAuth, briefingController.setPublic)
 router.delete('/:id', requireAuth, briefingController.delete)
 
 export default router
