@@ -5,9 +5,13 @@ import { generateId } from '../lib/nanoid'
 
 export const briefingService = {
   getById: async (briefingId: string) => {
-    return await db.query.briefings.findFirst({
+    const briefing = await db.query.briefings.findFirst({
       where: eq(briefings.briefing_id, briefingId),
+      with: { user: { columns: { name: true } } },
     })
+    if (!briefing) return undefined
+    const { user, ...rest } = briefing
+    return { ...rest, user_name: user.name }
   },
 
   getByUserId: async (userId: string) => {
