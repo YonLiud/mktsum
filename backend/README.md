@@ -114,6 +114,7 @@ All routes below require `Authorization: Bearer <token>` unless noted.
 - `GET /user/:userId` - Get all briefings for user — self or admin
 - `GET /user/:userId/latest` - Get latest briefing — self or admin
 - `POST /` - Create briefing (body: `{ user_id, full_summary, short_summary, sources? }`)
+- `PATCH /:id/public` - Set `is_public` (body: `{ is_public: boolean }`) — owner only
 - `DELETE /:id` - Delete briefing
 
 #### Watchlist (`/v1/watchlist`)
