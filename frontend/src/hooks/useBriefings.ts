@@ -44,6 +44,21 @@ export function useSetBriefingPublic() {
   })
 }
 
+export function useDeleteBriefing() {
+  const queryClient = useQueryClient()
+  const { data: user } = useAuth()
+  return useMutation({
+    mutationFn: async (briefingId: string) => {
+      const res = await api.delete(`/briefings/${briefingId}`)
+      if (!res.ok) throw new Error('Failed to delete briefing')
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['briefings', user?.user_id] })
+      queryClient.invalidateQueries({ queryKey: ['briefings', user?.user_id, 'latest'] })
+    },
+  })
+}
+
 export function useLatestBriefing() {
   const { data: user } = useAuth()
   return useQuery({
