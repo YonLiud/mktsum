@@ -5,6 +5,10 @@ import styles from './root.module.css'
 
 const NO_NAV = ['/', '/login', '/signup']
 
+function isNoNav(path: string) {
+  return NO_NAV.includes(path) || path.startsWith('/legal')
+}
+
 function NotFound() {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '80px 16px' }}>
@@ -17,7 +21,7 @@ export const Route = createRootRoute({
   notFoundComponent: NotFound,
   component: () => {
     const { location } = useRouterState()
-    const showNav = !NO_NAV.includes(location.pathname)
+    const showNav = !isNoNav(location.pathname)
 
     if (!showNav) {
       return (
@@ -31,7 +35,7 @@ export const Route = createRootRoute({
       <div className={styles.layout}>
         <Navbar />
         <main className={styles.main}>
-<div key={location.pathname} className="page-transition">
+          <div key={location.pathname} className="page-transition">
             <Outlet />
           </div>
         </main>

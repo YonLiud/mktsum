@@ -31,6 +31,14 @@ export function BriefingPage() {
   const isUpdating = mutationStatus === 'pending'
   const isOwner = !!user && briefing?.user_id === user.user_id
 
+  function goBack() {
+    if (window.history.length > 1) {
+      window.history.back()
+    } else {
+      navigate({ to: '/dashboard' })
+    }
+  }
+
   function copyShareLink() {
     navigator.clipboard.writeText(window.location.href)
     setCopied(true)
@@ -39,6 +47,7 @@ export function BriefingPage() {
 
   if (isLoading) return (
     <div className={styles.page}>
+      <button className={styles.back} onClick={goBack}>← back</button>
       <div className={styles.header}>
         <Skeleton height="10px" width="120px" />
         <Skeleton height="32px" width="90%" />
@@ -59,7 +68,8 @@ export function BriefingPage() {
   if (isError) {
     const status = error instanceof BriefingError ? error.status : 0
     return (
-      <div className={styles.center}>
+      <div className={styles.page}>
+        <button className={styles.back} onClick={goBack}>← back</button>
         <EmptyState
           title={status === 403 ? 'access denied' : status === 404 ? 'not found' : 'something went wrong'}
           description={
@@ -78,6 +88,8 @@ export function BriefingPage() {
 
   return (
     <div className={styles.page}>
+
+      <button className={styles.back} onClick={goBack}>← back</button>
 
       <div className={styles.header}>
         <p className={styles.eyebrow}>briefing · {formatDate(briefing.created_at)}</p>

@@ -15,7 +15,11 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LegalIndexRouteImport } from './routes/legal/index'
 import { Route as ComponentsIndexRouteImport } from './routes/components/index'
+import { Route as LegalTermsRouteImport } from './routes/legal/terms'
+import { Route as LegalPrivacyRouteImport } from './routes/legal/privacy'
+import { Route as LegalDisclaimerRouteImport } from './routes/legal/disclaimer'
 import { Route as ComponentsComponentNameRouteImport } from './routes/components/$componentName'
 import { Route as BriefingsBriefingIdRouteImport } from './routes/briefings/$briefingId'
 
@@ -49,9 +53,29 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LegalIndexRoute = LegalIndexRouteImport.update({
+  id: '/legal/',
+  path: '/legal/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsIndexRoute = ComponentsIndexRouteImport.update({
   id: '/components/',
   path: '/components/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalTermsRoute = LegalTermsRouteImport.update({
+  id: '/legal/terms',
+  path: '/legal/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalPrivacyRoute = LegalPrivacyRouteImport.update({
+  id: '/legal/privacy',
+  path: '/legal/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalDisclaimerRoute = LegalDisclaimerRouteImport.update({
+  id: '/legal/disclaimer',
+  path: '/legal/disclaimer',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsComponentNameRoute = ComponentsComponentNameRouteImport.update({
@@ -74,7 +98,11 @@ export interface FileRoutesByFullPath {
   '/watchlist': typeof WatchlistRoute
   '/briefings/$briefingId': typeof BriefingsBriefingIdRoute
   '/components/$componentName': typeof ComponentsComponentNameRoute
+  '/legal/disclaimer': typeof LegalDisclaimerRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/terms': typeof LegalTermsRoute
   '/components/': typeof ComponentsIndexRoute
+  '/legal/': typeof LegalIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -85,7 +113,11 @@ export interface FileRoutesByTo {
   '/watchlist': typeof WatchlistRoute
   '/briefings/$briefingId': typeof BriefingsBriefingIdRoute
   '/components/$componentName': typeof ComponentsComponentNameRoute
+  '/legal/disclaimer': typeof LegalDisclaimerRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/terms': typeof LegalTermsRoute
   '/components': typeof ComponentsIndexRoute
+  '/legal': typeof LegalIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -97,7 +129,11 @@ export interface FileRoutesById {
   '/watchlist': typeof WatchlistRoute
   '/briefings/$briefingId': typeof BriefingsBriefingIdRoute
   '/components/$componentName': typeof ComponentsComponentNameRoute
+  '/legal/disclaimer': typeof LegalDisclaimerRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/terms': typeof LegalTermsRoute
   '/components/': typeof ComponentsIndexRoute
+  '/legal/': typeof LegalIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -110,7 +146,11 @@ export interface FileRouteTypes {
     | '/watchlist'
     | '/briefings/$briefingId'
     | '/components/$componentName'
+    | '/legal/disclaimer'
+    | '/legal/privacy'
+    | '/legal/terms'
     | '/components/'
+    | '/legal/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -121,7 +161,11 @@ export interface FileRouteTypes {
     | '/watchlist'
     | '/briefings/$briefingId'
     | '/components/$componentName'
+    | '/legal/disclaimer'
+    | '/legal/privacy'
+    | '/legal/terms'
     | '/components'
+    | '/legal'
   id:
     | '__root__'
     | '/'
@@ -132,7 +176,11 @@ export interface FileRouteTypes {
     | '/watchlist'
     | '/briefings/$briefingId'
     | '/components/$componentName'
+    | '/legal/disclaimer'
+    | '/legal/privacy'
+    | '/legal/terms'
     | '/components/'
+    | '/legal/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -144,7 +192,11 @@ export interface RootRouteChildren {
   WatchlistRoute: typeof WatchlistRoute
   BriefingsBriefingIdRoute: typeof BriefingsBriefingIdRoute
   ComponentsComponentNameRoute: typeof ComponentsComponentNameRoute
+  LegalDisclaimerRoute: typeof LegalDisclaimerRoute
+  LegalPrivacyRoute: typeof LegalPrivacyRoute
+  LegalTermsRoute: typeof LegalTermsRoute
   ComponentsIndexRoute: typeof ComponentsIndexRoute
+  LegalIndexRoute: typeof LegalIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -191,11 +243,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/legal/': {
+      id: '/legal/'
+      path: '/legal'
+      fullPath: '/legal/'
+      preLoaderRoute: typeof LegalIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/': {
       id: '/components/'
       path: '/components'
       fullPath: '/components/'
       preLoaderRoute: typeof ComponentsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/terms': {
+      id: '/legal/terms'
+      path: '/legal/terms'
+      fullPath: '/legal/terms'
+      preLoaderRoute: typeof LegalTermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/privacy': {
+      id: '/legal/privacy'
+      path: '/legal/privacy'
+      fullPath: '/legal/privacy'
+      preLoaderRoute: typeof LegalPrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/disclaimer': {
+      id: '/legal/disclaimer'
+      path: '/legal/disclaimer'
+      fullPath: '/legal/disclaimer'
+      preLoaderRoute: typeof LegalDisclaimerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/$componentName': {
@@ -224,7 +304,11 @@ const rootRouteChildren: RootRouteChildren = {
   WatchlistRoute: WatchlistRoute,
   BriefingsBriefingIdRoute: BriefingsBriefingIdRoute,
   ComponentsComponentNameRoute: ComponentsComponentNameRoute,
+  LegalDisclaimerRoute: LegalDisclaimerRoute,
+  LegalPrivacyRoute: LegalPrivacyRoute,
+  LegalTermsRoute: LegalTermsRoute,
   ComponentsIndexRoute: ComponentsIndexRoute,
+  LegalIndexRoute: LegalIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
