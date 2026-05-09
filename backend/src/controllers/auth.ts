@@ -25,10 +25,11 @@ export const authController = {
 
     const session = await sessionService.create(user.user_id)
 
+    const isProduction = Bun.env.NODE_ENV === 'production'
     setCookie(c, COOKIE_NAME, session.session_id, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'Strict',
+      secure: isProduction,
+      sameSite: isProduction ? 'Strict' : 'Lax',
       path: '/',
       maxAge: COOKIE_TTL,
     })
