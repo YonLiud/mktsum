@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { Route } from '@/routes/briefings/$briefingId'
 import { useBriefing, useSetBriefingPublic, useDeleteBriefing, BriefingError } from '@/hooks/useBriefings'
@@ -26,8 +27,15 @@ export function BriefingPage() {
   const { mutate: deleteBriefing, isPending: isDeleting } = useDeleteBriefing()
   const { data: user } = useAuth()
   const navigate = useNavigate()
+  const [copied, setCopied] = useState(false)
   const isUpdating = mutationStatus === 'pending'
   const isOwner = !!user && briefing?.user_id === user.user_id
+
+  function copyShareLink() {
+    navigator.clipboard.writeText(window.location.href)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   if (isLoading) return (
     <div className={styles.page}>
@@ -127,6 +135,15 @@ export function BriefingPage() {
             >
               {briefing.is_public ? 'make private' : 'make public'}
             </Button>
+            {briefing.is_public && (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={copyShareLink}
+              >
+                {copied ? 'copied!' : 'copy link'}
+              </Button>
+            )}
             <Button
               variant="danger"
               size="sm"
