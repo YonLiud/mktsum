@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { Route } from '@/routes/briefings/$briefingId'
 import { useBriefing, useSetBriefingPublic, useDeleteBriefing, BriefingError } from '@/hooks/useBriefings'
 import { useAuth } from '@/hooks/useAuth'
@@ -132,6 +132,15 @@ export function BriefingPage() {
               </a>
             ))}
           </div>
+        </>
+      )}
+
+      {!user && (
+        <>
+          <Divider />
+          <p className={styles.publicFooter}>
+            <Link to="/legal">legal & policies</Link>
+          </p>
         </>
       )}
 

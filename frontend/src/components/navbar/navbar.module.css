@@ -82,6 +82,9 @@
   color: var(--sidebar-item-active-text);
 }
 
+/* legal link — desktop: inherits .link styles; mobile: override below */
+.legalLink {}
+
 /* ─── Bottom nav — mobile ───────────────────────────────── */
 @media (max-width: 767px) {
   .nav {
@@ -163,5 +166,33 @@
   .themeBtn:hover {
     background: transparent;
     color: var(--nav-active);
+  }
+
+  /* hide theme from bottom nav, show legal instead */
+  .themeBtn {
+    display: none;
+  }
+
+  .legalLink {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 0;
+    border-radius: 0;
+    font-size: 0.625rem;
+    color: var(--nav-inactive);
+    text-decoration: none;
+  }
+
+  .legalLink:hover {
+    color: var(--nav-active);
+  }
+
+  .legalLink:global(.active) {
+    color: var(--nav-active);
+    font-weight: 600;
   }
 }

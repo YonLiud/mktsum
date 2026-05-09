@@ -121,6 +121,22 @@
   flex-shrink: 0;
 }
 
+/* ── public footer (unauthenticated) ── */
+.publicFooter {
+  font-size: 0.8125rem;
+  color: var(--text-tertiary);
+  text-align: center;
+}
+
+.publicFooter a {
+  color: var(--text-accent);
+  text-decoration: none;
+}
+
+.publicFooter a:hover {
+  text-decoration: underline;
+}
+
 /* ── owner actions ── */
 .actions {
   display: flex;

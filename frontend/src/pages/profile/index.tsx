@@ -1,8 +1,11 @@
 import { useState } from 'react'
+import { Link } from '@tanstack/react-router'
+import { Sun, Moon } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useUpdateUser } from '@/hooks/useUpdateUser'
 import { useLogout } from '@/hooks/useLogout'
 import { useLogoutAll } from '@/hooks/useLogoutAll'
+import { useTheme } from '@/hooks/useTheme'
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -15,6 +18,7 @@ export function ProfilePage() {
   const { mutate: updateUser, isPending } = useUpdateUser()
   const logout = useLogout()
   const logoutAll = useLogoutAll()
+  const { theme, toggle } = useTheme()
   const [isEditing, setIsEditing] = useState(false)
   const [form, setForm] = useState({ name: user?.name ?? '', ntfy_topic: user?.ntfy_topic ?? '' })
 
@@ -97,6 +101,28 @@ export function ProfilePage() {
           </Button>
         </div>
         <p className={styles.syncNote}>data syncs every 10s — may take a moment to reflect across sessions.</p>
+      </div>
+
+      <Divider />
+
+      <div className={styles.section}>
+        <div className={styles.field}>
+          <p className={styles.fieldLabel}>appearance</p>
+          <p className={styles.fieldValue}>{theme === 'dark' ? 'dark mode' : 'light mode'}</p>
+        </div>
+        <Button variant="ghost" size="sm" onClick={toggle}>
+          {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
+          switch to {theme === 'dark' ? 'light' : 'dark'} mode
+        </Button>
+      </div>
+
+      <Divider />
+
+      <div className={styles.section}>
+        <div className={styles.field}>
+          <p className={styles.fieldLabel}>legal</p>
+        </div>
+        <Link to="/legal" className={styles.legalLink}>terms, privacy & disclaimer →</Link>
       </div>
 
     </div>

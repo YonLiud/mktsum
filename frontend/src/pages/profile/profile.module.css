@@ -74,3 +74,14 @@
   color: var(--text-tertiary);
   line-height: 1.5;
 }
+
+.legalLink {
+  font-size: 0.875rem;
+  color: var(--text-accent);
+  text-decoration: none;
+  align-self: flex-start;
+}
+
+.legalLink:hover {
+  text-decoration: underline;
+}

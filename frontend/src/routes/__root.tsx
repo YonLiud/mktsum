@@ -1,6 +1,7 @@
 import { createRootRoute, Outlet, useRouterState } from '@tanstack/react-router'
 import { Navbar } from '@/components/navbar'
 import { EmptyState } from '@/components/ui/empty-state'
+import { useAuth } from '@/hooks/useAuth'
 import styles from './root.module.css'
 
 const NO_NAV = ['/', '/login', '/signup']
@@ -21,7 +22,8 @@ export const Route = createRootRoute({
   notFoundComponent: NotFound,
   component: () => {
     const { location } = useRouterState()
-    const showNav = !isNoNav(location.pathname)
+    const { data: user } = useAuth()
+    const showNav = !isNoNav(location.pathname) && !!user
 
     if (!showNav) {
       return (

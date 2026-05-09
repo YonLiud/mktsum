@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { LayoutDashboard, BookMarked, User, Sun, Moon } from 'lucide-react'
+import { LayoutDashboard, BookMarked, User, Sun, Moon, Scale } from 'lucide-react'
 import { useTheme } from '@/hooks/useTheme'
 import styles from './navbar.module.css'
 
@@ -30,6 +30,10 @@ export function Navbar() {
           {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
           {theme === 'dark' ? 'light mode' : 'dark mode'}
         </button>
+        <Link to="/legal" className={`${styles.link} ${styles.legalLink}`}>
+          <Scale size={16} />
+          legal
+        </Link>
       </div>
     </nav>
   )
