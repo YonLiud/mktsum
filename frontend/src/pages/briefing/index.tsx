@@ -30,6 +30,7 @@ export function BriefingPage() {
   const { data: user } = useAuth()
   const navigate = useNavigate()
   const [copied, setCopied] = useState(false)
+  const [showSources, setShowSources] = useState(false)
   const isUpdating = mutationStatus === 'pending'
   const isOwner = !!user && briefing?.user_id === user.user_id
 
@@ -117,8 +118,13 @@ export function BriefingPage() {
         <>
           <Divider />
           <div className={styles.sources}>
-            <p className={styles.sectionLabel}>sources</p>
-            {briefing.sources.map((s, i) => (
+            <button className={styles.sourcesToggle} onClick={() => setShowSources(v => !v)}>
+              <span className={styles.sectionLabel}>sources ({briefing.sources.length})</span>
+              <svg className={`${styles.chevron} ${showSources ? styles.chevronOpen : ''}`} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+            {showSources && briefing.sources.map((s, i) => (
               <a
                 key={i}
                 href={s.url}
