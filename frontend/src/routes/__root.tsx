@@ -2,7 +2,7 @@ import { createRootRoute, Outlet, useRouterState } from '@tanstack/react-router'
 import { Navbar } from '@/components/navbar'
 import styles from './root.module.css'
 
-const NO_NAV = ['/', '/login']
+const NO_NAV = ['/', '/login', '/signup']
 
 export const Route = createRootRoute({
   component: () => {

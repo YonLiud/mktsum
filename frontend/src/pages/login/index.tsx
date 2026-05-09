@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import { useLogin } from '@/hooks/useLogin'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -16,6 +17,9 @@ export function LoginPage() {
           {error && <p className={styles.error}>{error}</p>}
           <Button type="submit" loading={isLoading}>log in</Button>
         </form>
+        <p className={styles.switch}>
+          no account? <Link to="/signup" className={styles.switchLink}>sign up</Link>
+        </p>
       </div>
     </div>
   )

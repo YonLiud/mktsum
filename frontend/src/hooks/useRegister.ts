@@ -43,10 +43,9 @@ export function useRegister() {
       return
     }
 
-    const { token, ...user } = await loginRes.json()
-    localStorage.setItem('auth_token', token)
+    const user = await loginRes.json()
     setAuth(user)
-    navigate({ to: '/' })
+    navigate({ to: '/dashboard' })
   }
 
   return { error, isLoading, handleSubmit }
