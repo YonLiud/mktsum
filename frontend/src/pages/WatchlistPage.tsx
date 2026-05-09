@@ -1,5 +1,12 @@
 import { useState } from 'react'
 import { useWatchlist, useAddTicker, useRemoveTicker } from '@/hooks/useWatchlist'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { WatchlistItem } from '@/components/ui/watchlist-item'
+import { EmptyState } from '@/components/ui/empty-state'
+import { Spinner } from '@/components/ui/spinner'
+import { Divider } from '@/components/ui/divider'
+import styles from './watchlist.module.css'
 
 export function WatchlistPage() {
   const { data: watchlist, isLoading } = useWatchlist()
@@ -20,59 +27,65 @@ export function WatchlistPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-12 flex flex-col gap-8">
+    <div className={styles.page}>
+
       <div>
-        <h1 className="text-3xl font-medium">watchlist.</h1>
-        <p className="text-sm opacity-50 mt-1">your tracked tickers</p>
+        <p className={styles.title}>watchlist.</p>
+        <p className={styles.subtitle}>your tracked tickers</p>
       </div>
 
-      <form onSubmit={handleAdd} className="flex gap-2">
-        <input
+      <Divider />
+
+      <form onSubmit={handleAdd} className={styles.addRow}>
+        <Input
           value={input}
           onChange={e => setInput(e.target.value)}
-          placeholder="add ticker (e.g. AAPL)"
-          className="flex-1 border border-current/20 rounded-lg px-3 py-2 text-sm bg-transparent focus:outline-none focus:border-current/40"
+          placeholder="ticker symbol"
+          mono
+          className={styles.addInput}
         />
-        <button
+        <Button
           type="submit"
-          disabled={isAdding || !input.trim()}
-          className="px-4 py-2 text-sm border border-current/20 rounded-lg hover:bg-current/5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          variant="secondary"
+          loading={isAdding}
+          disabled={!input.trim()}
         >
-          {isAdding ? 'adding...' : 'add'}
-        </button>
+          add
+        </Button>
       </form>
 
       {addError && (
-        <p className="text-sm text-red-500 -mt-4">
+        <p className={styles.error}>
           {(addError as Error).message.includes('Failed') ? 'ticker not found or already on watchlist.' : (addError as Error).message}
         </p>
       )}
 
+      <Divider />
+
       {isLoading ? (
-        <p className="text-sm opacity-40">loading...</p>
+        <div className={styles.center}>
+          <Spinner size="sm" />
+        </div>
       ) : !watchlist?.length ? (
-        <p className="text-sm opacity-40">no tickers yet. add one above.</p>
+        <EmptyState
+          title="no tickers yet"
+          description="add a ticker above to start tracking it."
+        />
       ) : (
-        <div className="flex flex-col gap-2">
-          <p className="text-xs opacity-40 uppercase tracking-widest">tickers</p>
-          <div className="flex flex-col gap-1">
-            {watchlist.map(entry => (
-              <div
-                key={entry.watchlist_id}
-                className="flex items-center justify-between border border-current/10 rounded-lg px-4 py-3"
-              >
-                <span className="font-medium">{entry.ticker}</span>
-                <button
-                  onClick={() => removeTicker(entry.watchlist_id)}
-                  className="text-xs opacity-40 hover:opacity-80 transition-opacity cursor-pointer"
-                >
-                  remove
-                </button>
-              </div>
-            ))}
-          </div>
+        <div className={styles.list}>
+          <p className={styles.sectionLabel}>
+            {watchlist.length} ticker{watchlist.length === 1 ? '' : 's'} tracked
+          </p>
+          {watchlist.map(entry => (
+            <WatchlistItem
+              key={entry.watchlist_id}
+              symbol={entry.ticker}
+              onRemove={() => removeTicker(entry.watchlist_id)}
+            />
+          ))}
         </div>
       )}
+
     </div>
   )
 }

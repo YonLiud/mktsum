@@ -1,30 +1,143 @@
-import { Link } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import { useAuth } from '@/hooks/useAuth'
-import { useLatestBriefing } from '@/hooks/useBriefings'
+import { useBriefings, useLatestBriefing } from '@/hooks/useBriefings'
+import { useWatchlist } from '@/hooks/useWatchlist'
+import { Divider } from '@/components/ui/divider'
+import { Spinner } from '@/components/ui/spinner'
+import { TickerPill } from '@/components/ui/ticker-pill'
+import type { Briefing } from '@/types'
+import styles from './dashboard.module.css'
+
+function isToday(dateStr: string) {
+  const d = new Date(dateStr)
+  const now = new Date()
+  return d.getFullYear() === now.getFullYear()
+    && d.getMonth() === now.getMonth()
+    && d.getDate() === now.getDate()
+}
+
+function greeting() {
+  const h = new Date().getHours()
+  if (h < 12) return 'good morning'
+  if (h < 17) return 'good afternoon'
+  return 'good evening'
+}
+
+function formatDate() {
+  return new Date().toLocaleDateString('en-US', {
+    weekday: 'long', month: 'long', day: 'numeric',
+  }).toLowerCase()
+}
+
+function formatTime(dateStr: string) {
+  return new Date(dateStr).toLocaleTimeString('en-US', {
+    hour: 'numeric', minute: '2-digit',
+  }).toLowerCase()
+}
+
+function formatBriefingDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    month: 'long', day: 'numeric',
+  }).toLowerCase() + ' briefing'
+}
+
+function tickers(b: Briefing) {
+  return [...new Set(b.sources?.map(s => s.ticker) ?? [])]
+}
 
 export function DashboardPage() {
+  const navigate = useNavigate()
   const { data: user } = useAuth()
-  const { data: briefing } = useLatestBriefing()
+  const { data: latest } = useLatestBriefing()
+  const { data: allBriefings } = useBriefings()
+  const { data: watchlist } = useWatchlist()
+
+  const todaysBriefing = latest && isToday(latest.created_at) ? latest : null
+  const past = (allBriefings ?? [])
+    .filter(b => b.briefing_id !== todaysBriefing?.briefing_id)
+    .slice(0, 3)
+  const hasMore = (allBriefings?.length ?? 0) - (todaysBriefing ? 1 : 0) > 3
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-12 flex flex-col gap-8">
+    <div className={styles.page}>
+
+      {/* page header */}
       <div>
-        <h1 className="text-3xl font-medium">dashboard.</h1>
-        <p className="text-sm opacity-50 mt-1">hey, {user?.name}</p>
+        <p className={styles.greeting}>{greeting()}, {user?.name}.</p>
+        <p className={styles.meta}>
+          {formatDate()} · {watchlist?.length ?? 0} ticker{watchlist?.length === 1 ? '' : 's'} tracked
+        </p>
       </div>
 
-      {briefing && (
-        <div className="flex flex-col gap-2">
-          <p className="text-xs opacity-40 uppercase tracking-widest">Latest briefing</p>
-          <Link
-            to="/briefings/$briefingId"
-            params={{ briefingId: briefing.briefing_id }}
-            className="border border-current/10 rounded-lg p-4 hover:bg-current/5 transition-colors"
-          >
-            <p className="font-medium">{briefing.short_summary}</p>
-          </Link>
+      <Divider />
+
+      {/* today's briefing */}
+      {todaysBriefing ? (
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <p className={styles.eyebrow}>today's briefing</p>
+            <p className={styles.cardTitle}>{todaysBriefing.short_summary}</p>
+          </div>
+          <div className={`${styles.cardBody} selectable`}>
+            <p className={styles.preview}>{todaysBriefing.full_summary}</p>
+            {tickers(todaysBriefing).length > 0 && (
+              <div className={styles.tickers}>
+                {tickers(todaysBriefing).map(t => <TickerPill key={t} symbol={t} />)}
+              </div>
+            )}
+            <div className={styles.cardFooter}>
+              <span className={styles.generatedAt}>
+                generated {formatTime(todaysBriefing.created_at)}
+              </span>
+              <button
+                className={styles.readMore}
+                onClick={() => navigate({ to: '/briefings/$briefingId', params: { briefingId: todaysBriefing.briefing_id } })}
+              >
+                read full briefing →
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className={styles.generating}>
+          <Spinner size="sm" />
+          <p className={styles.generatingLabel}>briefing generating...</p>
         </div>
       )}
+
+      {/* past briefings */}
+      {past.length > 0 && (
+        <>
+          <Divider />
+          <div>
+            <p className={styles.sectionLabel}>past briefings</p>
+            {past.map(b => (
+              <button
+                key={b.briefing_id}
+                className={styles.briefingRow}
+                onClick={() => navigate({ to: '/briefings/$briefingId', params: { briefingId: b.briefing_id } })}
+              >
+                <div>
+                  <p className={styles.rowDate}>{formatBriefingDate(b.created_at)}</p>
+                  <p className={styles.rowSubtitle}>{b.short_summary}</p>
+                </div>
+                <svg className={styles.chevron} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </button>
+            ))}
+            {hasMore && (
+              <button
+                className={styles.viewAll}
+                onClick={() => navigate({ to: '/briefings/$briefingId', params: { briefingId: 'all' } })}
+              >
+                view all →
+              </button>
+            )}
+          </div>
+        </>
+      )}
+
     </div>
   )
 }

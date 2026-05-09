@@ -1,8 +1,11 @@
 import { useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
+import styles from './home.module.css'
 
 export function HomePage() {
   const [dark, setDark] = useState(false)
+  const navigate = useNavigate()
 
   function toggleTheme() {
     setDark(d => {
@@ -12,46 +15,25 @@ export function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-base text-foreground px-4 py-12 max-w-lg mx-auto flex flex-col gap-12">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">mktsum.</h1>
-          <p className="text-muted text-sm mt-1">component library</p>
-        </div>
+    <div className={styles.page}>
+
+      <div className={styles.topRight}>
         <Button variant="ghost" size="sm" onClick={toggleTheme}>
           {dark ? 'light' : 'dark'}
         </Button>
       </div>
 
-      <section className="flex flex-col gap-4">
-        <p className="section-label">button</p>
+      <div className={styles.inner}>
+        <h1 className={styles.wordmark}>mktsum.</h1>
+        <p className={styles.tagline}>
+          ai-powered market briefings,<br />
+          delivered daily to your watchlist.
+        </p>
+        <Button className={styles.cta} onClick={() => navigate({ to: '/login' })}>
+          log in
+        </Button>
+      </div>
 
-        <div className="flex flex-col gap-3">
-          <p className="text-subtle text-xs">variants</p>
-          <div className="flex flex-wrap gap-2">
-            <Button variant="primary">primary</Button>
-            <Button variant="ghost">ghost</Button>
-            <Button variant="danger">danger</Button>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-3">
-          <p className="text-subtle text-xs">sizes</p>
-          <div className="flex flex-wrap items-center gap-2">
-            <Button size="md">medium</Button>
-            <Button size="sm">small</Button>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-3">
-          <p className="text-subtle text-xs">disabled</p>
-          <div className="flex flex-wrap gap-2">
-            <Button disabled>primary</Button>
-            <Button variant="ghost" disabled>ghost</Button>
-            <Button variant="danger" disabled>danger</Button>
-          </div>
-        </div>
-      </section>
     </div>
   )
 }

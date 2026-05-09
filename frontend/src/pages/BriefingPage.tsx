@@ -2,6 +2,22 @@ import { useNavigate } from '@tanstack/react-router'
 import { Route } from '@/routes/briefings/$briefingId'
 import { useBriefing, useSetBriefingPublic, useDeleteBriefing, BriefingError } from '@/hooks/useBriefings'
 import { useAuth } from '@/hooks/useAuth'
+import { Spinner } from '@/components/ui/spinner'
+import { Button } from '@/components/ui/button'
+import { Divider } from '@/components/ui/divider'
+import { TickerPill } from '@/components/ui/ticker-pill'
+import { EmptyState } from '@/components/ui/empty-state'
+import styles from './briefing.module.css'
+
+function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    weekday: 'long', month: 'long', day: 'numeric',
+  }).toLowerCase()
+}
+
+function uniqueTickers(sources: { ticker: string }[]) {
+  return [...new Set(sources.map(s => s.ticker))]
+}
 
 export function BriefingPage() {
   const { briefingId } = Route.useParams()
@@ -13,54 +29,103 @@ export function BriefingPage() {
   const isUpdating = mutationStatus === 'pending'
   const isOwner = !!user && briefing?.user_id === user.user_id
 
-  if (isLoading) return <div>loading...</div>
+  if (isLoading) return (
+    <div className={styles.center}>
+      <Spinner size="md" />
+    </div>
+  )
+
   if (isError) {
     const status = error instanceof BriefingError ? error.status : 0
-    if (status === 403) return <div>you don't have access to this briefing.</div>
-    if (status === 404) return <div>briefing not found.</div>
-    return <div>something went wrong.</div>
+    return (
+      <div className={styles.center}>
+        <EmptyState
+          title={status === 403 ? 'access denied' : status === 404 ? 'not found' : 'something went wrong'}
+          description={
+            status === 403 ? "you don't have access to this briefing."
+            : status === 404 ? 'this briefing does not exist.'
+            : 'try again later.'
+          }
+        />
+      </div>
+    )
   }
+
   if (!briefing) return null
 
+  const tickers = briefing.sources ? uniqueTickers(briefing.sources) : []
+
   return (
-    <div>
-      <div>
-        <h1>{briefing.short_summary}</h1>
-        <p>{new Date(briefing.created_at).toLocaleString()}</p>
-        {isOwner && (
-          <>
-            <button
-              onClick={() => setPublic({ id: briefing.briefing_id, isPublic: !briefing.is_public })}
-              disabled={isUpdating}
-              style={{ cursor: isUpdating ? 'wait' : 'pointer' }}
-            >
-              {isUpdating ? 'updating...' : briefing.is_public ? 'make private' : 'make public'}
-            </button>
-            <button
-              onClick={() => deleteBriefing(briefing.briefing_id, { onSuccess: () => navigate({ to: '/dashboard' }) })}
-              disabled={isDeleting}
-              style={{ cursor: isDeleting ? 'wait' : 'pointer' }}
-            >
-              {isDeleting ? 'deleting...' : 'delete'}
-            </button>
-          </>
-        )}
+    <div className={styles.page}>
+
+      <div className={styles.header}>
+        <p className={styles.eyebrow}>briefing · {formatDate(briefing.created_at)}</p>
+        <h1 className={styles.title}>{briefing.short_summary}</h1>
       </div>
-      <p>{briefing.full_summary}</p>
-      {briefing.sources && briefing.sources.length > 0 && (
-        <details>
-          <summary>Sources ({briefing.sources.length})</summary>
-          <ul>
-            {briefing.sources.map((s, i) => (
-              <li key={i}>
-                <span>{s.ticker}</span>
-                {' — '}
-                <a href={s.url} target="_blank" rel="noopener noreferrer">{s.title}</a>
-              </li>
-            ))}
-          </ul>
-        </details>
+
+      <Divider />
+
+      <p className={`${styles.body} selectable`}>{briefing.full_summary}</p>
+
+      {tickers.length > 0 && (
+        <>
+          <Divider />
+          <div className={styles.tickers}>
+            {tickers.map(t => <TickerPill key={t} symbol={t} />)}
+          </div>
+        </>
       )}
+
+      {briefing.sources && briefing.sources.length > 0 && (
+        <>
+          <Divider />
+          <div className={styles.sources}>
+            <p className={styles.sectionLabel}>sources</p>
+            {briefing.sources.map((s, i) => (
+              <a
+                key={i}
+                href={s.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.sourceItem}
+              >
+                <TickerPill symbol={s.ticker} />
+                <span className={styles.sourceTitle}>{s.title}</span>
+                <svg className={styles.externalIcon} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
+              </a>
+            ))}
+          </div>
+        </>
+      )}
+
+      {isOwner && (
+        <>
+          <Divider />
+          <div className={styles.actions}>
+            <Button
+              variant="ghost"
+              size="sm"
+              loading={isUpdating}
+              onClick={() => setPublic({ id: briefing.briefing_id, isPublic: !briefing.is_public })}
+            >
+              {briefing.is_public ? 'make private' : 'make public'}
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              loading={isDeleting}
+              onClick={() => deleteBriefing(briefing.briefing_id, { onSuccess: () => navigate({ to: '/dashboard' }) })}
+            >
+              delete
+            </Button>
+          </div>
+        </>
+      )}
+
     </div>
   )
 }
