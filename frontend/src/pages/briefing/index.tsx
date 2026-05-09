@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Route } from '@/routes/briefings/$briefingId'
 import { useBriefing, useSetBriefingPublic, useDeleteBriefing, BriefingError } from '@/hooks/useBriefings'
@@ -98,7 +100,9 @@ export function BriefingPage() {
 
       <Divider />
 
-      <p className={`${styles.body} selectable`}>{briefing.full_summary}</p>
+      <div className={`${styles.body} selectable`}>
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{briefing.full_summary}</ReactMarkdown>
+      </div>
 
       {tickers.length > 0 && (
         <>
