@@ -121,6 +121,8 @@
   --negative:        #dc2626;
   --danger-border:   #fecaca;
   --danger-text:     #dc2626;
+  --success-border:  #bbf7d0;
+  --success-text:    #16a34a;
 
   /* sidebar */
   --sidebar-bg:               #fafafa;
@@ -194,6 +196,8 @@
   --negative:        #f87171;
   --danger-border:   #3a1a1a;
   --danger-text:     #f87171;
+  --success-border:  #14532d;
+  --success-text:    #4ade80;
 
   /* sidebar */
   --sidebar-bg:               #171717;
