@@ -1,10 +1,10 @@
 import { Link } from '@tanstack/react-router'
-import { LayoutDashboard, BookMarked, User, LogOut } from 'lucide-react'
-import { useLogout } from '@/hooks/useLogout'
+import { LayoutDashboard, BookMarked, User, Sun, Moon } from 'lucide-react'
+import { useTheme } from '@/hooks/useTheme'
 import styles from './navbar.module.css'
 
 export function Navbar() {
-  const logout = useLogout()
+  const { theme, toggle } = useTheme()
 
   return (
     <nav className={styles.nav}>
@@ -26,9 +26,9 @@ export function Navbar() {
           <User size={16} />
           profile
         </Link>
-        <button className={styles.logout} onClick={logout}>
-          <LogOut size={16} />
-          log out
+        <button className={styles.themeBtn} onClick={toggle}>
+          {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+          {theme === 'dark' ? 'light mode' : 'dark mode'}
         </button>
       </div>
     </nav>

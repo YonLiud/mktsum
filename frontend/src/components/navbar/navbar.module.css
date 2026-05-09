@@ -60,7 +60,7 @@
   border-top: 0.5px solid var(--sidebar-border);
 }
 
-.logout {
+.themeBtn {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -74,11 +74,12 @@
   font-family: var(--font-sans);
   text-align: left;
   width: 100%;
-  transition: color 0.12s;
+  transition: background 0.12s, color 0.12s;
 }
 
-.logout:hover {
-  color: var(--negative);
+.themeBtn:hover {
+  background: var(--sidebar-item-active-bg);
+  color: var(--sidebar-item-active-text);
 }
 
 /* ─── Bottom nav — mobile ───────────────────────────────── */
@@ -113,7 +114,7 @@
   }
 
   .footer {
-    flex: 1;
+    flex: 2;
     flex-direction: row;
     align-items: stretch;
     border-top: none;
@@ -145,7 +146,22 @@
     font-weight: 600;
   }
 
-  .logout {
-    display: none;
+  .themeBtn {
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 0;
+    border-radius: 0;
+    font-size: 0.625rem;
+    color: var(--nav-inactive);
+    width: auto;
+    text-align: center;
+  }
+
+  .themeBtn:hover {
+    background: transparent;
+    color: var(--nav-active);
   }
 }
