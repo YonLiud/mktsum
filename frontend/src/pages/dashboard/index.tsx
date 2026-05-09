@@ -17,11 +17,46 @@ function isToday(dateStr: string) {
     && d.getDate() === now.getDate()
 }
 
-function greeting() {
+const GREETINGS_MORNING = [
+  (name: string) => `good morning, ${name}.`,
+  (name: string) => `morning, ${name}.`,
+  (name: string) => `early start, ${name}?`,
+  (name: string) => `markets open soon, ${name}.`,
+  (name: string) => `rise and grind, ${name}.`,
+]
+
+const GREETINGS_AFTERNOON = [
+  (name: string) => `good afternoon, ${name}.`,
+  (name: string) => `afternoon, ${name}.`,
+  (name: string) => `how's the day treating you, ${name}?`,
+  (name: string) => `keeping an eye on things, ${name}?`,
+]
+
+const GREETINGS_EVENING = [
+  (name: string) => `good evening, ${name}.`,
+  (name: string) => `winding down, ${name}?`,
+  (name: string) => `markets are closed, ${name}. rest up.`,
+  (name: string) => `evening, ${name}.`,
+]
+
+const GREETINGS_GENERAL = [
+  (name: string) => `how are you, ${name}?`,
+  (name: string) => `welcome back, ${name}.`,
+  (name: string) => `hey, ${name}.`,
+  (name: string) => `glad you're here, ${name}.`,
+  (name: string) => `what's the plan, ${name}?`,
+  (name: string) => `nice to see you, ${name}.`,
+  (name: string) => `ready to check the markets, ${name}?`,
+  (name: string) => `let's see what's moving, ${name}.`,
+  (name: string) => `back again, ${name}.`,
+  (name: string) => `your watchlist is waiting, ${name}.`,
+]
+
+function greeting(name: string) {
   const h = new Date().getHours()
-  if (h < 12) return 'good morning'
-  if (h < 17) return 'good afternoon'
-  return 'good evening'
+  const timeBucket = h < 12 ? GREETINGS_MORNING : h < 17 ? GREETINGS_AFTERNOON : GREETINGS_EVENING
+  const pool = [...timeBucket, ...GREETINGS_GENERAL]
+  return pool[Math.floor(Math.random() * pool.length)](name)
 }
 
 function formatDate() {
@@ -64,7 +99,7 @@ export function DashboardPage() {
 
       {/* page header */}
       <div>
-        <p className={styles.greeting}>{greeting()}, {user?.name}.</p>
+        <p className={styles.greeting}>{greeting(user?.name ?? '')}</p>
         <p className={styles.meta}>
           {formatDate()} · {watchlist?.length ?? 0} ticker{watchlist?.length === 1 ? '' : 's'} tracked
         </p>
