@@ -2,11 +2,11 @@ import { useNavigate } from '@tanstack/react-router'
 import { Route } from '@/routes/briefings/$briefingId'
 import { useBriefing, useSetBriefingPublic, useDeleteBriefing, BriefingError } from '@/hooks/useBriefings'
 import { useAuth } from '@/hooks/useAuth'
-import { Spinner } from '@/components/ui/spinner'
 import { Button } from '@/components/ui/button'
 import { Divider } from '@/components/ui/divider'
 import { TickerPill } from '@/components/ui/ticker-pill'
 import { EmptyState } from '@/components/ui/empty-state'
+import { Skeleton } from '@/components/ui/skeleton'
 import styles from './briefing.module.css'
 
 function formatDate(dateStr: string) {
@@ -30,8 +30,21 @@ export function BriefingPage() {
   const isOwner = !!user && briefing?.user_id === user.user_id
 
   if (isLoading) return (
-    <div className={styles.center}>
-      <Spinner size="md" />
+    <div className={styles.page}>
+      <div className={styles.header}>
+        <Skeleton height="10px" width="120px" />
+        <Skeleton height="32px" width="90%" />
+        <Skeleton height="32px" width="55%" />
+      </div>
+      <Divider />
+      <div className={styles.skeletonBody}>
+        <Skeleton height="15px" />
+        <Skeleton height="15px" />
+        <Skeleton height="15px" />
+        <Skeleton height="15px" width="80%" />
+        <Skeleton height="15px" />
+        <Skeleton height="15px" width="65%" />
+      </div>
     </div>
   )
 

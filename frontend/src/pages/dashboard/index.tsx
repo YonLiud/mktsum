@@ -4,6 +4,7 @@ import { useBriefings, useLatestBriefing } from '@/hooks/useBriefings'
 import { useWatchlist } from '@/hooks/useWatchlist'
 import { Divider } from '@/components/ui/divider'
 import { Spinner } from '@/components/ui/spinner'
+import { Skeleton } from '@/components/ui/skeleton'
 import { TickerPill } from '@/components/ui/ticker-pill'
 import type { Briefing } from '@/types'
 import styles from './dashboard.module.css'
@@ -48,8 +49,8 @@ function tickers(b: Briefing) {
 export function DashboardPage() {
   const navigate = useNavigate()
   const { data: user } = useAuth()
-  const { data: latest } = useLatestBriefing()
-  const { data: allBriefings } = useBriefings()
+  const { data: latest, isLoading: latestLoading } = useLatestBriefing()
+  const { data: allBriefings, isLoading: briefingsLoading } = useBriefings()
   const { data: watchlist } = useWatchlist()
 
   const todaysBriefing = latest && isToday(latest.created_at) ? latest : null
@@ -72,7 +73,20 @@ export function DashboardPage() {
       <Divider />
 
       {/* today's briefing */}
-      {todaysBriefing ? (
+      {latestLoading ? (
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <Skeleton variant="dark" height="10px" width="80px" />
+            <Skeleton variant="dark" height="18px" width="90%" />
+            <Skeleton variant="dark" height="18px" width="60%" />
+          </div>
+          <div className={styles.cardBody}>
+            <Skeleton height="13px" />
+            <Skeleton height="13px" />
+            <Skeleton height="13px" width="70%" />
+          </div>
+        </div>
+      ) : todaysBriefing ? (
         <div className={styles.card}>
           <div className={styles.cardHeader}>
             <p className={styles.eyebrow}>today's briefing</p>

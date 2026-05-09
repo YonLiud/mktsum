@@ -38,6 +38,13 @@
   margin: 0;
 }
 
+/* ── skeleton body ── */
+.skeletonBody {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 /* ── body ── */
 .body {
   font-size: 0.9375rem;

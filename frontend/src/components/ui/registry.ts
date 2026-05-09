@@ -15,6 +15,7 @@ import { showcase as searchInput }   from './search-input/showcase'
 import { showcase as briefingCard }  from './briefing-card/showcase'
 import { showcase as watchlistItem } from './watchlist-item/showcase'
 import { showcase as divider }       from './divider/showcase'
+import { showcase as skeleton }      from './skeleton/showcase'
 
 export const componentRegistry: Record<string, ReactNode> = {
   button,
@@ -33,4 +34,5 @@ export const componentRegistry: Record<string, ReactNode> = {
   'briefing-card':  briefingCard,
   'watchlist-item': watchlistItem,
   divider,
+  skeleton,
 }
