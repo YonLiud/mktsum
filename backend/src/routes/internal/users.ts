@@ -4,7 +4,7 @@ import { userService } from '../../services/users'
 const router = new Hono()
 
 router.get('/', async (c) => {
-  const users = await userService.getAll()
+  const users = await userService.getAllWithTickers()
   return c.json(users)
 })
 

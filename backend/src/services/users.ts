@@ -33,6 +33,7 @@ export const userService = {
 
   getAllWithTickers: async () => {
     return await db.query.users.findMany({
+      columns: { password_hash: false },
       with: {
         watchlist: {
           columns: { ticker: true },
