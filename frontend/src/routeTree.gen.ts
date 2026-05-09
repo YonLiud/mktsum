@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WatchlistRouteImport } from './routes/watchlist'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -21,6 +22,11 @@ import { Route as BriefingsBriefingIdRouteImport } from './routes/briefings/$bri
 const WatchlistRoute = WatchlistRouteImport.update({
   id: '/watchlist',
   path: '/watchlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -64,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
+  '/signup': typeof SignupRoute
   '/watchlist': typeof WatchlistRoute
   '/briefings/$briefingId': typeof BriefingsBriefingIdRoute
   '/components/$componentName': typeof ComponentsComponentNameRoute
@@ -74,6 +81,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
+  '/signup': typeof SignupRoute
   '/watchlist': typeof WatchlistRoute
   '/briefings/$briefingId': typeof BriefingsBriefingIdRoute
   '/components/$componentName': typeof ComponentsComponentNameRoute
@@ -85,6 +93,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
+  '/signup': typeof SignupRoute
   '/watchlist': typeof WatchlistRoute
   '/briefings/$briefingId': typeof BriefingsBriefingIdRoute
   '/components/$componentName': typeof ComponentsComponentNameRoute
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/profile'
+    | '/signup'
     | '/watchlist'
     | '/briefings/$briefingId'
     | '/components/$componentName'
@@ -107,6 +117,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/profile'
+    | '/signup'
     | '/watchlist'
     | '/briefings/$briefingId'
     | '/components/$componentName'
@@ -117,6 +128,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/profile'
+    | '/signup'
     | '/watchlist'
     | '/briefings/$briefingId'
     | '/components/$componentName'
@@ -128,6 +140,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
   ProfileRoute: typeof ProfileRoute
+  SignupRoute: typeof SignupRoute
   WatchlistRoute: typeof WatchlistRoute
   BriefingsBriefingIdRoute: typeof BriefingsBriefingIdRoute
   ComponentsComponentNameRoute: typeof ComponentsComponentNameRoute
@@ -141,6 +154,13 @@ declare module '@tanstack/react-router' {
       path: '/watchlist'
       fullPath: '/watchlist'
       preLoaderRoute: typeof WatchlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -200,6 +220,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
   ProfileRoute: ProfileRoute,
+  SignupRoute: SignupRoute,
   WatchlistRoute: WatchlistRoute,
   BriefingsBriefingIdRoute: BriefingsBriefingIdRoute,
   ComponentsComponentNameRoute: ComponentsComponentNameRoute,
