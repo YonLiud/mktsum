@@ -181,8 +181,8 @@
 
   /* text */
   --text-primary:    #f0f0f0;
-  --text-secondary:  #555555;
-  --text-tertiary:   #3d3d3d;
+  --text-secondary:  #888888;
+  --text-tertiary:   #666666;
   --text-accent:     #7e9ab5;  /* muted stone blue — no neon */
   --text-on-accent:  #ffffff;
   --text-on-card:    #ffffff;
@@ -202,7 +202,7 @@
   /* sidebar */
   --sidebar-bg:               #171717;
   --sidebar-border:           #2c2c2c;
-  --sidebar-item-text:        #3d3d3d;
+  --sidebar-item-text:        #666666;
   --sidebar-item-active-bg:   #192430;
   --sidebar-item-active-text: #7e9ab5;
 
@@ -210,7 +210,7 @@
   --nav-bg:          #171717;
   --nav-border:      #2c2c2c;
   --nav-active:      #7e9ab5;
-  --nav-inactive:    #3d3d3d;
+  --nav-inactive:    #555555;
 
   /* avatar */
   --avatar-bg:       #192430;
@@ -219,7 +219,7 @@
   /* topbar */
   --topbar-bg:       #171717;
   --topbar-border:   #2c2c2c;
-  --topbar-text:     #3d3d3d;
+  --topbar-text:     #555555;
 
   /* misc */
   --link-text:       #7e9ab5;
@@ -250,6 +250,14 @@ body {
 
 .selectable {
   user-select: text;
+}
+
+/* ─── Theme transition ───────────────────────────────────── */
+.theme-transitioning,
+.theme-transitioning *,
+.theme-transitioning *::before,
+.theme-transitioning *::after {
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease !important;
 }
 
 /* ─── Page transition ────────────────────────────────────── */

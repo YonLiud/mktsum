@@ -26,7 +26,12 @@ export function useTheme() {
     applyTheme(theme)
   }, [theme])
 
-  const toggle = () => setTheme(t => (t === 'dark' ? 'light' : 'dark'))
+  const toggle = () => {
+    const root = document.documentElement
+    root.classList.add('theme-transitioning')
+    setTheme(t => (t === 'dark' ? 'light' : 'dark'))
+    setTimeout(() => root.classList.remove('theme-transitioning'), 300)
+  }
 
   return { theme, toggle }
 }
