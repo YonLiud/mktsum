@@ -25,15 +25,7 @@
   font-display: swap;
 }
 
-/* ─── Tailwind v4 theme ──────────────────────────────────── */
-/*
- * All --color-* tokens here become Tailwind utilities automatically:
- *   --color-accent  →  bg-accent  text-accent  border-accent
- *   --color-surface →  bg-surface text-surface border-surface  etc.
- *
- * Light-mode values are set here. .dark overrides them below.
- * Tailwind reads the live CSS var at runtime, so dark mode just works.
- */
+/* ─── Tailwind v4 @theme ─────────────────────────────────── */
 @theme {
   /* fonts */
   --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
@@ -46,133 +38,188 @@
   --radius-xl:   16px;
   --radius-full: 9999px;
 
-  /* ── primitive ramps (for one-offs, e.g. bg-teal-100) ── */
-  --color-teal-50:  #f0faf8;
-  --color-teal-100: #d0ede8;
-  --color-teal-200: #a3d5cc;
-  --color-teal-300: #72b8ad;
-  --color-teal-400: #4d9e93;
-  --color-teal-500: #0d9488;
-  --color-teal-600: #0a7870;
-  --color-teal-700: #085f58;
+  /* ── stone blue ramp ── */
+  --color-blue-50:        #ebf3fa;  /* pill bg light, accent-sub */
+  --color-blue-100:       #cce0f2;
+  --color-blue-200:       #9dc4e6;
+  --color-blue-300:       #6fa5d4;
+  --color-blue-400:       #4a7fa5;  /* accent text / icons — light */
+  --color-blue-500:       #3a7ebf;  /* primary btn fill */
+  --color-blue-600:       #2c5282;  /* briefing card header — light */
+  --color-blue-700:       #1e3a5f;
+  --color-blue-800:       #1e3448;  /* briefing card header — dark */
+  --color-blue-900:       #111e2e;
+  --color-blue-muted:     #7e9ab5;  /* accent text / icons — dark */
+  --color-blue-pill-dark: #192430;  /* pill bg dark */
 
+  /* ── neutrals — light ── */
   --color-neutral-0:   #ffffff;
   --color-neutral-50:  #fafafa;
   --color-neutral-100: #f5f5f5;
   --color-neutral-200: #ebebeb;
   --color-neutral-300: #e0e0e0;
-  --color-neutral-400: #aaaaaa;
-  --color-neutral-500: #888888;
+  --color-neutral-400: #cccccc;
+  --color-neutral-500: #aaaaaa;
   --color-neutral-600: #666666;
   --color-neutral-700: #444444;
   --color-neutral-800: #222222;
   --color-neutral-900: #111111;
 
-  /* ── semantic tokens — light mode defaults ── */
+  /* ── neutrals — dark (true neutral #202020) ── */
+  --color-dark-900: #141414;  /* topbar / nav */
+  --color-dark-800: #171717;  /* sidebar */
+  --color-dark-700: #202020;  /* page bg */
+  --color-dark-600: #282828;  /* card surface */
+  --color-dark-500: #2c2c2c;  /* border default */
+  --color-dark-400: #333333;  /* border strong */
+  --color-dark-300: #3d3d3d;  /* muted icons, timestamps */
+  --color-dark-200: #555555;  /* secondary text */
+  --color-dark-100: #d0d0d0;  /* secondary headings */
+  --color-dark-50:  #f0f0f0;  /* primary text */
 
-  /* backgrounds */
-  --color-base:        #ffffff;   /* page bg          → bg-base        */
-  --color-surface:     #fafafa;   /* card / panel      → bg-surface     */
-  --color-elevated:    #ffffff;   /* modal / popover   → bg-elevated    */
-  --color-input-bg:    #fafafa;   /* form inputs       → bg-input-bg    */
-  --color-accent:      #0d9488;   /* teal fill + text  → bg/text-accent */
-  --color-accent-sub:  #f0faf8;   /* teal tint bg      → bg-accent-sub  */
-  --color-accent-card: #0d9488;   /* briefing header   → bg-accent-card */
-
-  /* borders */
-  --color-line:        #e0e0e0;   /* default border    → border-line        */
-  --color-line-subtle: #ebebeb;   /* hairline divider  → border-line-subtle */
-  --color-line-strong: #cccccc;   /* emphasis border   → border-line-strong */
-
-  /* text */
-  --color-foreground:  #111111;   /* body copy         → text-foreground  */
-  --color-muted:       #888888;   /* secondary text    → text-muted       */
-  --color-subtle:      #aaaaaa;   /* placeholder/hint  → text-subtle      */
-  --color-on-accent:   #ffffff;   /* text on teal fill → text-on-accent   */
-
-  /* ticker pills */
-  --color-pill:        #f0faf8;   /* pill bg           → bg-pill      */
-  --color-pill-fg:     #0a7870;   /* pill text         → text-pill-fg */
-
-  /* status */
-  --color-positive:    #16a34a;   /* price up / ok     → text/bg-positive */
-  --color-negative:    #dc2626;   /* price down / error→ text/bg-negative */
-  --color-danger:      #fecaca;   /* danger border     → border-danger    */
-
-  /* nav (mobile bottom bar) */
-  --color-nav:         #fafafa;
-  --color-nav-border:  #ebebeb;
-  --color-nav-active:  #0d9488;
-  --color-nav-inactive:#cccccc;
-
-  /* sidebar (desktop) */
-  --color-sidebar:            #fafafa;
-  --color-sidebar-border:     #ebebeb;
-  --color-sidebar-active:     #f0faf8;
-  --color-sidebar-active-fg:  #0d9488;
-  --color-sidebar-fg:         #999999;
-
-  /* topbar */
-  --color-topbar:        #fafafa;
-  --color-topbar-border: #ebebeb;
-  --color-topbar-fg:     #aaaaaa;
-
-  /* avatar */
-  --color-avatar:    #f0faf8;
-  --color-avatar-fg: #0d9488;
-
-  /* links */
-  --color-link: #0d9488;
+  /* ── semantic status ── */
+  --color-positive-light:      #16a34a;
+  --color-positive-dark:       #4ade80;
+  --color-negative-light:      #dc2626;
+  --color-negative-dark:       #f87171;
+  --color-danger-border-light: #fecaca;
+  --color-danger-border-dark:  #3a1a1a;
 }
 
-/* ─── Dark mode overrides ────────────────────────────────── */
-/* Toggle by adding class="dark" to <html>                    */
-.dark {
+/* ─── Light mode (:root) ─────────────────────────────────── */
+:root {
+  color-scheme: light;
+
+  /* backgrounds */
+  --bg-base:         #ffffff;
+  --bg-surface:      #fafafa;
+  --bg-elevated:     #ffffff;
+  --bg-input:        #fafafa;
+  --bg-accent:       #3a7ebf;  /* primary btn */
+  --bg-accent-sub:   #ebf3fa;  /* pill bg, subtle tints */
+  --bg-card-header:  #2c5282;  /* briefing card — the money color */
+
+  /* borders */
+  --border-subtle:   #ebebeb;
+  --border-default:  #e0e0e0;
+  --border-strong:   #cccccc;
+
+  /* text */
+  --text-primary:    #111111;
+  --text-secondary:  #888888;
+  --text-tertiary:   #aaaaaa;
+  --text-accent:     #4a7fa5;  /* links, active nav, read more */
+  --text-on-accent:  #ffffff;
+  --text-on-card:    #ffffff;
+
+  /* ticker pills */
+  --pill-bg:         #ebf3fa;
+  --pill-text:       #2a5f80;
+
+  /* status */
+  --positive:        #16a34a;
+  --negative:        #dc2626;
+  --danger-border:   #fecaca;
+  --danger-text:     #dc2626;
+
+  /* sidebar */
+  --sidebar-bg:               #fafafa;
+  --sidebar-border:           #ebebeb;
+  --sidebar-item-text:        #aaaaaa;
+  --sidebar-item-active-bg:   #ebf3fa;
+  --sidebar-item-active-text: #3a7ebf;
+
+  /* bottom nav */
+  --nav-bg:          #fafafa;
+  --nav-border:      #ebebeb;
+  --nav-active:      #4a7fa5;
+  --nav-inactive:    #cccccc;
+
+  /* avatar */
+  --avatar-bg:       #ebf3fa;
+  --avatar-text:     #2c5282;
+
+  /* topbar */
+  --topbar-bg:       #fafafa;
+  --topbar-border:   #ebebeb;
+  --topbar-text:     #cccccc;
+
+  /* misc */
+  --link-text:       #4a7fa5;
+  --dot-accent:      #4a7fa5;
+
+  /* type + radius passthrough */
+  --font-sans:   "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:   "Geist Mono", ui-monospace, monospace;
+  --radius-sm:   6px;
+  --radius-md:   9px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
+  --radius-full: 9999px;
+}
+
+/* ─── Dark mode ──────────────────────────────────────────── */
+.dark,
+[data-theme="dark"] {
   color-scheme: dark;
 
-  --color-base:        #202020;
-  --color-surface:     #272727;
-  --color-elevated:    #272727;
-  --color-input-bg:    #171717;
-  --color-accent:      #0d9488;
-  --color-accent-sub:  #1e2d2a;
-  --color-accent-card: #1e3530;
+  /* backgrounds */
+  --bg-base:         #202020;
+  --bg-surface:      #282828;
+  --bg-elevated:     #282828;
+  --bg-input:        #171717;
+  --bg-accent:       #3a7ebf;  /* keep same for btn, enough contrast */
+  --bg-accent-sub:   #192430;
+  --bg-card-header:  #1e3448;  /* deep navy — rich, not neon */
 
-  --color-line:        #2c2c2c;
-  --color-line-subtle: #313131;
-  --color-line-strong: #3d3d3d;
+  /* borders */
+  --border-subtle:   #2c2c2c;
+  --border-default:  #2c2c2c;
+  --border-strong:   #333333;
 
-  --color-foreground:  #f5f5f5;
-  --color-muted:       #666666;
-  --color-subtle:      #4d4d4d;
-  --color-on-accent:   #ffffff;
+  /* text */
+  --text-primary:    #f0f0f0;
+  --text-secondary:  #555555;
+  --text-tertiary:   #3d3d3d;
+  --text-accent:     #7e9ab5;  /* muted stone blue — no neon */
+  --text-on-accent:  #ffffff;
+  --text-on-card:    #ffffff;
 
-  --color-pill:        #1e2d2a;
-  --color-pill-fg:     #5c8f82;
+  /* ticker pills */
+  --pill-bg:         #192430;
+  --pill-text:       #7e9ab5;
 
-  --color-positive:    #4ade80;
-  --color-negative:    #f87171;
-  --color-danger:      #3a1a1a;
+  /* status */
+  --positive:        #4ade80;
+  --negative:        #f87171;
+  --danger-border:   #3a1a1a;
+  --danger-text:     #f87171;
 
-  --color-nav:         #171717;
-  --color-nav-border:  #2c2c2c;
-  --color-nav-active:  #5c8f82;
-  --color-nav-inactive:#3d3d3d;
+  /* sidebar */
+  --sidebar-bg:               #171717;
+  --sidebar-border:           #2c2c2c;
+  --sidebar-item-text:        #3d3d3d;
+  --sidebar-item-active-bg:   #192430;
+  --sidebar-item-active-text: #7e9ab5;
 
-  --color-sidebar:           #171717;
-  --color-sidebar-border:    #2c2c2c;
-  --color-sidebar-active:    #1e2d2a;
-  --color-sidebar-active-fg: #5c8f82;
-  --color-sidebar-fg:        #3d3d3d;
+  /* bottom nav */
+  --nav-bg:          #171717;
+  --nav-border:      #2c2c2c;
+  --nav-active:      #7e9ab5;
+  --nav-inactive:    #3d3d3d;
 
-  --color-topbar:        #171717;
-  --color-topbar-border: #2c2c2c;
-  --color-topbar-fg:     #3d3d3d;
+  /* avatar */
+  --avatar-bg:       #192430;
+  --avatar-text:     #7e9ab5;
 
-  --color-avatar:    #1e2d2a;
-  --color-avatar-fg: #5c8f82;
+  /* topbar */
+  --topbar-bg:       #171717;
+  --topbar-border:   #2c2c2c;
+  --topbar-text:     #3d3d3d;
 
-  --color-link: #5c8f82;
+  /* misc */
+  --link-text:       #7e9ab5;
+  --dot-accent:      #7e9ab5;
 }
 
 /* ─── Base styles ────────────────────────────────────────── */
@@ -190,255 +237,8 @@ html {
 }
 
 body {
-  background-color: var(--color-base);
-  color: var(--color-foreground);
+  background-color: var(--bg-base);
+  color: var(--text-primary);
   line-height: 1.6;
   font-weight: 400;
-}
-
-/* ─── Reusable component primitives ─────────────────────── */
-
-/* ticker pill */
-.ticker-pill {
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  padding: 2px 8px;
-  border-radius: var(--radius-sm);
-  background: var(--color-pill);
-  color: var(--color-pill-fg);
-  display: inline-block;
-  line-height: 1.5;
-}
-
-/* card surface */
-.card {
-  background: var(--color-elevated);
-  border: 0.5px solid var(--color-line-subtle);
-  border-radius: var(--radius-lg);
-}
-
-/* section label (uppercase eyebrow) */
-.section-label {
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--color-subtle);
-}
-
-/* divider */
-.divider {
-  border: none;
-  border-top: 0.5px solid var(--color-line-subtle);
-}
-
-/* primary button */
-.btn-primary {
-  background: var(--color-accent);
-  color: var(--color-on-accent);
-  border: none;
-  border-radius: var(--radius-md);
-  font-family: var(--font-sans);
-  font-size: 0.875rem;
-  font-weight: 500;
-  padding: 10px 20px;
-  cursor: pointer;
-  line-height: 1;
-}
-
-/* ghost button */
-.btn-ghost {
-  background: transparent;
-  color: var(--color-accent);
-  border: 0.5px solid var(--color-line);
-  border-radius: var(--radius-md);
-  font-family: var(--font-sans);
-  font-size: 0.8125rem;
-  font-weight: 400;
-  padding: 8px 14px;
-  cursor: pointer;
-  line-height: 1;
-}
-
-/* danger button */
-.btn-danger {
-  background: transparent;
-  color: var(--color-negative);
-  border: 0.5px solid var(--color-danger);
-  border-radius: var(--radius-md);
-  font-family: var(--font-sans);
-  font-size: 0.8125rem;
-  font-weight: 400;
-  padding: 9px 20px;
-  cursor: pointer;
-  line-height: 1;
-}
-
-/* text input */
-.input {
-  width: 100%;
-  background: var(--color-input-bg);
-  border: 0.5px solid var(--color-line);
-  border-radius: var(--radius-md);
-  padding: 10px 14px;
-  font-family: var(--font-sans);
-  font-size: 0.875rem;
-  color: var(--color-foreground);
-  outline: none;
-  line-height: 1;
-}
-.input::placeholder {
-  color: var(--color-subtle);
-}
-.input:focus {
-  border-color: var(--color-accent);
-}
-
-/* mono input (for ticker add field) */
-.input-mono {
-  font-family: var(--font-mono);
-  font-size: 0.8125rem;
-}
-
-/* field row (profile edit rows) */
-.field-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--color-input-bg);
-  border: 0.5px solid var(--color-line-subtle);
-  border-radius: var(--radius-md);
-  padding: 10px 14px;
-}
-.field-row-value {
-  font-size: 0.8125rem;
-  color: var(--color-foreground);
-}
-.field-row-edit {
-  background: none;
-  border: none;
-  color: var(--color-accent);
-  font-family: var(--font-sans);
-  font-size: 0.75rem;
-  cursor: pointer;
-  padding: 0;
-}
-
-/* icon button (share/delete in briefing header) */
-.btn-icon {
-  background: none;
-  border: 0.5px solid var(--color-line-subtle);
-  border-radius: var(--radius-sm);
-  padding: 7px;
-  cursor: pointer;
-  color: var(--color-muted);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-}
-
-/* briefing card — teal header */
-.briefing-card-header {
-  background: var(--color-accent-card);
-  padding: 16px;
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-}
-.briefing-card-body {
-  background: var(--color-surface);
-  border: 0.5px solid var(--color-line-subtle);
-  border-top: none;
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-  padding: 14px 16px;
-}
-
-/* positive / negative price change */
-.change-pos { color: var(--color-positive); }
-.change-neg { color: var(--color-negative); }
-
-/* source link */
-.source-link {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 0.6875rem;
-  color: var(--color-link);
-  text-decoration: none;
-}
-
-/* avatar circle */
-.avatar {
-  border-radius: var(--radius-full);
-  background: var(--color-avatar);
-  color: var(--color-avatar-fg);
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-/* ─── Layout: sidebar (desktop) ──────────────────────────── */
-.sidebar {
-  width: 200px;
-  flex-shrink: 0;
-  background: var(--color-sidebar);
-  border-right: 0.5px solid var(--color-sidebar-border);
-  display: flex;
-  flex-direction: column;
-  padding: 20px 0;
-}
-.sidebar-logo {
-  padding: 0 16px 20px;
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--color-foreground);
-  letter-spacing: -0.4px;
-}
-.sidebar-logo span {
-  color: var(--color-accent);
-}
-.sidebar-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 16px;
-  font-size: 0.8125rem;
-  color: var(--color-sidebar-fg);
-  cursor: pointer;
-  text-decoration: none;
-  transition: color 0.1s;
-}
-.sidebar-item.active {
-  color: var(--color-sidebar-active-fg);
-  background: var(--color-sidebar-active);
-  font-weight: 500;
-}
-.sidebar-footer {
-  margin-top: auto;
-  padding: 12px 16px 0;
-  border-top: 0.5px solid var(--color-sidebar-border);
-}
-
-/* ─── Layout: bottom nav (mobile) ───────────────────────── */
-.bottom-nav {
-  display: flex;
-  background: var(--color-nav);
-  border-top: 0.5px solid var(--color-nav-border);
-}
-.bottom-nav-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  padding: 10px 0;
-  font-size: 0.625rem;
-  color: var(--color-nav-inactive);
-  cursor: pointer;
-  text-decoration: none;
-}
-.bottom-nav-item.active {
-  color: var(--color-nav-active);
 }
