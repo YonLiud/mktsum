@@ -1,40 +1,50 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { api } from '@/lib/api'
+import {
+  type AuthUser,
+  getStoredUser,
+  setStoredUser,
+  clearAuthStorage,
+} from '@/lib/authStorage'
 
-export type AuthUser = {
-  user_id: string
-  username: string
-  name: string
-  role: string
-  ntfy_topic? :string
-}
+export type { AuthUser }
+export { clearAuthStorage }
 
 const AUTH_KEY = ['auth']
 
-export function clearAuthStorage() {
-  localStorage.removeItem('auth_user')
-}
+async function fetchUser(): Promise<AuthUser | null> {
+  const stored = getStoredUser()
+  if (!stored) return null
 
-function getStoredUser(): AuthUser | null {
-  try {
-    const raw = localStorage.getItem('auth_user')
-    return raw ? JSON.parse(raw) : null
-  } catch {
-    return null
+  const res = await api.get(`/users/${stored.user_id}`)
+  if (!res.ok) return stored
+
+  const data = await res.json()
+  const user: AuthUser = {
+    user_id: data.user_id,
+    username: data.username,
+    name: data.name,
+    role: data.role,
+    ntfy_topic: data.ntfy_topic,
   }
+  setStoredUser(user)
+  return user
 }
 
 export function useAuth() {
   return useQuery({
     queryKey: AUTH_KEY,
-    queryFn: getStoredUser,
-    staleTime: Infinity,
+    queryFn: fetchUser,
+    staleTime: 0,
+    refetchInterval: 10_000,
+    initialData: getStoredUser,
   })
 }
 
 export function useSetAuth() {
   const queryClient = useQueryClient()
   return (user: AuthUser) => {
-    localStorage.setItem('auth_user', JSON.stringify(user))
+    setStoredUser(user)
     queryClient.setQueryData(AUTH_KEY, user)
   }
 }
