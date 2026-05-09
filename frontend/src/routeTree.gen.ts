@@ -14,6 +14,8 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ComponentsIndexRouteImport } from './routes/components/index'
+import { Route as ComponentsComponentNameRouteImport } from './routes/components/$componentName'
 import { Route as BriefingsBriefingIdRouteImport } from './routes/briefings/$briefingId'
 
 const WatchlistRoute = WatchlistRouteImport.update({
@@ -41,6 +43,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsIndexRoute = ComponentsIndexRouteImport.update({
+  id: '/components/',
+  path: '/components/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsComponentNameRoute = ComponentsComponentNameRouteImport.update({
+  id: '/components/$componentName',
+  path: '/components/$componentName',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BriefingsBriefingIdRoute = BriefingsBriefingIdRouteImport.update({
   id: '/briefings/$briefingId',
   path: '/briefings/$briefingId',
@@ -54,6 +66,8 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/watchlist': typeof WatchlistRoute
   '/briefings/$briefingId': typeof BriefingsBriefingIdRoute
+  '/components/$componentName': typeof ComponentsComponentNameRoute
+  '/components/': typeof ComponentsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +76,8 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/watchlist': typeof WatchlistRoute
   '/briefings/$briefingId': typeof BriefingsBriefingIdRoute
+  '/components/$componentName': typeof ComponentsComponentNameRoute
+  '/components': typeof ComponentsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,6 +87,8 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/watchlist': typeof WatchlistRoute
   '/briefings/$briefingId': typeof BriefingsBriefingIdRoute
+  '/components/$componentName': typeof ComponentsComponentNameRoute
+  '/components/': typeof ComponentsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,6 +99,8 @@ export interface FileRouteTypes {
     | '/profile'
     | '/watchlist'
     | '/briefings/$briefingId'
+    | '/components/$componentName'
+    | '/components/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -89,6 +109,8 @@ export interface FileRouteTypes {
     | '/profile'
     | '/watchlist'
     | '/briefings/$briefingId'
+    | '/components/$componentName'
+    | '/components'
   id:
     | '__root__'
     | '/'
@@ -97,6 +119,8 @@ export interface FileRouteTypes {
     | '/profile'
     | '/watchlist'
     | '/briefings/$briefingId'
+    | '/components/$componentName'
+    | '/components/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -106,6 +130,8 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   WatchlistRoute: typeof WatchlistRoute
   BriefingsBriefingIdRoute: typeof BriefingsBriefingIdRoute
+  ComponentsComponentNameRoute: typeof ComponentsComponentNameRoute
+  ComponentsIndexRoute: typeof ComponentsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -145,6 +171,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/': {
+      id: '/components/'
+      path: '/components'
+      fullPath: '/components/'
+      preLoaderRoute: typeof ComponentsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/$componentName': {
+      id: '/components/$componentName'
+      path: '/components/$componentName'
+      fullPath: '/components/$componentName'
+      preLoaderRoute: typeof ComponentsComponentNameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/briefings/$briefingId': {
       id: '/briefings/$briefingId'
       path: '/briefings/$briefingId'
@@ -162,6 +202,8 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   WatchlistRoute: WatchlistRoute,
   BriefingsBriefingIdRoute: BriefingsBriefingIdRoute,
+  ComponentsComponentNameRoute: ComponentsComponentNameRoute,
+  ComponentsIndexRoute: ComponentsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

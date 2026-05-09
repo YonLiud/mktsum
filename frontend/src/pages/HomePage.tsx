@@ -1,27 +1,57 @@
-import { Link } from '@tanstack/react-router'
-import { useAuth } from '@/hooks/useAuth'
-import { useLogout } from '@/hooks/useLogout'
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
 
 export function HomePage() {
-  const { data: user, dataUpdatedAt, refetch } = useAuth()
-  const logout = useLogout()
+  const [dark, setDark] = useState(false)
+
+  function toggleTheme() {
+    setDark(d => {
+      document.documentElement.classList.toggle('dark', !d)
+      return !d
+    })
+  }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen gap-2">
-      <h1 className="text-3xl font-medium">mktsum.</h1>
-      <p className="text-sm opacity-50">
-        {user ? `hey, ${user.name}` : 'not logged in'}
-      </p>
-      <p className="text-xs opacity-30">
-        last pull: {dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleTimeString() : '—'}
-      </p>
-      <button onClick={() => refetch()} className="text-xs opacity-40 underline cursor-pointer">
-        refetch
-      </button>
-      {user
-        ? <button onClick={logout} className="text-xs opacity-40 underline cursor-pointer">log out</button>
-        : <Link to="/login" className="text-xs opacity-40 underline">log in</Link>
-      }
+    <div className="min-h-screen bg-base text-foreground px-4 py-12 max-w-lg mx-auto flex flex-col gap-12">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">mktsum.</h1>
+          <p className="text-muted text-sm mt-1">component library</p>
+        </div>
+        <Button variant="ghost" size="sm" onClick={toggleTheme}>
+          {dark ? 'light' : 'dark'}
+        </Button>
+      </div>
+
+      <section className="flex flex-col gap-4">
+        <p className="section-label">button</p>
+
+        <div className="flex flex-col gap-3">
+          <p className="text-subtle text-xs">variants</p>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="primary">primary</Button>
+            <Button variant="ghost">ghost</Button>
+            <Button variant="danger">danger</Button>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <p className="text-subtle text-xs">sizes</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button size="md">medium</Button>
+            <Button size="sm">small</Button>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <p className="text-subtle text-xs">disabled</p>
+          <div className="flex flex-wrap gap-2">
+            <Button disabled>primary</Button>
+            <Button variant="ghost" disabled>ghost</Button>
+            <Button variant="danger" disabled>danger</Button>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }
