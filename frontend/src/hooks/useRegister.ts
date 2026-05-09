@@ -33,7 +33,17 @@ export function useRegister() {
 
     if (!res.ok) {
       const body = await res.json().catch(() => null)
-      setError(body?.error?.formErrors?.[0] ?? body?.error ?? 'Registration failed.')
+      const err = body?.error
+      let msg = 'Registration failed.'
+      if (typeof err === 'string') {
+        msg = err
+      } else if (err?.formErrors?.[0]) {
+        msg = err.formErrors[0]
+      } else if (err?.fieldErrors) {
+        const first = Object.values(err.fieldErrors).flat()[0]
+        if (typeof first === 'string') msg = first
+      }
+      setError(msg)
       return
     }
 

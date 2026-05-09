@@ -3,8 +3,8 @@ import { useAuth } from '@/hooks/useAuth'
 import { useBriefings, useLatestBriefing } from '@/hooks/useBriefings'
 import { useWatchlist } from '@/hooks/useWatchlist'
 import { Divider } from '@/components/ui/divider'
-import { Spinner } from '@/components/ui/spinner'
 import { Skeleton } from '@/components/ui/skeleton'
+import { EmptyState } from '@/components/ui/empty-state'
 import { TickerPill } from '@/components/ui/ticker-pill'
 import type { Briefing } from '@/types'
 import styles from './dashboard.module.css'
@@ -85,7 +85,7 @@ export function DashboardPage() {
   const navigate = useNavigate()
   const { data: user } = useAuth()
   const { data: latest, isLoading: latestLoading } = useLatestBriefing()
-  const { data: allBriefings, isLoading: briefingsLoading } = useBriefings()
+  const { data: allBriefings } = useBriefings()
   const { data: watchlist } = useWatchlist()
 
   const todaysBriefing = latest && isToday(latest.created_at) ? latest : null
@@ -148,10 +148,10 @@ export function DashboardPage() {
           </div>
         </div>
       ) : (
-        <div className={styles.generating}>
-          <Spinner size="sm" />
-          <p className={styles.generatingLabel}>briefing generating...</p>
-        </div>
+        <EmptyState
+          title="no briefing yet"
+          description="add tickers to your watchlist and your first briefing will arrive tomorrow morning."
+        />
       )}
 
       {/* past briefings */}

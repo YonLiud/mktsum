@@ -72,8 +72,9 @@ export function useLatestBriefing() {
   const { data: user } = useAuth()
   return useQuery({
     queryKey: ['briefings', user?.user_id, 'latest'],
-    queryFn: async (): Promise<Briefing> => {
+    queryFn: async (): Promise<Briefing | null> => {
       const res = await api.get(`/briefings/user/${user!.user_id}/latest`)
+      if (res.status === 404) return null
       if (!res.ok) throw new Error('Failed to fetch latest briefing')
       return res.json()
     },
