@@ -30,7 +30,6 @@ This policy applies to:
 | IP address | Standard server logging, security, abuse prevention |
 | Browser & device type (User-Agent) | Technical compatibility, debugging |
 | Pages visited and timestamps | Understanding usage, improving the service |
-| Session cookies | Keeping you logged in, basic site functionality |
 
 This data is collected automatically whenever you use the site. It is not used to identify you personally and is not sold to third parties.
 
@@ -38,25 +37,36 @@ This data is collected automatically whenever you use the site. It is not used t
 
 | Data | Why We Collect It |
 |---|---|
-| Email address | Account creation, login, notifications |
+| Username | Account creation and login credential |
+| Display name | Shown within the app |
 | Password (stored as a secure hash — never plain text) | Authentication |
-| Account activity (login times, briefings accessed) | Security, account management |
+| ntfy topic (optional) | Sending push notification briefings to your device via ntfy.sh |
+| Watchlist (stock tickers you add) | Generating personalised market briefings |
+| Briefings (AI-generated summaries) | Core service functionality; viewable in your account |
+| Session tokens | Keeping you logged in (30-day expiry) |
 
-We do not collect your name, phone number, payment details, or any other personal information unless you explicitly provide it.
-
----
-
-## 4. Cookies
-
-We use cookies for:
-- **Session management** — keeping you logged in
-- **Preferences** — remembering your settings
-
-We do not currently use third-party advertising or tracking cookies. If this changes, this policy will be updated and you will be notified.
+We do not collect your email address, phone number, payment details, or any other personal information.
 
 ---
 
-## 5. How We Store Your Data
+## 4. Session Management
+
+We use **bearer tokens** (not browser cookies) to manage sessions. A session token is stored in your browser's local storage and sent with each request. Sessions expire after 30 days or when you log out.
+
+---
+
+## 5. Third-Party Services
+
+| Service | Purpose | Data Sent |
+|---|---|---|
+| **Yahoo Finance** | Fetching ticker metadata (company names, descriptions) | No user data — we query public market data only |
+| **ntfy.sh** | Delivering push notification briefings | Your briefing summary is sent to the ntfy topic you provided; ntfy's own privacy policy applies |
+
+We do not use third-party advertising networks or tracking scripts.
+
+---
+
+## 6. How We Store Your Data
 
 Your data is stored on our private server infrastructure. We take reasonable technical measures to protect it, including:
 - Password hashing (we never store your password in plain text)
@@ -67,19 +77,18 @@ We do not store your data longer than necessary. If you delete your account, you
 
 ---
 
-## 6. Who We Share Data With
+## 7. Who We Share Data With
 
 We do not sell your data.
 
 We do not share your personal data with third parties except:
 - **When required by law** — if a valid legal request is made by Israeli authorities
 - **Service providers** — infrastructure or hosting providers who process data on our behalf under confidentiality obligations
-
-**Third-party data sources** (Google RSS, Yahoo Finance) are used to fetch market data. We send no user data to these services.
+- **ntfy.sh** — briefing content is transmitted to ntfy.sh if you have configured an ntfy topic (see Section 5)
 
 ---
 
-## 7. Your Rights
+## 8. Your Rights
 
 ### Israeli Users
 Under Israel's Privacy Protection Law, you have the right to:
@@ -97,29 +106,29 @@ To exercise any of these rights, contact us at: ejliud@gmail.com
 
 ---
 
-## 8. Data Retention
+## 9. Data Retention
 
 | Data Type | Retention Period |
 |---|---|
 | Server logs (IP, access logs) | Up to 90 days |
 | Registered account data | Until account deletion + 30 days |
-| Cookies | Session cookies expire when you close your browser; persistent cookies expire within 1 year |
+| Session tokens | 30 days from creation, or on logout |
 
 ---
 
-## 9. Children
+## 10. Children
 
 mktsum is not intended for users under the age of 16. We do not knowingly collect data from minors. If you believe a minor has registered, please contact us and we will delete the account.
 
 ---
 
-## 10. Changes to This Policy
+## 11. Changes to This Policy
 
-We may update this policy. For significant changes, registered users will be notified by email. The "last updated" date at the top of this page will always reflect the current version.
+We may update this policy. The "last updated" date at the top of this page will always reflect the current version.
 
 ---
 
-## 11. Contact
+## 12. Contact
 
 For privacy questions or data requests:
 
