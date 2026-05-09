@@ -14,5 +14,6 @@ export interface WatchlistEntry {
   watchlist_id: string
   user_id: string
   ticker: string
+  ticker_name?: string
   created_at: string
 }

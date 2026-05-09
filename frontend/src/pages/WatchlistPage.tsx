@@ -80,6 +80,7 @@ export function WatchlistPage() {
             <WatchlistItem
               key={entry.watchlist_id}
               symbol={entry.ticker}
+              name={entry.ticker_name}
               onRemove={() => removeTicker(entry.watchlist_id)}
             />
           ))}
