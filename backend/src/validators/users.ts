@@ -5,6 +5,7 @@ export const createUserSchema = z.object({
   name: z.string().min(1, 'Name is required').trim(),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   ntfy_topic: z.string().min(1).trim().optional(),
+  terms_accepted: z.literal(true, { errorMap: () => ({ message: 'You must accept the terms to create an account' }) }),
 })
 
 export const updateUserSchema = z.object({

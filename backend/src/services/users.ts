@@ -40,11 +40,11 @@ export const userService = {
     })
   },
 
-  create: async (data: { username: string; name: string; password: string; ntfy_topic?: string }) => {
+  create: async (data: { username: string; name: string; password: string; ntfy_topic?: string; terms_accepted: true }) => {
     const user_id = generateId()
     const password_hash = await Bun.password.hash(data.password)
-    const { password, ...rest } = data
-    const [user] = await db.insert(users).values({ user_id, ...rest, password_hash }).returning()
+    const { password, terms_accepted, ...rest } = data
+    const [user] = await db.insert(users).values({ user_id, ...rest, password_hash, terms_accepted_at: new Date() }).returning()
     const { password_hash: _, ...safeUser } = user
     return safeUser
   },

@@ -28,7 +28,7 @@ export function useRegister() {
     }
 
     setIsLoading(true)
-    const res = await api.post('/users', { username, name, password, ntfy_topic: ntfy_topic || undefined })
+    const res = await api.post('/users', { username, name, password, ntfy_topic: ntfy_topic || undefined, terms_accepted: true })
     setIsLoading(false)
 
     if (!res.ok) {

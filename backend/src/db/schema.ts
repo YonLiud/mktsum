@@ -8,6 +8,7 @@ export const users = pgTable('users', {
   password_hash: text('password_hash').notNull(),
   role: text('role', { enum: ['user', 'admin'] }).notNull().default('user'),
   ntfy_topic: text('ntfy_topic'),
+  terms_accepted_at: timestamp('terms_accepted_at'),
   created_at: timestamp('created_at').defaultNow().notNull(),
 })
 

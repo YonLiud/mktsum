@@ -22,6 +22,13 @@
       "when": 1777132363178,
       "tag": "0002_nasty_power_man",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1778357781617,
+      "tag": "0003_watery_risque",
+      "breakpoints": true
     }
   ]
 }
