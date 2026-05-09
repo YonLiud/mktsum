@@ -54,16 +54,16 @@
 
 .terms {
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  font-size: 0.8125rem;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
   color: var(--text-tertiary);
   cursor: pointer;
-  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .terms input[type='checkbox'] {
-  margin-top: 2px;
   flex-shrink: 0;
   accent-color: var(--bg-accent);
   cursor: pointer;
@@ -72,6 +72,7 @@
 .termsLink {
   color: var(--text-accent);
   text-decoration: none;
+  flex-shrink: 0;
 }
 
 .termsLink:hover {

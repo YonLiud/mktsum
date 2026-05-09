@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { useRegister } from '@/hooks/useRegister'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import styles from '../login/login.module.css'
 
 export function SignupPage() {
@@ -18,13 +19,9 @@ export function SignupPage() {
           <Input name="username" type="text" placeholder="username" autoComplete="username" />
           <Input name="password" type="password" placeholder="password" autoComplete="new-password" />
           <Input name="ntfy_topic" type="text" placeholder="ntfy topic (optional)" />
-          <label className={styles.terms}>
-            <input type="checkbox" checked={agreed} onChange={e => setAgreed(e.target.checked)} />
-            I agree to the{' '}
-            <Link to="/legal/terms" className={styles.termsLink} target="_blank">Terms of Service</Link>
-            {' '}and{' '}
-            <Link to="/legal/disclaimer" className={styles.termsLink} target="_blank">Financial Disclaimer</Link>
-          </label>
+          <Checkbox checked={agreed} onChange={setAgreed}>
+            I agree to the <Link to="/legal/terms" className={styles.termsLink} target="_blank">terms</Link> &amp; <Link to="/legal/disclaimer" className={styles.termsLink} target="_blank">disclaimer</Link>
+          </Checkbox>
           {error && <p className={styles.error}>{error}</p>}
           <Button type="submit" loading={isLoading} disabled={!agreed}>create account</Button>
         </form>
