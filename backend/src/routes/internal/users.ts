@@ -8,4 +8,10 @@ router.get('/', async (c) => {
   return c.json(users)
 })
 
+router.get('/:id', async (c) => {
+  const user = await userService.getById(c.req.param('id'))
+  if (!user) return c.json({ error: 'User not found' }, 404)
+  return c.json(user)
+})
+
 export default router
