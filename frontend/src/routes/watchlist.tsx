@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { WatchlistPage } from '@/pages/WatchlistPage'
+import { WatchlistPage } from '@/pages/watchlist'
 import { requireAuth } from '@/lib/routeGuards'
 
 export const Route = createFileRoute('/watchlist')({
