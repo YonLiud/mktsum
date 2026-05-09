@@ -2,23 +2,63 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 0;
+  padding: 12px 8px;
+  margin: 0 -8px;
   border-bottom: 0.5px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  transition: background 0.12s;
 }
 
 .item:last-child {
   border-bottom: none;
 }
 
+.item:has(.leftClickable:hover) {
+  background: var(--bg-surface);
+}
+
 .left {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.leftClickable {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  padding: 0;
+  text-align: left;
+}
+
+.leftClickable:hover .name {
+  color: var(--text-primary);
+}
+
+.chevron {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+  margin-right: 2px;
+  transition: transform 0.12s, color 0.12s;
+}
+
+.item:has(.leftClickable:hover) .chevron {
+  transform: translateX(2px);
+  color: var(--text-secondary);
 }
 
 .name {
   font-size: 0.8125rem;
   color: var(--text-secondary);
+  transition: color 0.12s;
 }
 
 .remove {

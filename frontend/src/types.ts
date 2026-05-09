@@ -10,6 +10,12 @@ export interface Briefing {
   sources?: { ticker: string; title: string; url: string }[]
 }
 
+export interface Ticker {
+  symbol: string
+  name: string
+  description?: string
+}
+
 export interface WatchlistEntry {
   watchlist_id: string
   user_id: string

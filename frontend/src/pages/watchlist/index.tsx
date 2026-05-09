@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { useWatchlist, useAddTicker, useRemoveTicker } from '@/hooks/useWatchlist'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -9,6 +10,7 @@ import { Divider } from '@/components/ui/divider'
 import styles from './watchlist.module.css'
 
 export function WatchlistPage() {
+  const navigate = useNavigate()
   const { data: watchlist, isLoading } = useWatchlist()
   const { mutate: addTicker, isPending: isAdding, error: addError, reset } = useAddTicker()
   const { mutate: removeTicker } = useRemoveTicker()
@@ -81,6 +83,7 @@ export function WatchlistPage() {
               key={entry.watchlist_id}
               symbol={entry.ticker}
               name={entry.ticker_name}
+              onClick={() => navigate({ to: '/watchlist/$ticker', params: { ticker: entry.ticker } })}
               onRemove={() => removeTicker(entry.watchlist_id)}
             />
           ))}
