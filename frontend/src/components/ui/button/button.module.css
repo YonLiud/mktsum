@@ -6,7 +6,7 @@
   font-family: var(--font-sans);
   cursor: pointer;
   border-radius: var(--radius-lg);
-  transition: opacity 0.15s, transform 0.1s;
+  transition: opacity 0.15s, transform 0.1s, background 0.15s, border-color 0.15s;
   line-height: 1;
   border: none;
 }
@@ -43,10 +43,19 @@
   font-weight: 400;
 }
 
+.ghost:hover:not(:disabled) {
+  background: var(--bg-accent-sub);
+  border-color: var(--text-accent);
+}
+
 .secondary {
   background: var(--bg-accent-sub);
   color: var(--text-accent);
   font-weight: 400;
+}
+
+.secondary:hover:not(:disabled) {
+  opacity: 0.75;
 }
 
 .danger {
@@ -56,11 +65,19 @@
   font-weight: 400;
 }
 
+.danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--danger-text) 8%, transparent);
+}
+
 .success {
   background: transparent;
   color: var(--success-text);
   border: 2px solid var(--success-border);
   font-weight: 400;
+}
+
+.success:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--success-text) 8%, transparent);
 }
 
 /* sizes */
