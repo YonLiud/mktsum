@@ -1,4 +1,5 @@
 import { eq } from 'drizzle-orm'
+import { HTTPException } from 'hono/http-exception'
 import { db } from '../db'
 import { users } from '../db/schema'
 import { generateId } from '../lib/nanoid'
@@ -44,9 +45,14 @@ export const userService = {
     const user_id = generateId()
     const password_hash = await Bun.password.hash(data.password)
     const { password, terms_accepted, ...rest } = data
-    const [user] = await db.insert(users).values({ user_id, ...rest, password_hash, terms_accepted_at: new Date() }).returning()
-    const { password_hash: _, ...safeUser } = user
-    return safeUser
+    try {
+      const [user] = await db.insert(users).values({ user_id, ...rest, password_hash, terms_accepted_at: new Date() }).returning()
+      const { password_hash: _, ...safeUser } = user!
+      return safeUser
+    } catch (err: any) {
+      if (err?.cause?.constraint === 'users_username_unique') throw new HTTPException(409, { message: 'Username already taken' })
+      throw err
+    }
   },
 
   update: async (userId: string, data: Partial<{ name: string; ntfy_topic: string }>) => {
