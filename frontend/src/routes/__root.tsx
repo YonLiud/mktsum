@@ -1,17 +1,31 @@
 import { createRootRoute, Outlet, useRouterState } from '@tanstack/react-router'
-import { Navbar } from '@/components/Navbar'
+import { Navbar } from '@/components/navbar'
+import styles from './root.module.css'
 
-const NO_NAVBAR = ['/', '/login']
+const NO_NAV = ['/', '/login']
 
 export const Route = createRootRoute({
   component: () => {
     const { location } = useRouterState()
-    const showNavbar = !NO_NAVBAR.includes(location.pathname)
+    const showNav = !NO_NAV.includes(location.pathname)
+
+    if (!showNav) {
+      return (
+        <div key={location.pathname} className="page-transition">
+          <Outlet />
+        </div>
+      )
+    }
+
     return (
-      <>
-        {showNavbar && <Navbar />}
-        <Outlet />
-      </>
+      <div className={styles.layout}>
+        <Navbar />
+        <main className={styles.main}>
+<div key={location.pathname} className="page-transition">
+            <Outlet />
+          </div>
+        </main>
+      </div>
     )
   },
 })
