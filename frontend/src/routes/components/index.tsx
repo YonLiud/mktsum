@@ -8,7 +8,7 @@ export const Route = createFileRoute('/components/')({
 function ComponentsIndexPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-12 flex flex-col gap-4">
-      <h1 className="text-2xl font-medium">components</h1>
+      <h1 className="text-2xl font-medium">components.</h1>
       <ul className="flex flex-col gap-2">
         {Object.keys(componentRegistry).map((name) => (
           <li key={name}>
