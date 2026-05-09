@@ -1,0 +1,21 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.description {
+  font-size: 0.8125rem;
+  color: var(--text-tertiary);
+  max-width: 280px;
+}

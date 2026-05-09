@@ -1,0 +1,38 @@
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 0.5px solid var(--border-subtle);
+}
+
+.item:last-child {
+  border-bottom: none;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.name {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+.remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s;
+}
+
+.remove:hover {
+  color: var(--danger-text);
+}

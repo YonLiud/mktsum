@@ -1,0 +1,27 @@
+import { TickerPill } from '../ticker-pill'
+import styles from './watchlist-item.module.css'
+
+interface WatchlistItemProps {
+  symbol: string
+  name?: string
+  onRemove?: () => void
+}
+
+export function WatchlistItem({ symbol, name, onRemove }: WatchlistItemProps) {
+  return (
+    <div className={styles.item}>
+      <div className={styles.left}>
+        <TickerPill symbol={symbol} />
+        {name && <span className={styles.name}>{name}</span>}
+      </div>
+      {onRemove && (
+        <button className={styles.remove} onClick={onRemove} aria-label={`remove ${symbol}`}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      )}
+    </div>
+  )
+}

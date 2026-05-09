@@ -1,0 +1,26 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.positive {
+  color: var(--positive);
+  background: color-mix(in srgb, var(--positive) 12%, transparent);
+}
+
+.negative {
+  color: var(--negative);
+  background: color-mix(in srgb, var(--negative) 12%, transparent);
+}
+
+.neutral {
+  color: var(--text-secondary);
+  background: var(--bg-accent-sub);
+}

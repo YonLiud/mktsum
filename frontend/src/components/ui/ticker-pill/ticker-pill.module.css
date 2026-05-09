@@ -1,0 +1,12 @@
+.pill {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--pill-bg);
+  color: var(--pill-text);
+  display: inline-block;
+  line-height: 1.5;
+  white-space: nowrap;
+}
