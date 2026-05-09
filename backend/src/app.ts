@@ -4,8 +4,10 @@ import router from './routes'
 
 const app = new Hono()
 
+const allowedOrigins = (Bun.env.FRONTEND_URL ?? 'http://localhost:5173').split(',').map(s => s.trim())
+
 app.use(cors({
-  origin: Bun.env.FRONTEND_URL ?? 'http://localhost:5173',
+  origin: (origin) => allowedOrigins.includes(origin) ? origin : null,
   credentials: true,
 }))
 app.route('/', router)
