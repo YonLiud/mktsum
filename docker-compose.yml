@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     ports:
-      - "127.0.0.1:4173:80"
+      - "4173:80"
     networks:
       - internal
 
@@ -57,8 +57,24 @@ services:
     environment:
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
       BACKEND_URL: http://backend:5000
+      NOTIFIER_URL: http://notifier:3001
       NEWS_PER_TICKER: ${NEWS_PER_TICKER:-10}
       FAILURE_NTFY_TOPIC: ${FAILURE_NTFY_TOPIC:-yonsnewsletter}
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - internal
+
+  notifier:
+    build:
+      context: ./notifier
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:3001:3001"
+    environment:
+      BACKEND_URL: http://backend:5000
+      FRONTEND_URL: ${FRONTEND_URL:-https://mktsum.yxnliu.net}
     depends_on:
       backend:
         condition: service_healthy
@@ -70,6 +86,7 @@ services:
     restart: unless-stopped
     depends_on:
       - engine
+      - notifier
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     command: daemon --docker

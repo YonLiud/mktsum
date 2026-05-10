@@ -1,4 +1,4 @@
-import { getUsers, getTickers, getAllTickerRecords, refreshAllTickers, postBriefingsBulk } from './fetcher'
+import { getUsers, getTickers, getAllTickerRecords, refreshAllTickers, postBriefingsBulk, triggerNotifier } from './fetcher'
 import { fetchNews } from './rss'
 import { summarizeTickers, generateNewsletter, generateMeta } from './llm'
 import type { TickerWithNews } from './types'
@@ -75,10 +75,12 @@ async function run() {
     })
   }
 
-  // 6. Post all briefings to the backend
+  // 6. Post all briefings to the backend, then trigger the notifier
   if (briefings.length > 0) {
     console.log(`[engine] posting ${briefings.length} briefings`)
     await postBriefingsBulk(briefings)
+    console.log('[engine] triggering notifier')
+    await triggerNotifier()
   }
 
   console.log('[engine] done')

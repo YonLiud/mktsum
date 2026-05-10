@@ -52,3 +52,9 @@ export type BriefingPayload = {
 export async function postBriefingsBulk(briefings: BriefingPayload[]): Promise<void> {
   await post('/internal/briefings/bulk', briefings)
 }
+
+export async function triggerNotifier(): Promise<void> {
+  const url = process.env.NOTIFIER_URL ?? 'http://notifier:3001'
+  const res = await fetch(`${url}/trigger`, { method: 'POST' })
+  if (!res.ok) throw new Error(`notifier trigger failed: ${res.status}`)
+}
