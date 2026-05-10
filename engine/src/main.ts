@@ -84,7 +84,19 @@ async function run() {
   console.log('[engine] done')
 }
 
-run().catch(err => {
+async function notifyFailure(err: unknown) {
+  const topic = process.env.FAILURE_NTFY_TOPIC
+  if (!topic) return
+  const message = err instanceof Error ? err.message : String(err)
+  await fetch(`https://ntfy.sh/${topic}`, {
+    method: 'POST',
+    body: `Engine run failed: ${message}`,
+    headers: { Title: 'mktsum engine error', Priority: 'high' },
+  }).catch(() => {})
+}
+
+run().catch(async err => {
   console.error('[engine] fatal:', err)
+  await notifyFailure(err)
   process.exit(1)
 })

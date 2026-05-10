@@ -40,6 +40,12 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "bun", "--eval", "fetch('http://localhost:5000/').then(()=>process.exit(0)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     networks:
       - internal
 
@@ -52,8 +58,10 @@ services:
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
       BACKEND_URL: http://backend:5000
       NEWS_PER_TICKER: ${NEWS_PER_TICKER:-10}
+      FAILURE_NTFY_TOPIC: ${FAILURE_NTFY_TOPIC:-yonsnewsletter}
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - internal
 
