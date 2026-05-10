@@ -239,7 +239,10 @@ Two surface areas, split at the router level:
 | POST | `/refresh-all` — refresh all cached tickers |
 
 #### `/internal/users`
-Currently empty (router exists, no handlers).
+| Method | Path | Returns |
+|---|---|---|
+| GET | `/` | all users with their watchlist tickers `[{ user_id, username, name, role, ntfy_topic, created_at, watchlist: [{ ticker }] }]` |
+| GET | `/:id` | single user by id (same shape, 404 if not found) |
 
 ## Conventions
 
