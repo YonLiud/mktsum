@@ -29,6 +29,13 @@
       "when": 1778357781617,
       "tag": "0003_watery_risque",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1778420224095,
+      "tag": "0004_lame_green_goblin",
+      "breakpoints": true
     }
   ]
 }

@@ -96,7 +96,7 @@ export function BriefingPage() {
 
       <div className={styles.header}>
         <p className={styles.eyebrow}>briefing · {formatDate(briefing.created_at)}</p>
-        <h1 className={styles.title}>{briefing.short_summary}</h1>
+        <h1 className={styles.title}>{briefing.subject ?? briefing.short_summary}</h1>
       </div>
 
       <Divider />

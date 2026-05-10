@@ -125,10 +125,10 @@ export function DashboardPage() {
         <div className={styles.card}>
           <div className={styles.cardHeader}>
             <p className={styles.eyebrow}>today's briefing</p>
-            <p className={styles.cardTitle}>{todaysBriefing.short_summary}</p>
+            <p className={styles.cardTitle}>{todaysBriefing.subject ?? todaysBriefing.short_summary}</p>
           </div>
           <div className={`${styles.cardBody} selectable`}>
-            <p className={styles.preview}>{todaysBriefing.full_summary}</p>
+            <p className={styles.preview}>{todaysBriefing.short_summary}</p>
             {tickers(todaysBriefing).length > 0 && (
               <div className={styles.tickers}>
                 {tickers(todaysBriefing).map(t => <TickerPill key={t} symbol={t} />)}
@@ -168,7 +168,7 @@ export function DashboardPage() {
               >
                 <div>
                   <p className={styles.rowDate}>{formatBriefingDate(b.created_at)}</p>
-                  <p className={styles.rowSubtitle}>{b.short_summary}</p>
+                  <p className={styles.rowSubtitle}>{b.subject ?? b.short_summary}</p>
                 </div>
                 <svg className={styles.chevron} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="9 18 15 12 9 6" />

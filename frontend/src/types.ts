@@ -2,6 +2,7 @@ export interface Briefing {
   briefing_id: string
   user_id: string
   user_name: string
+  subject?: string
   full_summary: string
   short_summary: string
   is_public: boolean
