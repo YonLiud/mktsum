@@ -53,6 +53,7 @@ services:
     build:
       context: ./engine
       dockerfile: Dockerfile
+    restart: unless-stopped
     command: ["tail", "-f", "/dev/null"]
     environment:
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
@@ -70,6 +71,7 @@ services:
     build:
       context: ./notifier
       dockerfile: Dockerfile
+    restart: unless-stopped
     ports:
       - "127.0.0.1:3001:3001"
     environment:
