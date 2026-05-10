@@ -22,6 +22,7 @@ export const sessions = pgTable('sessions', {
 export const briefings = pgTable('briefings', {
   briefing_id: text('briefing_id').primaryKey(),
   user_id: text('user_id').notNull().references(() => users.user_id),
+  subject: text('subject'),
   full_summary: text('full_summary').notNull(),
   short_summary: text('short_summary').notNull(),
   sources: jsonb('sources'),

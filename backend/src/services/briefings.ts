@@ -33,6 +33,7 @@ export const briefingService = {
 
   create: async (data: {
     user_id: string
+    subject?: string
     full_summary: string
     short_summary: string
     sources?: { ticker: string; title: string; url: string }[]
@@ -44,6 +45,7 @@ export const briefingService = {
 
   bulkCreate: async (data: {
     user_id: string
+    subject?: string
     full_summary: string
     short_summary: string
     sources?: { ticker: string; title: string; url: string }[]
