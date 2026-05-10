@@ -29,10 +29,12 @@ export const tickersService = {
     if (!name) return null
 
     const description = quote.assetProfile?.longBusinessSummary ?? null
+    const price = quote.price?.regularMarketPrice ?? null
+    const change_pct = quote.price?.regularMarketChangePercent ?? null
 
     const [ticker] = await db
       .insert(tickers)
-      .values({ symbol, name, description })
+      .values({ symbol, name, description, price, change_pct })
       .returning()
 
     return ticker
@@ -49,10 +51,12 @@ export const tickersService = {
     if (!name) return null
 
     const description = quote.assetProfile?.longBusinessSummary ?? null
+    const price = quote.price?.regularMarketPrice ?? null
+    const change_pct = quote.price?.regularMarketChangePercent ?? null
 
     const [ticker] = await db
       .update(tickers)
-      .set({ name, description })
+      .set({ name, description, price, change_pct })
       .where(eq(tickers.symbol, symbol))
       .returning()
 

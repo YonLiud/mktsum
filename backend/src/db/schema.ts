@@ -1,4 +1,4 @@
-import { pgTable, text, boolean, timestamp, uniqueIndex, jsonb } from 'drizzle-orm/pg-core'
+import { pgTable, text, boolean, timestamp, uniqueIndex, jsonb, real } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 
 export const users = pgTable('users', {
@@ -44,6 +44,8 @@ export const tickers = pgTable('tickers', {
   symbol: text('symbol').primaryKey(),
   name: text('name').notNull(),
   description: text('description'),
+  price: real('price'),
+  change_pct: real('change_pct'),
 })
 
 export const usersRelations = relations(users, ({ many }) => ({

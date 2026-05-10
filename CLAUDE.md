@@ -1,21 +1,21 @@
 # mktsum - PRE-WIPE DESCRIPTION
 
-AI-powered market summarization service. Users maintain a watchlist of stock tickers and receive AI-generated briefings (full + short summaries) pushed via ntfy notifications. An n8n automation engine fetches data and triggers briefing creation on a schedule.
+AI-powered market summarization service. Users maintain a watchlist of stock tickers and receive AI-generated briefings (full + short summaries) pushed via ntfy notifications. A custom engine runs on a daily cron schedule to fetch data, call the LLM, and post briefings back to the backend.
 
 ## Architecture
 
 ```
  ┌─────────┐    ┌─────────┐    ┌──────────┐
- │   n8n   │──▶ │ backend │──▶ │ postgres │
+ │ engine  │──▶ │ backend │──▶ │ postgres │
  └─────────┘    └─────────┘    └──────────┘
-      │              │
-      │              └──▶ ntfy (push notifications)
-      └──▶ Yahoo Finance, news/LLM sources
+                     │
+                     └──▶ ntfy (push notifications)
 ```
 
 - **backend** — REST API (Bun + Hono + Drizzle + PostgreSQL)
-- **n8n** — automation engine; fetches market data, calls LLM, posts briefings back to backend, triggers ntfy
-- **postgres** — shared DB for backend and n8n
+- **engine** — daily cron job (Bun); fetches RSS + Yahoo Finance quotes, calls LLM, posts briefings back to backend via `/internal/*`
+- **frontend** — React SPA
+- **postgres** — shared DB
 - **nginx** — reverse proxy in front of backend on `api.mktsum.yxnliu.net`; blocks `/internal/*` from the public internet, only `/v1/*` is exposed
 
 Request flow inside backend: `Request → Middleware → Route → Controller → Service → DB`.
@@ -151,6 +151,8 @@ All primary keys are 12-char nanoids (text), except `tickers.symbol` which is th
 | `symbol` | text PK | e.g. `AAPL` — always uppercased |
 | `name` | text | from Yahoo Finance |
 | `description` | text nullable | `longBusinessSummary` |
+| `price` | real nullable | `regularMarketPrice` from Yahoo Finance; populated on create/refresh |
+| `change_pct` | real nullable | `regularMarketChangePercent` from Yahoo Finance; populated on create/refresh |
 
 ## Auth
 

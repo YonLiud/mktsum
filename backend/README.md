@@ -1,9 +1,5 @@
 # Backend
 
-> [!NOTE]
-> TODO: add relevant tickers in breifings
-
-
 ## Architecture
 ```
 Request → Middleware → Route → Controller → Service → DB
@@ -194,3 +190,5 @@ All routes below require `Authorization: Bearer <token>` unless noted.
 | `symbol` | String (PK) | Ticker symbol (e.g., `AAPL`) — always uppercased |
 | `name` | String | Company name from Yahoo Finance |
 | `description` | String (optional) | `longBusinessSummary` from Yahoo Finance |
+| `price` | Float (optional) | `regularMarketPrice` from Yahoo Finance; populated on create/refresh |
+| `change_pct` | Float (optional) | `regularMarketChangePercent` from Yahoo Finance; populated on create/refresh |
