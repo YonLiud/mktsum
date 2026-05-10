@@ -3,7 +3,8 @@ import { useNavigate } from '@tanstack/react-router'
 import { useWatchlist, useAddTicker, useRemoveTicker } from '@/hooks/useWatchlist'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { WatchlistItem } from '@/components/ui/watchlist-item'
+import { ListItem } from '@/components/ui/list-item'
+import { TickerPill } from '@/components/ui/ticker-pill'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Spinner } from '@/components/ui/spinner'
 import { Divider } from '@/components/ui/divider'
@@ -79,13 +80,15 @@ export function WatchlistPage() {
             {watchlist.length} ticker{watchlist.length === 1 ? '' : 's'} tracked
           </p>
           {watchlist.map(entry => (
-            <WatchlistItem
+            <ListItem
               key={entry.watchlist_id}
-              symbol={entry.ticker}
-              name={entry.ticker_name}
               onClick={() => navigate({ to: '/watchlist/$ticker', params: { ticker: entry.ticker } })}
               onRemove={() => removeTicker(entry.watchlist_id)}
-            />
+              removeLabel={`remove ${entry.ticker}`}
+            >
+              <TickerPill symbol={entry.ticker} />
+              {entry.ticker_name && <span className={styles.itemName}>{entry.ticker_name}</span>}
+            </ListItem>
           ))}
         </div>
       )}

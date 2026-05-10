@@ -6,6 +6,7 @@ import { Route } from '@/routes/briefings/$briefingId'
 import { useBriefing, useSetBriefingPublic, useDeleteBriefing, BriefingError } from '@/hooks/useBriefings'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
+import { BackButton } from '@/components/ui/back-button'
 import { Divider } from '@/components/ui/divider'
 import { TickerPill } from '@/components/ui/ticker-pill'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -50,7 +51,7 @@ export function BriefingPage() {
 
   if (isLoading) return (
     <div className={styles.page}>
-      <button className={styles.back} onClick={goBack}>← back</button>
+      <BackButton onClick={goBack} />
       <div className={styles.header}>
         <Skeleton height="10px" width="120px" />
         <Skeleton height="32px" width="90%" />
@@ -72,7 +73,7 @@ export function BriefingPage() {
     const status = error instanceof BriefingError ? error.status : 0
     return (
       <div className={styles.page}>
-        <button className={styles.back} onClick={goBack}>← back</button>
+        <BackButton onClick={goBack} />
         <EmptyState
           title={status === 403 ? 'access denied' : status === 404 ? 'not found' : 'something went wrong'}
           description={
@@ -92,7 +93,7 @@ export function BriefingPage() {
   return (
     <div className={styles.page}>
 
-      <button className={styles.back} onClick={goBack}>← back</button>
+      <BackButton onClick={goBack} />
 
       <div className={styles.header}>
         <p className={styles.eyebrow}>briefing · {formatDate(briefing.created_at)}</p>
