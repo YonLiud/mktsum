@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     ports:
-      - "3000:80"
+      - "4173:80"
     networks:
       - internal
 
@@ -40,6 +40,36 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - internal
+
+  engine:
+    build:
+      context: ./engine
+      dockerfile: Dockerfile
+    command: ["tail", "-f", "/dev/null"]
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      BACKEND_URL: http://backend:5000
+      NEWS_PER_TICKER: ${NEWS_PER_TICKER:-10}
+    depends_on:
+      - backend
+    networks:
+      - internal
+
+  ofelia:
+    image: mcuadros/ofelia:latest
+    restart: unless-stopped
+    depends_on:
+      - engine
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: daemon --docker
+    labels:
+      ofelia.job-exec.engine-daily.schedule: "${ENGINE_SCHEDULE:-0 7 * * *}"
+      ofelia.job-exec.engine-daily.container: "mktsum-engine-1"
+      ofelia.job-exec.engine-daily.command: "bun src/main.ts"
+      ofelia.job-exec.engine-daily.no-overlap: "true"
     networks:
       - internal
 
