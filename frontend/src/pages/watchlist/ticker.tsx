@@ -4,6 +4,7 @@ import { useTicker } from '@/hooks/useTicker'
 import { useWatchlist, useRemoveTicker } from '@/hooks/useWatchlist'
 import { TickerPill } from '@/components/ui/ticker-pill'
 import { Button } from '@/components/ui/button'
+import { BackButton } from '@/components/ui/back-button'
 import { Divider } from '@/components/ui/divider'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -24,7 +25,7 @@ export function TickerPage() {
 
   if (isLoading) return (
     <div className={styles.page}>
-      <button className={styles.back} onClick={goBack}>← watchlist</button>
+      <BackButton onClick={goBack} />
       <div className={styles.header}>
         <Skeleton height="22px" width="60px" />
         <Skeleton height="28px" width="180px" />
@@ -41,7 +42,7 @@ export function TickerPage() {
 
   if (isError || !ticker) return (
     <div className={styles.page}>
-      <button className={styles.back} onClick={goBack}>← watchlist</button>
+      <BackButton onClick={goBack} />
       <EmptyState title="ticker not found" description="this ticker isn't in our database." />
     </div>
   )
@@ -49,7 +50,7 @@ export function TickerPage() {
   return (
     <div className={styles.page}>
 
-      <button className={styles.back} onClick={goBack}>← watchlist</button>
+      <BackButton onClick={goBack} />
 
       <div className={styles.header}>
         <TickerPill symbol={ticker.symbol} />
