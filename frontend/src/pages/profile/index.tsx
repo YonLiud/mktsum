@@ -10,6 +10,7 @@ import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { FormField } from '@/components/ui/form-field'
+import { Label } from '@/components/ui/label'
 import { Divider } from '@/components/ui/divider'
 import styles from './profile.module.css'
 
@@ -69,11 +70,11 @@ export function ProfilePage() {
       ) : (
         <div className={styles.section}>
           <div className={styles.field}>
-            <p className={styles.fieldLabel}>display name</p>
+            <Label>display name</Label>
             <p className={styles.fieldValue}>{user.name}</p>
           </div>
           <div className={styles.field}>
-            <p className={styles.fieldLabel}>ntfy topic</p>
+            <Label>ntfy topic</Label>
             {user.ntfy_topic
               ? <p className={styles.fieldValue}>{user.ntfy_topic}</p>
               : <p className={styles.fieldEmpty}>not set</p>
@@ -89,7 +90,7 @@ export function ProfilePage() {
 
       <div className={styles.section}>
         <div className={styles.field}>
-          <p className={styles.fieldLabel}>session</p>
+          <Label>session</Label>
           <p className={styles.fieldEmpty}>logged in as @{user.username}</p>
         </div>
         <div className={styles.actions}>
@@ -107,7 +108,7 @@ export function ProfilePage() {
 
       <div className={styles.section}>
         <div className={styles.field}>
-          <p className={styles.fieldLabel}>appearance</p>
+          <Label>appearance</Label>
           <p className={styles.fieldValue}>{theme === 'dark' ? 'dark mode' : 'light mode'}</p>
         </div>
         <Button variant="ghost" size="sm" onClick={toggle}>
@@ -120,7 +121,7 @@ export function ProfilePage() {
 
       <div className={styles.section}>
         <div className={styles.field}>
-          <p className={styles.fieldLabel}>legal</p>
+          <Label>legal</Label>
         </div>
         <Link to="/legal" className={styles.legalLink}>terms, privacy & disclaimer →</Link>
       </div>

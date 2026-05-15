@@ -7,6 +7,7 @@ import { ListItem } from '@/components/ui/list-item'
 import { TickerPill } from '@/components/ui/ticker-pill'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Spinner } from '@/components/ui/spinner'
+import { Label } from '@/components/ui/label'
 import { Divider } from '@/components/ui/divider'
 import styles from './watchlist.module.css'
 
@@ -76,9 +77,9 @@ export function WatchlistPage() {
         />
       ) : (
         <div className={styles.list}>
-          <p className={styles.sectionLabel}>
+          <Label>
             {watchlist.length} ticker{watchlist.length === 1 ? '' : 's'} tracked
-          </p>
+          </Label>
           {watchlist.map(entry => (
             <ListItem
               key={entry.watchlist_id}
