@@ -16,7 +16,7 @@ AI-powered market summarization service. Users maintain a watchlist of stock tic
 - **engine** — daily cron job (Bun); fetches RSS + Yahoo Finance quotes, calls LLM, posts briefings back to backend via `/internal/*`
 - **frontend** — React SPA
 - **postgres** — shared DB
-- **nginx** — reverse proxy in front of backend on `mktsum.yxnliu.net`; blocks `/internal/*` from the public internet, only `/v1/*` is exposed
+- **nginx** — reverse proxy in front of backend on `mktsum.yxnliu.net`; blocks `/internal/*` from the public internet, only `/v1/*` is exposed. Listens on port 80 only — TLS is terminated by Cloudflare, not on the server.
 
 Request flow inside backend: `Request → Middleware → Route → Controller → Service → DB`.
 
