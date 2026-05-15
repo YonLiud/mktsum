@@ -22,6 +22,7 @@ import { Route as LegalTermsRouteImport } from './routes/legal/terms'
 import { Route as LegalPrivacyRouteImport } from './routes/legal/privacy'
 import { Route as LegalDisclaimerRouteImport } from './routes/legal/disclaimer'
 import { Route as ComponentsComponentNameRouteImport } from './routes/components/$componentName'
+import { Route as BriefingsAllRouteImport } from './routes/briefings/all'
 import { Route as BriefingsBriefingIdRouteImport } from './routes/briefings/$briefingId'
 
 const SignupRoute = SignupRouteImport.update({
@@ -89,6 +90,11 @@ const ComponentsComponentNameRoute = ComponentsComponentNameRouteImport.update({
   path: '/components/$componentName',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BriefingsAllRoute = BriefingsAllRouteImport.update({
+  id: '/briefings/all',
+  path: '/briefings/all',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BriefingsBriefingIdRoute = BriefingsBriefingIdRouteImport.update({
   id: '/briefings/$briefingId',
   path: '/briefings/$briefingId',
@@ -102,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/signup': typeof SignupRoute
   '/briefings/$briefingId': typeof BriefingsBriefingIdRoute
+  '/briefings/all': typeof BriefingsAllRoute
   '/components/$componentName': typeof ComponentsComponentNameRoute
   '/legal/disclaimer': typeof LegalDisclaimerRoute
   '/legal/privacy': typeof LegalPrivacyRoute
@@ -118,6 +125,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/signup': typeof SignupRoute
   '/briefings/$briefingId': typeof BriefingsBriefingIdRoute
+  '/briefings/all': typeof BriefingsAllRoute
   '/components/$componentName': typeof ComponentsComponentNameRoute
   '/legal/disclaimer': typeof LegalDisclaimerRoute
   '/legal/privacy': typeof LegalPrivacyRoute
@@ -135,6 +143,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/signup': typeof SignupRoute
   '/briefings/$briefingId': typeof BriefingsBriefingIdRoute
+  '/briefings/all': typeof BriefingsAllRoute
   '/components/$componentName': typeof ComponentsComponentNameRoute
   '/legal/disclaimer': typeof LegalDisclaimerRoute
   '/legal/privacy': typeof LegalPrivacyRoute
@@ -153,6 +162,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/signup'
     | '/briefings/$briefingId'
+    | '/briefings/all'
     | '/components/$componentName'
     | '/legal/disclaimer'
     | '/legal/privacy'
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/signup'
     | '/briefings/$briefingId'
+    | '/briefings/all'
     | '/components/$componentName'
     | '/legal/disclaimer'
     | '/legal/privacy'
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/signup'
     | '/briefings/$briefingId'
+    | '/briefings/all'
     | '/components/$componentName'
     | '/legal/disclaimer'
     | '/legal/privacy'
@@ -202,6 +214,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   SignupRoute: typeof SignupRoute
   BriefingsBriefingIdRoute: typeof BriefingsBriefingIdRoute
+  BriefingsAllRoute: typeof BriefingsAllRoute
   ComponentsComponentNameRoute: typeof ComponentsComponentNameRoute
   LegalDisclaimerRoute: typeof LegalDisclaimerRoute
   LegalPrivacyRoute: typeof LegalPrivacyRoute
@@ -305,6 +318,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsComponentNameRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/briefings/all': {
+      id: '/briefings/all'
+      path: '/briefings/all'
+      fullPath: '/briefings/all'
+      preLoaderRoute: typeof BriefingsAllRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/briefings/$briefingId': {
       id: '/briefings/$briefingId'
       path: '/briefings/$briefingId'
@@ -322,6 +342,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   SignupRoute: SignupRoute,
   BriefingsBriefingIdRoute: BriefingsBriefingIdRoute,
+  BriefingsAllRoute: BriefingsAllRoute,
   ComponentsComponentNameRoute: ComponentsComponentNameRoute,
   LegalDisclaimerRoute: LegalDisclaimerRoute,
   LegalPrivacyRoute: LegalPrivacyRoute,
