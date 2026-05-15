@@ -1,7 +1,9 @@
 import Anthropic from '@anthropic-ai/sdk'
+import pLimit from 'p-limit'
 import type { TickerWithNews, User } from './types'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+const limit = pLimit(Number(process.env.LLM_CONCURRENCY ?? 5))
 
 function priceOnlySummary(t: TickerWithNews): string {
   if (t.price == null) return `No news or price data available for ${t.symbol}.`
@@ -22,7 +24,7 @@ async function summarizeTicker(t: TickerWithNews): Promise<string> {
       : ''
   const headlines = t.news.map((n, i) => `${i + 1}. ${n.title}`).join('\n')
 
-  const res = await client.messages.create({
+  const res = await limit(() => client.messages.create({
     model: 'claude-haiku-4-5-20251001',
     max_tokens: 256,
     messages: [
@@ -36,7 +38,7 @@ ${headlines}
 Reply with only the summary, no preamble.`,
       },
     ],
-  })
+  }))
 
   const text = res.content[0]?.type === 'text' ? res.content[0].text : ''
   return text.trim()
@@ -61,7 +63,7 @@ export async function generateNewsletter(
     .map(t => `### ${t}\n${summaryMap[t]}`)
     .join('\n\n')
 
-  const res = await client.messages.create({
+  const res = await limit(() => client.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 8192,
     thinking: { type: 'adaptive' },
@@ -81,7 +83,7 @@ Write an engaging, well-structured markdown newsletter. Include:
 Be concise, professional, and direct. Use markdown headers and formatting.`,
       },
     ],
-  })
+  }))
 
   const textBlock = res.content.find(b => b.type === 'text')
   if (!textBlock || textBlock.type !== 'text') throw new Error('Stage 2: no text in response')
@@ -91,7 +93,7 @@ Be concise, professional, and direct. Use markdown headers and formatting.`,
 export async function generateMeta(
   newsletter: string
 ): Promise<{ subject: string; short_summary: string }> {
-  const res = await client.messages.create({
+  const res = await limit(() => client.messages.create({
     model: 'claude-haiku-4-5-20251001',
     max_tokens: 512,
     messages: [
@@ -107,7 +109,7 @@ Newsletter:
 ${newsletter}`,
       },
     ],
-  })
+  }))
 
   const text = res.content[0]?.type === 'text' ? res.content[0].text : ''
   const jsonMatch = text.match(/\{[\s\S]*\}/)

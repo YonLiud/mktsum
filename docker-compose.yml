@@ -61,6 +61,7 @@ services:
       NOTIFIER_URL: http://notifier:3001
       NEWS_PER_TICKER: ${NEWS_PER_TICKER:-10}
       FAILURE_NTFY_TOPIC: ${FAILURE_NTFY_TOPIC:-yonsnewsletter}
+      LLM_CONCURRENCY: ${LLM_CONCURRENCY:-5}
     depends_on:
       backend:
         condition: service_healthy
