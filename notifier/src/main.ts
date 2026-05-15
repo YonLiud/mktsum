@@ -21,10 +21,35 @@ async function get<T>(path: string): Promise<T> {
   return res.json() as Promise<T>
 }
 
-async function run() {
+async function notify(briefing: Briefing) {
+  const users = await get<User[]>('/internal/users')
+  const user = users.find(u => u.user_id === briefing.user_id)
+
+  if (user?.ntfy_topic) {
+    await fetch(`${NTFY_BASE}/${user.ntfy_topic}`, {
+      method: 'POST',
+      headers: {
+        Title: 'mktsum',
+        Tags: 'newspaper',
+        Click: `${FRONTEND_URL}/briefings/${briefing.briefing_id}`,
+      },
+      body: briefing.subject ?? 'Your daily market briefing',
+    })
+    console.log(`[notifier] notified ${briefing.user_id}`)
+  } else {
+    console.log(`[notifier] no ntfy_topic for ${briefing.user_id}, skipping`)
+  }
+
+  await fetch(`${BACKEND_URL}/internal/briefings/${briefing.briefing_id}/sent`, {
+    method: 'PATCH',
+  })
+}
+
+async function run(briefingId?: string) {
   console.log('[notifier] starting run')
 
-  const briefings = await get<Briefing[]>('/internal/briefings/pending')
+  const all = await get<Briefing[]>('/internal/briefings/pending')
+  const briefings = briefingId ? all.filter(b => b.briefing_id === briefingId) : all
 
   if (briefings.length === 0) {
     console.log('[notifier] no pending briefings')
@@ -33,30 +58,8 @@ async function run() {
 
   console.log(`[notifier] ${briefings.length} pending briefings`)
 
-  const users = await get<User[]>('/internal/users')
-  const userMap = new Map(users.map(u => [u.user_id, u]))
-
   for (const briefing of briefings) {
-    const user = userMap.get(briefing.user_id)
-
-    if (user?.ntfy_topic) {
-      await fetch(`${NTFY_BASE}/${user.ntfy_topic}`, {
-        method: 'POST',
-        headers: {
-          Title: 'mktsum',
-          Tags: 'newspaper',
-          Click: `${FRONTEND_URL}/briefings/${briefing.briefing_id}`,
-        },
-        body: briefing.subject ?? 'Your daily market briefing',
-      })
-      console.log(`[notifier] notified ${briefing.user_id}`)
-    } else {
-      console.log(`[notifier] no ntfy_topic for ${briefing.user_id}, skipping`)
-    }
-
-    await fetch(`${BACKEND_URL}/internal/briefings/${briefing.briefing_id}/sent`, {
-      method: 'PATCH',
-    })
+    await notify(briefing)
   }
 
   console.log('[notifier] done')
@@ -66,7 +69,8 @@ Bun.serve({
   port: PORT,
   async fetch(req) {
     if (req.method === 'POST' && new URL(req.url).pathname === '/trigger') {
-      run().catch(err => console.error('[notifier] run failed:', err))
+      const body = await req.json().catch(() => ({})) as { briefing_id?: string }
+      run(body.briefing_id).catch(err => console.error('[notifier] run failed:', err))
       return new Response('ok')
     }
     return new Response('not found', { status: 404 })

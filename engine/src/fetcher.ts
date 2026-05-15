@@ -49,12 +49,16 @@ export type BriefingPayload = {
   sources?: { ticker: string; title: string; url: string }[]
 }
 
-export async function postBriefingsBulk(briefings: BriefingPayload[]): Promise<void> {
-  await post('/internal/briefings/bulk', briefings)
+export async function postBriefing(briefing: BriefingPayload): Promise<{ briefing_id: string }> {
+  return post('/internal/briefings', briefing)
 }
 
-export async function triggerNotifier(): Promise<void> {
+export async function triggerNotifier(briefingId: string): Promise<void> {
   const url = process.env.NOTIFIER_URL ?? 'http://notifier:3001'
-  const res = await fetch(`${url}/trigger`, { method: 'POST' })
+  const res = await fetch(`${url}/trigger`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ briefing_id: briefingId }),
+  })
   if (!res.ok) throw new Error(`notifier trigger failed: ${res.status}`)
 }
