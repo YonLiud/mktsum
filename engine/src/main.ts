@@ -1,4 +1,4 @@
-import { getUsers, getTickers, getAllTickerRecords, refreshAllTickers, postBriefingsBulk, triggerNotifier } from './fetcher'
+import { getUsers, getTickers, getAllTickerRecords, refreshAllTickers, postBriefing, triggerNotifier } from './fetcher'
 import { fetchNews } from './rss'
 import { summarizeTickers, generateNewsletter, generateMeta } from './llm'
 import type { TickerWithNews } from './types'
@@ -42,46 +42,38 @@ async function run() {
   console.log('[engine] stage 1: summarizing tickers')
   const summaryMap = await summarizeTickers(tickersWithNews)
 
-  // 5. Stage 2 + 3: per-user newsletter + meta, then collect briefings
-  const briefings: Parameters<typeof postBriefingsBulk>[0] = []
+  // 5. Stage 2 + 3: per-user newsletter + meta, post, and notify — all in parallel
+  await Promise.all(
+    users
+      .filter(user => user.watchlist.length > 0)
+      .map(async user => {
+        const userTickers = user.watchlist.map(w => w.ticker)
 
-  for (const user of users) {
-    const userTickers = user.watchlist.map(w => w.ticker)
-    if (userTickers.length === 0) continue
+        console.log(`[engine] generating briefing for ${user.username}`)
 
-    console.log(`[engine] generating briefing for ${user.username}`)
+        const newsletter = await generateNewsletter(user, summaryMap)
+        const meta = await generateMeta(newsletter)
 
-    // Stage 2: full newsletter (Sonnet)
-    const newsletter = await generateNewsletter(user, summaryMap)
+        const sources = userTickers.flatMap(symbol =>
+          (tickersWithNews.find(t => t.symbol === symbol)?.news ?? []).map(n => ({
+            ticker: n.ticker,
+            title: n.title,
+            url: n.url,
+          }))
+        )
 
-    // Stage 3: subject + short_summary (Haiku)
-    const meta = await generateMeta(newsletter)
+        const { briefing_id } = await postBriefing({
+          user_id: user.user_id,
+          subject: meta.subject,
+          full_summary: newsletter,
+          short_summary: meta.short_summary,
+          sources,
+        })
 
-    // Collect sources from the user's tickers
-    const sources = userTickers.flatMap(symbol =>
-      (tickersWithNews.find(t => t.symbol === symbol)?.news ?? []).map(n => ({
-        ticker: n.ticker,
-        title: n.title,
-        url: n.url,
-      }))
-    )
-
-    briefings.push({
-      user_id: user.user_id,
-      subject: meta.subject,
-      full_summary: newsletter,
-      short_summary: meta.short_summary,
-      sources,
-    })
-  }
-
-  // 6. Post all briefings to the backend, then trigger the notifier
-  if (briefings.length > 0) {
-    console.log(`[engine] posting ${briefings.length} briefings`)
-    await postBriefingsBulk(briefings)
-    console.log('[engine] triggering notifier')
-    await triggerNotifier()
-  }
+        console.log(`[engine] posted briefing for ${user.username}, triggering notifier`)
+        await triggerNotifier(briefing_id)
+      })
+  )
 
   console.log('[engine] done')
 }
