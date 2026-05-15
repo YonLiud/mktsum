@@ -158,7 +158,7 @@ export function DashboardPage() {
             {hasMore && (
               <button
                 className={styles.viewAll}
-                onClick={() => navigate({ to: '/briefings/$briefingId', params: { briefingId: 'all' } })}
+                onClick={() => navigate({ to: '/briefings/all' })}
               >
                 view all →
               </button>
