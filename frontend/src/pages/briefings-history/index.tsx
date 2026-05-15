@@ -1,5 +1,8 @@
 import { useNavigate } from '@tanstack/react-router'
 import { useBriefings } from '@/hooks/useBriefings'
+import { Container } from '@/components/ui/container'
+import { Heading } from '@/components/ui/heading'
+import { Label } from '@/components/ui/label'
 import { BackButton } from '@/components/ui/back-button'
 import { Divider } from '@/components/ui/divider'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -13,13 +16,13 @@ export function BriefingsHistoryPage() {
   const { data: briefings, isLoading } = useBriefings()
 
   return (
-    <div className={styles.page}>
+    <Container className={styles.page}>
 
       <BackButton onClick={() => navigate({ to: '/dashboard' })} />
 
       <div className={styles.header}>
-        <p className={styles.eyebrow}>history</p>
-        <h1 className={styles.title}>all briefings.</h1>
+        <Label>history</Label>
+        <Heading as="h1">all briefings.</Heading>
       </div>
 
       <Divider />
@@ -51,6 +54,6 @@ export function BriefingsHistoryPage() {
         </div>
       )}
 
-    </div>
+    </Container>
   )
 }
