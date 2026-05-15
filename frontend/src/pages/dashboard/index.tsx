@@ -6,6 +6,7 @@ import { Divider } from '@/components/ui/divider'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EmptyState } from '@/components/ui/empty-state'
 import { TickerPill } from '@/components/ui/ticker-pill'
+import { ListItem } from '@/components/ui/list-item'
 import type { Briefing } from '@/types'
 import styles from './dashboard.module.css'
 
@@ -161,19 +162,15 @@ export function DashboardPage() {
           <div>
             <p className={styles.sectionLabel}>past briefings</p>
             {past.map(b => (
-              <button
+              <ListItem
                 key={b.briefing_id}
-                className={styles.briefingRow}
                 onClick={() => navigate({ to: '/briefings/$briefingId', params: { briefingId: b.briefing_id } })}
               >
-                <div>
-                  <p className={styles.rowDate}>{formatBriefingDate(b.created_at)}</p>
-                  <p className={styles.rowSubtitle}>{b.subject ?? b.short_summary}</p>
+                <div className={styles.briefingContent}>
+                  <span className={styles.briefingTitle}>{formatBriefingDate(b.created_at)}</span>
+                  <span className={styles.briefingSubtitle}>{b.subject ?? b.short_summary}</span>
                 </div>
-                <svg className={styles.chevron} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="9 18 15 12 9 6" />
-                </svg>
-              </button>
+              </ListItem>
             ))}
             {hasMore && (
               <button

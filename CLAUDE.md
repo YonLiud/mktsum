@@ -1,4 +1,4 @@
-# mktsum - PRE-WIPE DESCRIPTION
+# mktsum
 
 AI-powered market summarization service. Users maintain a watchlist of stock tickers and receive AI-generated briefings (full + short summaries) pushed via ntfy notifications. A custom engine runs on a daily cron schedule to fetch data, call the LLM, and post briefings back to the backend.
 

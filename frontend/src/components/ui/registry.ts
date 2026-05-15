@@ -13,7 +13,8 @@ import { showcase as spinner }       from './spinner/showcase'
 import { showcase as emptyState }    from './empty-state/showcase'
 import { showcase as searchInput }   from './search-input/showcase'
 import { showcase as briefingCard }  from './briefing-card/showcase'
-import { showcase as watchlistItem } from './watchlist-item/showcase'
+import { showcase as listItem }      from './list-item/showcase'
+import { showcase as backButton }    from './back-button/showcase'
 import { showcase as divider }       from './divider/showcase'
 import { showcase as skeleton }      from './skeleton/showcase'
 
@@ -32,7 +33,8 @@ export const componentRegistry: Record<string, ReactNode> = {
   'empty-state':    emptyState,
   'search-input':   searchInput,
   'briefing-card':  briefingCard,
-  'watchlist-item': watchlistItem,
+  'list-item':      listItem,
+  'back-button':    backButton,
   divider,
   skeleton,
 }
