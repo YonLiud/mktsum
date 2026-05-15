@@ -23,9 +23,11 @@ Request flow inside backend: `Request → Middleware → Route → Controller �
 ## Infra
 
 - App dir on server: `/opt/mktsum`
-- Persistent volumes: `/srv/mktsum_data/postgres`, `/srv/mktsum_data/n8n`
-- Ports: backend `5000`, n8n `5678`, postgres internal-only
-- Docker compose service name: `mktsum` (project-scoped)
+- Persistent volumes: `/srv/mktsum_data/postgres` (prod), `/srv/mktsum_data/postgres_staging` (staging)
+- Ports — prod: backend `5000`, notifier `3001`, frontend `4173`; staging: backend `5001`, notifier `3002`, frontend `4174`; postgres internal-only
+- Swarm stack names: `mktsum` (prod), `mktsum-staging` (staging)
+- Orchestration: Docker Swarm (single node); `docker-stack.yml` for prod, `docker-stack.staging.yml` for staging
+- Engine runs as an ofelia `job-run` (fresh container per schedule, no idle container)
 
 ## Backend
 
@@ -259,12 +261,30 @@ Two surface areas, split at the router level:
 
 ## Deployment
 
+Production and staging both run on the same VPS under Docker Swarm. Images are built locally on the VPS then deployed via `docker stack deploy`.
+
 ```bash
+# first-time swarm init (once per VPS)
+docker swarm init
+
+# deploy / update prod
 git pull
-docker compose up -d --build
+docker compose build
+docker stack deploy -c docker-stack.yml mktsum
+
+# deploy / update staging
+git pull
+docker compose build
+docker stack deploy -c docker-stack.staging.yml mktsum-staging
 ```
 
-Compose builds backend from `./backend`, wires postgres with healthcheck, runs n8n on the same internal network. Migrations run on every backend container start.
+Swarm rolls updates with `start-first` order — new container passes healthcheck before old one is stopped. Failed deploys auto-rollback. Migrations run on every backend container start.
+
+### Local dev
+
+```bash
+docker compose up -d --build   # uses docker-compose.yml, all services
+```
 
 ## Branching
 
@@ -272,5 +292,6 @@ Compose builds backend from `./backend`, wires postgres with healthcheck, runs n
 - `dev` — integration; merges from `feature/*`
 - `feature/*` — off `dev`
 - `fix/*` — off `dev`
+- `infra/*` — off `dev`, for infrastructure changes (Docker, Swarm, CI/CD, nginx)
 
-Commit prefixes: `feat:`, `fix:`, `refactor:`, `docs:`, `misc:`, `docker:`, `git:`.
+Commit prefixes: `feat:`, `fix:`, `refactor:`, `docs:`, `chore:`, `infra:`.
