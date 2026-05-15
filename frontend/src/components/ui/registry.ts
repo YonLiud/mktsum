@@ -16,6 +16,7 @@ import { showcase as briefingCard }  from './briefing-card/showcase'
 import { showcase as listItem }      from './list-item/showcase'
 import { showcase as backButton }    from './back-button/showcase'
 import { showcase as divider }       from './divider/showcase'
+import { showcase as label }         from './label/showcase'
 import { showcase as skeleton }      from './skeleton/showcase'
 
 export const componentRegistry: Record<string, ReactNode> = {
@@ -36,5 +37,6 @@ export const componentRegistry: Record<string, ReactNode> = {
   'list-item':      listItem,
   'back-button':    backButton,
   divider,
+  label,
   skeleton,
 }
