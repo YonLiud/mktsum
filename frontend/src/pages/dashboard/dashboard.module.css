@@ -119,15 +119,6 @@
 }
 
 /* ── past briefings ── */
-.sectionLabel {
-  font-size: 0.625rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-tertiary);
-  margin-bottom: 4px;
-}
-
 .briefingContent {
   display: flex;
   flex-direction: column;

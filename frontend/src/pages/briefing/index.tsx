@@ -11,6 +11,7 @@ import { Divider } from '@/components/ui/divider'
 import { TickerPill } from '@/components/ui/ticker-pill'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Label } from '@/components/ui/label'
 import { formatDate } from '@/lib/dateFormat'
 import styles from './briefing.module.css'
 
@@ -91,7 +92,7 @@ export function BriefingPage() {
       <BackButton onClick={goBack} />
 
       <div className={styles.header}>
-        <p className={styles.eyebrow}>briefing · {formatDate(briefing.created_at)}</p>
+        <Label>briefing · {formatDate(briefing.created_at)}</Label>
         <h1 className={styles.title}>{briefing.subject ?? briefing.short_summary}</h1>
       </div>
 
@@ -115,7 +116,7 @@ export function BriefingPage() {
           <Divider />
           <div className={styles.sources}>
             <button className={styles.sourcesToggle} onClick={() => setShowSources(v => !v)}>
-              <span className={styles.sectionLabel}>sources ({briefing.sources.length})</span>
+              <Label as="span">sources ({briefing.sources.length})</Label>
               <svg className={`${styles.chevron} ${showSources ? styles.chevronOpen : ''}`} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="6 9 12 15 18 9" />
               </svg>

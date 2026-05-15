@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useAuth } from '@/hooks/useAuth'
 import { useBriefings, useLatestBriefing } from '@/hooks/useBriefings'
@@ -7,9 +8,40 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { EmptyState } from '@/components/ui/empty-state'
 import { TickerPill } from '@/components/ui/ticker-pill'
 import { ListItem } from '@/components/ui/list-item'
+import { Label } from '@/components/ui/label'
 import { formatToday, formatTime, formatBriefingDate } from '@/lib/dateFormat'
 import type { Briefing } from '@/types'
 import styles from './dashboard.module.css'
+
+function useNextBriefingCountdown() {
+  const [countdown, setCountdown] = useState('')
+
+  useEffect(() => {
+    function nextRun() {
+      const now = new Date()
+      const target = new Date(now)
+      target.setUTCHours(4, 0, 0, 0)
+      if (now >= target) target.setUTCDate(target.getUTCDate() + 1)
+      return target
+    }
+
+    function format(ms: number) {
+      const total = Math.max(0, Math.floor(ms / 1000))
+      const h = Math.floor(total / 3600)
+      const m = Math.floor((total % 3600) / 60)
+      const s = total % 60
+      if (h > 0) return `${h}h ${m}m ${s}s`
+      return `${m}m and ${s}s`
+    }
+
+    const tick = () => setCountdown(format(nextRun().getTime() - Date.now()))
+    tick()
+    const id = setInterval(tick, 1000)
+    return () => clearInterval(id)
+  }, [])
+
+  return countdown
+}
 
 function isToday(dateStr: string) {
   const d = new Date(dateStr)
@@ -61,6 +93,19 @@ function greeting(name: string) {
   return pool[Math.floor(Math.random() * pool.length)](name)
 }
 
+const WAITING_TEMPLATES = [
+  (t: string) => `almost time. ready in ${t}.`,
+  (t: string) => `brewing. ready in ${t}.`,
+  (t: string) => `your briefing arrives in ${t}.`,
+  (t: string) => `your day starts in ${t}.`,
+  (t: string) => `still cooking. ready in ${t}.`,
+  (t: string) => `morning read ready in ${t}.`,
+  (t: string) => `come back in ${t}.`,
+  (t: string) => `crunching numbers. back in ${t}.`,
+  (t: string) => `your briefing is ${t} away.`,
+  (t: string) => `markets open soon. briefing in ${t}.`,
+]
+
 function tickers(b: Briefing) {
   return [...new Set(b.sources?.map(s => s.ticker) ?? [])]
 }
@@ -71,6 +116,12 @@ export function DashboardPage() {
   const { data: latest, isLoading: latestLoading } = useLatestBriefing()
   const { data: allBriefings } = useBriefings()
   const { data: watchlist } = useWatchlist()
+  const countdown = useNextBriefingCountdown()
+  const greetingText = useMemo(() => greeting(user?.name ?? ''), [user?.name])
+  const waitingTemplate = useMemo(
+    () => WAITING_TEMPLATES[Math.floor(Math.random() * WAITING_TEMPLATES.length)],
+    [],
+  )
 
   const todaysBriefing = latest && isToday(latest.created_at) ? latest : null
   const past = (allBriefings ?? [])
@@ -83,7 +134,7 @@ export function DashboardPage() {
 
       {/* page header */}
       <div>
-        <p className={styles.greeting}>{greeting(user?.name ?? '')}</p>
+        <p className={styles.greeting}>{greetingText}</p>
         <p className={styles.meta}>
           {formatToday()} · {watchlist?.length ?? 0} ticker{watchlist?.length === 1 ? '' : 's'} tracked
         </p>
@@ -131,10 +182,15 @@ export function DashboardPage() {
             </div>
           </div>
         </div>
-      ) : (
+      ) : watchlist !== undefined && watchlist.length === 0 ? (
         <EmptyState
           title="no briefing yet"
-          description="add tickers to your watchlist and your first briefing will arrive tomorrow morning."
+          description="add tickers to your watchlist and your first briefing will arrive the next morning."
+        />
+      ) : (
+        <EmptyState
+          title="not ready yet"
+          description={waitingTemplate(countdown)}
         />
       )}
 
@@ -143,7 +199,7 @@ export function DashboardPage() {
         <>
           <Divider />
           <div>
-            <p className={styles.sectionLabel}>past briefings</p>
+            <Label>past briefings</Label>
             {past.map(b => (
               <ListItem
                 key={b.briefing_id}
