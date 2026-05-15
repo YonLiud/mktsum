@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { EmptyState } from '@/components/ui/empty-state'
 import { TickerPill } from '@/components/ui/ticker-pill'
 import { ListItem } from '@/components/ui/list-item'
+import { formatToday, formatTime, formatBriefingDate } from '@/lib/dateFormat'
 import type { Briefing } from '@/types'
 import styles from './dashboard.module.css'
 
@@ -60,24 +61,6 @@ function greeting(name: string) {
   return pool[Math.floor(Math.random() * pool.length)](name)
 }
 
-function formatDate() {
-  return new Date().toLocaleDateString('en-US', {
-    weekday: 'long', month: 'long', day: 'numeric',
-  }).toLowerCase()
-}
-
-function formatTime(dateStr: string) {
-  return new Date(dateStr).toLocaleTimeString('en-US', {
-    hour: 'numeric', minute: '2-digit',
-  }).toLowerCase()
-}
-
-function formatBriefingDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    month: 'long', day: 'numeric',
-  }).toLowerCase() + ' briefing'
-}
-
 function tickers(b: Briefing) {
   return [...new Set(b.sources?.map(s => s.ticker) ?? [])]
 }
@@ -102,7 +85,7 @@ export function DashboardPage() {
       <div>
         <p className={styles.greeting}>{greeting(user?.name ?? '')}</p>
         <p className={styles.meta}>
-          {formatDate()} · {watchlist?.length ?? 0} ticker{watchlist?.length === 1 ? '' : 's'} tracked
+          {formatToday()} · {watchlist?.length ?? 0} ticker{watchlist?.length === 1 ? '' : 's'} tracked
         </p>
       </div>
 

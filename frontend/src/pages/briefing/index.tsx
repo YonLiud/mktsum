@@ -11,13 +11,8 @@ import { Divider } from '@/components/ui/divider'
 import { TickerPill } from '@/components/ui/ticker-pill'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Skeleton } from '@/components/ui/skeleton'
+import { formatDate } from '@/lib/dateFormat'
 import styles from './briefing.module.css'
-
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    weekday: 'long', month: 'long', day: 'numeric',
-  }).toLowerCase()
-}
 
 function uniqueTickers(sources: { ticker: string }[]) {
   return [...new Set(sources.map(s => s.ticker))]

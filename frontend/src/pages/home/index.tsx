@@ -1,25 +1,18 @@
-import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { useTheme } from '@/hooks/useTheme'
 import { Button } from '@/components/ui/button'
 import styles from './home.module.css'
 
 export function HomePage() {
-  const [dark, setDark] = useState(false)
+  const { theme, toggle } = useTheme()
   const navigate = useNavigate()
-
-  function toggleTheme() {
-    setDark(d => {
-      document.documentElement.classList.toggle('dark', !d)
-      return !d
-    })
-  }
 
   return (
     <div className={styles.page}>
 
       <div className={styles.topRight}>
-        <Button variant="ghost" size="sm" onClick={toggleTheme}>
-          {dark ? 'light' : 'dark'}
+        <Button variant="ghost" size="sm" onClick={toggle}>
+          {theme === 'dark' ? 'light' : 'dark'}
         </Button>
       </div>
 
