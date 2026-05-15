@@ -9,8 +9,9 @@ AI powered market summarization
 
 ## Services
 
-- **backend** — REST API (Hono + Drizzle + PostgreSQL)
-- **n8n** — automation engine for data fetching and notifications
+- **backend** — REST API (Hono + Drizzle + PostgreSQL); exposed at `mktsum.yxnliu.net` via nginx
+- **engine** — daily cron job (Bun); fetches RSS + Yahoo Finance quotes, calls LLM, posts briefings
+- **nginx** — reverse proxy; exposes `/v1/*`, blocks `/internal/*`
 - **postgres** — shared database
 
 ## Infrastructure
@@ -37,15 +38,15 @@ docker compose up -d --build
 | Service | Port |
 |---------|------|
 | Backend API | 5000 |
-| n8n | 5678 |
 | PostgreSQL | internal only |
 
 ## Development Workflow
 
 ### Branching Strategy
 - `main` — production-ready, merges only from `dev`
-- `dev` — integration branch, merges from `feature/*`
-- `feature/*` — feature/fix branches off `dev`
+- `dev` — integration branch, merges from `feature/*` and `fix/*`
+- `feature/*` — feature branches off `dev`
+- `fix/*` — fix branches off `dev`
 
 Always create a feature branch. Never commit directly to `main` or `dev`.
 
