@@ -94,7 +94,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     command: daemon --docker
     labels:
-      ofelia.job-exec.engine-daily.schedule: "${ENGINE_SCHEDULE:-0 0 7 * * *}"
+      ofelia.job-exec.engine-daily.schedule: "${ENGINE_SCHEDULE:-0 0 4 * * *}"
       ofelia.job-exec.engine-daily.container: "mktsum-engine-1"
       ofelia.job-exec.engine-daily.command: "bun src/main.ts"
       ofelia.job-exec.engine-daily.no-overlap: "true"
