@@ -1,4 +1,4 @@
-import { createRootRoute, Outlet, useRouterState } from '@tanstack/react-router'
+import { createRootRoute, Outlet, useRouterState, HeadContent } from '@tanstack/react-router'
 import { Navbar } from '@/components/navbar'
 import { EmptyState } from '@/components/ui/empty-state'
 import { useAuth } from '@/hooks/useAuth'
@@ -20,6 +20,9 @@ function NotFound() {
 
 export const Route = createRootRoute({
   notFoundComponent: NotFound,
+  head: () => ({
+    meta: [{ title: 'mktsum' }],
+  }),
   component: () => {
     const { location } = useRouterState()
     const { data: user } = useAuth()
@@ -27,21 +30,27 @@ export const Route = createRootRoute({
 
     if (!showNav) {
       return (
-        <div key={location.pathname} className="page-transition">
-          <Outlet />
-        </div>
+        <>
+          <HeadContent />
+          <div key={location.pathname} className="page-transition">
+            <Outlet />
+          </div>
+        </>
       )
     }
 
     return (
-      <div className={styles.layout}>
-        <Navbar />
-        <main className={styles.main}>
-          <div key={location.pathname} className="page-transition">
-            <Outlet />
-          </div>
-        </main>
-      </div>
+      <>
+        <HeadContent />
+        <div className={styles.layout}>
+          <Navbar />
+          <main className={styles.main}>
+            <div key={location.pathname} className="page-transition">
+              <Outlet />
+            </div>
+          </main>
+        </div>
+      </>
     )
   },
 })
