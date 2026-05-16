@@ -22,10 +22,6 @@ export async function getUsers(): Promise<User[]> {
   return get<User[]>('/internal/users')
 }
 
-export async function getTickers(): Promise<string[]> {
-  return get<string[]>('/internal/watchlist/tickers')
-}
-
 export type TickerRecord = {
   symbol: string
   name: string
@@ -33,12 +29,11 @@ export type TickerRecord = {
   change_pct: number | null
 }
 
-export async function getAllTickerRecords(): Promise<TickerRecord[]> {
-  return get<TickerRecord[]>('/internal/tickers')
-}
-
-export async function refreshAllTickers(): Promise<void> {
-  await post('/internal/tickers/refresh-all')
+export async function refreshWatchedTickers(symbols: string[]): Promise<TickerRecord[]> {
+  const results = await Promise.all(
+    symbols.map(symbol => post<TickerRecord | null>(`/internal/tickers/${symbol}/refresh`))
+  )
+  return results.filter((r): r is TickerRecord => r !== null)
 }
 
 export type BriefingPayload = {

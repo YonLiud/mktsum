@@ -1,4 +1,4 @@
-import { getUsers, getTickers, getAllTickerRecords, refreshAllTickers, postBriefing, triggerNotifier } from './fetcher'
+import { getUsers, refreshWatchedTickers, postBriefing, triggerNotifier } from './fetcher'
 import { fetchNews } from './rss'
 import { summarizeTickers, generateNewsletter, generateMeta } from './llm'
 import type { TickerWithNews } from './types'
@@ -6,15 +6,9 @@ import type { TickerWithNews } from './types'
 async function run() {
   console.log('[engine] starting run')
 
-  // 1. Refresh ticker prices in the backend DB, then fetch updated records + users
-  console.log('[engine] refreshing tickers')
-  await refreshAllTickers()
-
-  const [users, tickerSymbols, tickerRecords] = await Promise.all([
-    getUsers(),
-    getTickers(),
-    getAllTickerRecords(),
-  ])
+  // 1. Get users, derive the set of watched tickers, refresh only those
+  const users = await getUsers()
+  const tickerSymbols = [...new Set(users.flatMap(u => u.watchlist.map(w => w.ticker)))]
   console.log(`[engine] ${users.length} users, ${tickerSymbols.length} unique tickers`)
 
   if (tickerSymbols.length === 0) {
@@ -22,6 +16,8 @@ async function run() {
     return
   }
 
+  console.log('[engine] refreshing watched tickers')
+  const tickerRecords = await refreshWatchedTickers(tickerSymbols)
   const priceMap = new Map(tickerRecords.map(t => [t.symbol, t]))
 
   // 2. Fetch news for all tickers in parallel
