@@ -10,7 +10,7 @@ beforeEach(async () => {
 // POST /v1/auth/login
 // ---------------------------------------------------------------------------
 describe('POST /v1/auth/login', () => {
-  test('returns a token on valid credentials', async () => {
+  test('returns user info and sets session cookie on valid credentials', async () => {
     await insertUser({ username: 'yon', name: 'Yon' })
 
     const res = await app.request('/v1/auth/login', {
@@ -21,11 +21,12 @@ describe('POST /v1/auth/login', () => {
 
     expect(res.status).toBe(200)
     const data = (await res.json()) as any
-    expect(data.token).toBeDefined()
     expect(data.username).toBe('yon')
     expect(data.user_id).toBeDefined()
     expect(data.role).toBe('user')
     expect(data.password_hash).toBeUndefined()
+    expect(data.token).toBeUndefined()
+    expect(res.headers.get('set-cookie')).toContain('session=')
   })
 
   test('returns 401 on wrong password', async () => {

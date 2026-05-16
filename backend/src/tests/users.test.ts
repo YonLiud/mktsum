@@ -14,7 +14,7 @@ describe('POST /v1/users', () => {
     const res = await app.request('/v1/users', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: 'alice', name: 'Alice', password: 'password123', ntfy_topic: 'alice-topic' }),
+      body: JSON.stringify({ username: 'alice', name: 'Alice', password: 'password123', ntfy_topic: 'alice-topic', terms_accepted: true }),
     })
 
     expect(res.status).toBe(201)
