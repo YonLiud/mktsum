@@ -1,8 +1,16 @@
-import { eq } from 'drizzle-orm'
+import { eq, count } from 'drizzle-orm'
 import { db } from '../db'
 import { watchlist, tickers } from '../db/schema'
 import { generateId } from '../lib/nanoid'
 import { tickersService } from './tickers'
+
+export const WATCHLIST_LIMIT = 15
+
+export class WatchlistLimitError extends Error {
+  constructor() {
+    super(`Watchlist limit of ${WATCHLIST_LIMIT} tickers reached`)
+  }
+}
 
 export const watchlistService = {
   getByUserId: async (userId: string) => {
@@ -37,6 +45,9 @@ export const watchlistService = {
   },
 
   addMany: async (userId: string, tickers: string[]) => {
+    const rows = await db.select({ current: count() }).from(watchlist).where(eq(watchlist.user_id, userId))
+    const current = rows[0]?.current ?? 0
+    if (current + tickers.length > WATCHLIST_LIMIT) throw new WatchlistLimitError()
     const entries = []
     for (const ticker of tickers) {
       entries.push(await watchlistService.add(userId, ticker))

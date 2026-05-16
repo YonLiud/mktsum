@@ -33,6 +33,33 @@ describe('POST /v1/watchlist/user/:userId', () => {
     expect(res.status).toBe(403)
   })
 
+  test('returns 422 when watchlist is at the limit', async () => {
+    const user = await insertUser()
+    const token = await createSession(user.user_id)
+    for (let i = 1; i <= 15; i++) await insertWatchlistEntry(user.user_id, `FAKE${i}`)
+
+    const res = await app.request(`/v1/watchlist/user/${user.user_id}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeader(token) },
+      body: JSON.stringify({ ticker: 'AAPL' }),
+    })
+    expect(res.status).toBe(422)
+    expect((await res.json() as any).error).toMatch(/limit/)
+  })
+
+  test('returns 422 when batch add would exceed the limit', async () => {
+    const user = await insertUser()
+    const token = await createSession(user.user_id)
+    for (let i = 1; i <= 14; i++) await insertWatchlistEntry(user.user_id, `FAKE${i}`)
+
+    const res = await app.request(`/v1/watchlist/user/${user.user_id}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeader(token) },
+      body: JSON.stringify({ tickers: ['AAPL', 'MSFT'] }),
+    })
+    expect(res.status).toBe(422)
+  })
+
   test('adds a ticker and returns 201', async () => {
     const user = await insertUser()
     const token = await createSession(user.user_id)

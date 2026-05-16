@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { useWatchlist, useAddTicker, useRemoveTicker } from '@/hooks/useWatchlist'
+import { useWatchlist, useAddTicker, useRemoveTicker, WATCHLIST_LIMIT } from '@/hooks/useWatchlist'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { ListItem } from '@/components/ui/list-item'
@@ -17,6 +17,7 @@ export function WatchlistPage() {
   const { mutate: addTicker, isPending: isAdding, error: addError, reset } = useAddTicker()
   const { mutate: removeTicker } = useRemoveTicker()
   const [input, setInput] = useState('')
+  const atLimit = (watchlist?.length ?? 0) >= WATCHLIST_LIMIT
 
   function handleAdd(e: React.FormEvent) {
     e.preventDefault()
@@ -47,24 +48,27 @@ export function WatchlistPage() {
           placeholder="ticker symbol"
           mono
           className={styles.addInput}
+          disabled={atLimit}
         />
         <Button
           type="submit"
           variant="secondary"
           loading={isAdding}
-          disabled={!input.trim()}
+          disabled={!input.trim() || atLimit}
         >
           add
         </Button>
       </form>
 
-      {addError && (
-        <p className={styles.error}>
-          {(addError as Error).message.includes('Failed') ? 'ticker not found or already on watchlist.' : (addError as Error).message}
-        </p>
+      {atLimit ? (
+        <p className={styles.error}>watchlist limit of {WATCHLIST_LIMIT} tickers reached.</p>
+      ) : addError && (
+        <p className={styles.error}>{(addError as Error).message}</p>
       )}
 
       <Divider />
+
+      {!isLoading && <Label>{watchlist?.length ?? 0} / {WATCHLIST_LIMIT} tickers</Label>}
 
       {isLoading ? (
         <div className={styles.center}>
@@ -77,9 +81,6 @@ export function WatchlistPage() {
         />
       ) : (
         <div className={styles.list}>
-          <Label>
-            {watchlist.length} ticker{watchlist.length === 1 ? '' : 's'} tracked
-          </Label>
           {watchlist.map(entry => (
             <ListItem
               key={entry.watchlist_id}

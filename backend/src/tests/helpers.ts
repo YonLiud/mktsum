@@ -85,5 +85,5 @@ export async function insertWatchlistEntry(userId: string, ticker: string) {
       ticker: ticker.toUpperCase(),
     })
     .returning()
-  return entry
+  return entry!
 }

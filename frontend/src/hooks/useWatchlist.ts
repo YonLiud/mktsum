@@ -1,4 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+
+export const WATCHLIST_LIMIT = 15
 import { useAuth } from '@/hooks/useAuth'
 import { api } from '@/lib/api'
 import type { WatchlistEntry } from '@/types'
@@ -22,7 +24,10 @@ export function useAddTicker() {
   return useMutation({
     mutationFn: async (ticker: string) => {
       const res = await api.post(`/watchlist/user/${user!.user_id}`, { ticker })
-      if (!res.ok) throw new Error('Failed to add ticker')
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body.error ?? 'Failed to add ticker')
+      }
       return res.json()
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['watchlist', user?.user_id] }),

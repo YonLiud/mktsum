@@ -1,5 +1,5 @@
 import type { Context } from 'hono'
-import { watchlistService } from '../services/watchlist'
+import { watchlistService, WatchlistLimitError } from '../services/watchlist'
 import { addTickerSchema, removeTickerSchema } from '../validators/watchlist'
 
 export const watchlistController = {
@@ -19,7 +19,13 @@ export const watchlistController = {
     const body = await c.req.json()
     const result = addTickerSchema.safeParse(body)
     if (!result.success) return c.json({ error: result.error.flatten() }, 400)
-    const entries = await watchlistService.addMany(userId, result.data.tickers)
+    let entries
+    try {
+      entries = await watchlistService.addMany(userId, result.data.tickers)
+    } catch (e) {
+      if (e instanceof WatchlistLimitError) return c.json({ error: e.message }, 422)
+      throw e
+    }
     const failed = result.data.tickers.filter((_, i) => entries[i] === null)
     if (failed.length > 0) return c.json({ error: `Ticker(s) not found: ${failed.join(', ')}` }, 404)
     return c.json(entries.length === 1 ? entries[0] : entries, 201)
