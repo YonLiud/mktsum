@@ -1,6 +1,8 @@
 services:
   frontend:
     image: mktsum-frontend:latest
+    ports:
+      - "4173:80"
     networks:
       - internal
     deploy:
