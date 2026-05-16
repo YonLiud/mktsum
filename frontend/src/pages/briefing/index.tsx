@@ -40,7 +40,8 @@ export function BriefingPage() {
   }
 
   function copyShareLink() {
-    navigator.clipboard.writeText(window.location.href)
+    const shareUrl = `${window.location.origin}/share/${briefing?.briefing_id}`
+    navigator.clipboard.writeText(shareUrl)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
