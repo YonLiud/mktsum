@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { LayoutDashboard, BookMarked, User, Sun, Moon, Scale } from 'lucide-react'
+import { LayoutDashboard, BookMarked, User, Sun, Moon, Scale, Coffee } from 'lucide-react'
 import { useTheme } from '@/hooks/useTheme'
 import styles from './navbar.module.css'
 
@@ -20,6 +20,16 @@ export function Navbar() {
           watchlist
         </Link>
       </div>
+
+      <a
+        href="https://ko-fi.com/C4W21ZNE8V"
+        target="_blank"
+        rel="noopener noreferrer"
+        className={styles.donateBtn}
+      >
+        <Coffee size={16} />
+        buy me a coffee
+      </a>
 
       <div className={styles.footer}>
         <Link to="/profile" className={styles.link}>
