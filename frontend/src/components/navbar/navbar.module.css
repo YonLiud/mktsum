@@ -100,6 +100,30 @@
   color: var(--sidebar-item-active-text);
 }
 
+.ntfyLink {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  margin: 0 8px 2px;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  color: var(--sidebar-item-text);
+  text-decoration: none;
+  transition: background 0.12s, color 0.12s;
+}
+
+.ntfyLink:hover {
+  background: var(--sidebar-item-active-bg);
+  color: var(--sidebar-item-active-text);
+}
+
+.ntfyLink:global(.active) {
+  background: var(--sidebar-item-active-bg);
+  color: var(--sidebar-item-active-text);
+  font-weight: 500;
+}
+
 /* legal link — desktop: inherits .link styles; mobile: override below */
 .legalLink {}
 
@@ -186,12 +210,16 @@
     color: var(--nav-active);
   }
 
-  /* hide theme and donate from bottom nav, show legal instead */
+  /* hide theme, donate and ntfy guide from bottom nav, show legal instead */
   .themeBtn {
     display: none;
   }
 
   .donateBtn {
+    display: none;
+  }
+
+  .ntfyLink {
     display: none;
   }
 

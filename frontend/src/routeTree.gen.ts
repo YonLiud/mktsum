@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as NtfyRouteImport } from './routes/ntfy'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
@@ -33,6 +34,11 @@ const SignupRoute = SignupRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NtfyRoute = NtfyRouteImport.update({
+  id: '/ntfy',
+  path: '/ntfy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -105,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/ntfy': typeof NtfyRoute
   '/profile': typeof ProfileRoute
   '/signup': typeof SignupRoute
   '/briefings/$briefingId': typeof BriefingsBriefingIdRoute
@@ -122,6 +129,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/ntfy': typeof NtfyRoute
   '/profile': typeof ProfileRoute
   '/signup': typeof SignupRoute
   '/briefings/$briefingId': typeof BriefingsBriefingIdRoute
@@ -140,6 +148,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/ntfy': typeof NtfyRoute
   '/profile': typeof ProfileRoute
   '/signup': typeof SignupRoute
   '/briefings/$briefingId': typeof BriefingsBriefingIdRoute
@@ -159,6 +168,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/login'
+    | '/ntfy'
     | '/profile'
     | '/signup'
     | '/briefings/$briefingId'
@@ -176,6 +186,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/login'
+    | '/ntfy'
     | '/profile'
     | '/signup'
     | '/briefings/$briefingId'
@@ -193,6 +204,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/login'
+    | '/ntfy'
     | '/profile'
     | '/signup'
     | '/briefings/$briefingId'
@@ -211,6 +223,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
+  NtfyRoute: typeof NtfyRoute
   ProfileRoute: typeof ProfileRoute
   SignupRoute: typeof SignupRoute
   BriefingsBriefingIdRoute: typeof BriefingsBriefingIdRoute
@@ -239,6 +252,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ntfy': {
+      id: '/ntfy'
+      path: '/ntfy'
+      fullPath: '/ntfy'
+      preLoaderRoute: typeof NtfyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -339,6 +359,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
+  NtfyRoute: NtfyRoute,
   ProfileRoute: ProfileRoute,
   SignupRoute: SignupRoute,
   BriefingsBriefingIdRoute: BriefingsBriefingIdRoute,

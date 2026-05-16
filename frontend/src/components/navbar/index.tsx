@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { LayoutDashboard, BookMarked, User, Sun, Moon, Scale, Coffee } from 'lucide-react'
+import { LayoutDashboard, BookMarked, User, Sun, Moon, Scale, Coffee, Bell } from 'lucide-react'
 import { useTheme } from '@/hooks/useTheme'
 import styles from './navbar.module.css'
 
@@ -20,6 +20,11 @@ export function Navbar() {
           watchlist
         </Link>
       </div>
+
+      <Link to="/ntfy" className={styles.ntfyLink}>
+        <Bell size={16} />
+        notifications
+      </Link>
 
       <a
         href="https://ko-fi.com/C4W21ZNE8V"
