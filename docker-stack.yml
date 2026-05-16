@@ -12,6 +12,13 @@ services:
         failure_action: rollback
       restart_policy:
         condition: on-failure
+      resources:
+        reservations:
+          cpus: '0.10'
+          memory: 32M
+        limits:
+          cpus: '0.25'
+          memory: 64M
 
   postgres:
     image: postgres:16-alpine
@@ -35,6 +42,13 @@ services:
           - node.role == manager
       restart_policy:
         condition: on-failure
+      resources:
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+        limits:
+          cpus: '1.00'
+          memory: 512M
 
   backend:
     image: mktsum-backend:latest
@@ -53,12 +67,19 @@ services:
     networks:
       - internal
     deploy:
-      replicas: 1
+      replicas: 2
       update_config:
         order: start-first
         failure_action: rollback
       restart_policy:
         condition: on-failure
+      resources:
+        reservations:
+          cpus: '0.10'
+          memory: 128M
+        limits:
+          cpus: '0.50'
+          memory: 256M
 
   notifier:
     image: mktsum-notifier:latest
@@ -76,6 +97,13 @@ services:
         failure_action: rollback
       restart_policy:
         condition: on-failure
+      resources:
+        reservations:
+          cpus: '0.10'
+          memory: 64M
+        limits:
+          cpus: '0.25'
+          memory: 128M
 
   ofelia:
     image: mcuadros/ofelia:latest
@@ -91,6 +119,13 @@ services:
           - node.role == manager
       restart_policy:
         condition: on-failure
+      resources:
+        reservations:
+          cpus: '0.05'
+          memory: 32M
+        limits:
+          cpus: '0.25'
+          memory: 64M
     labels:
       ofelia.job-run.engine-daily.schedule: "${ENGINE_SCHEDULE:-0 0 7 * * *}"
       ofelia.job-run.engine-daily.image: "mktsum-engine:latest"
