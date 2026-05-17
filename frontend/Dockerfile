@@ -4,6 +4,7 @@ COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 COPY . .
 ARG VITE_API_URL=""
+ARG VITE_TURNSTILE_SITE_KEY=""
 RUN bun run build
 
 FROM nginx:alpine

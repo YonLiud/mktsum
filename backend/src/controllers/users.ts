@@ -19,7 +19,20 @@ export const userController = {
     const body = await c.req.json()
     const result = createUserSchema.safeParse(body)
     if (!result.success) return c.json({ error: result.error.flatten() }, 400)
-    const user = await userService.create(result.data)
+
+    const secret = process.env.TURNSTILE_SECRET_KEY
+    if (secret) {
+      const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ secret, response: result.data.turnstile_token }),
+      })
+      const { success } = await res.json() as { success: boolean }
+      if (!success) return c.json({ error: 'Captcha verification failed' }, 400)
+    }
+
+    const { turnstile_token: _, ...userData } = result.data
+    const user = await userService.create(userData)
     return c.json(user, 201)
   },
 

@@ -6,7 +6,7 @@ import { useSetAuth } from '@/hooks/useAuth'
 
 type FormSubmitHandler = NonNullable<ComponentProps<'form'>['onSubmit']>
 
-export function useRegister() {
+export function useRegister(turnstileToken: string | null) {
   const navigate = useNavigate()
   const setAuth = useSetAuth()
   const [error, setError] = useState<string | null>(null)
@@ -27,8 +27,13 @@ export function useRegister() {
       return
     }
 
+    if (!turnstileToken) {
+      setError('Please complete the captcha.')
+      return
+    }
+
     setIsLoading(true)
-    const res = await api.post('/users', { username, name, password, ntfy_topic: ntfy_topic || undefined, terms_accepted: true })
+    const res = await api.post('/users', { username, name, password, ntfy_topic: ntfy_topic || undefined, terms_accepted: true, turnstile_token: turnstileToken })
     setIsLoading(false)
 
     if (!res.ok) {
