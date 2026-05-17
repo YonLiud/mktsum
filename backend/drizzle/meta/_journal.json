@@ -43,6 +43,13 @@
       "when": 1778423079735,
       "tag": "0005_cute_mephistopheles",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1779019063015,
+      "tag": "0006_lovely_odin",
+      "breakpoints": true
     }
   ]
 }

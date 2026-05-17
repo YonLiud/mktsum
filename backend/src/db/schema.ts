@@ -21,7 +21,7 @@ export const sessions = pgTable('sessions', {
 
 export const briefings = pgTable('briefings', {
   briefing_id: text('briefing_id').primaryKey(),
-  user_id: text('user_id').notNull().references(() => users.user_id),
+  user_id: text('user_id').notNull().references(() => users.user_id, { onDelete: 'cascade' }),
   subject: text('subject'),
   full_summary: text('full_summary').notNull(),
   short_summary: text('short_summary').notNull(),
@@ -33,7 +33,7 @@ export const briefings = pgTable('briefings', {
 
 export const watchlist = pgTable('watchlist', {
   watchlist_id: text('watchlist_id').primaryKey(),
-  user_id: text('user_id').notNull().references(() => users.user_id),
+  user_id: text('user_id').notNull().references(() => users.user_id, { onDelete: 'cascade' }),
   ticker: text('ticker').notNull().references(() => tickers.symbol),
   created_at: timestamp('created_at').defaultNow().notNull(),
 }, (table: { user_id: any; ticker: any }) => [

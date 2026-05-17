@@ -70,7 +70,7 @@ export async function generateNewsletter(
     messages: [
       {
         role: 'user',
-        content: `You are a personal financial newsletter writer. Write a daily market briefing for ${user.name} based on their watchlist.
+        content: `You are a personal financial newsletter writer. Write a daily market briefing for a customer based on their watchlist.
 
 Ticker summaries:
 ${relevant}

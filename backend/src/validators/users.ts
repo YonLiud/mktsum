@@ -1,7 +1,12 @@
 import { z } from 'zod'
 
 export const createUserSchema = z.object({
-  username: z.string().min(3, 'Username must be at least 3 characters').trim(),
+  username: z
+    .string()
+    .min(3, 'Username must be at least 3 characters')
+    .max(32, 'Username must be at most 32 characters')
+    .regex(/^[a-zA-Z0-9._@-]+$/, 'Username may only contain letters, numbers, and . _ @ -')
+    .trim(),
   name: z.string().min(1, 'Name is required').trim(),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   ntfy_topic: z.string().min(1).trim().optional(),

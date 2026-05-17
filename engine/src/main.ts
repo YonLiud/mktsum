@@ -47,27 +47,31 @@ async function run() {
 
         console.log(`[engine] generating briefing for ${user.username}`)
 
-        const newsletter = await generateNewsletter(user, summaryMap)
-        const meta = await generateMeta(newsletter)
+        try {
+          const newsletter = await generateNewsletter(user, summaryMap)
+          const meta = await generateMeta(newsletter)
 
-        const sources = userTickers.flatMap(symbol =>
-          (tickersWithNews.find(t => t.symbol === symbol)?.news ?? []).map(n => ({
-            ticker: n.ticker,
-            title: n.title,
-            url: n.url,
-          }))
-        )
+          const sources = userTickers.flatMap(symbol =>
+            (tickersWithNews.find(t => t.symbol === symbol)?.news ?? []).map(n => ({
+              ticker: n.ticker,
+              title: n.title,
+              url: n.url,
+            }))
+          )
 
-        const { briefing_id } = await postBriefing({
-          user_id: user.user_id,
-          subject: meta.subject,
-          full_summary: newsletter,
-          short_summary: meta.short_summary,
-          sources,
-        })
+          const { briefing_id } = await postBriefing({
+            user_id: user.user_id,
+            subject: meta.subject,
+            full_summary: newsletter,
+            short_summary: meta.short_summary,
+            sources,
+          })
 
-        console.log(`[engine] posted briefing for ${user.username}, triggering notifier`)
-        await triggerNotifier(briefing_id)
+          console.log(`[engine] posted briefing for ${user.username}, triggering notifier`)
+          await triggerNotifier(briefing_id)
+        } catch (err) {
+          console.error(`[engine] failed briefing for ${user.username}:`, err)
+        }
       })
   )
 
