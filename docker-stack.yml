@@ -113,6 +113,12 @@ services:
     command: daemon --docker
     networks:
       - internal
+    labels:
+      ofelia.job-run.engine-daily.schedule: "${ENGINE_SCHEDULE:-0 0 4 * * *}"
+      ofelia.job-run.engine-daily.image: "mktsum-engine:latest"
+      ofelia.job-run.engine-daily.network: "mktsum_internal"
+      ofelia.job-run.engine-daily.environment: '["ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}","BACKEND_URL=http://backend:5000","NOTIFIER_URL=http://notifier:3001","NEWS_PER_TICKER=${NEWS_PER_TICKER:-10}","FAILURE_NTFY_TOPIC=${FAILURE_NTFY_TOPIC:-yonsnewsletter}","LLM_CONCURRENCY=${LLM_CONCURRENCY:-5}"]'
+      ofelia.job-run.engine-daily.no-overlap: "true"
     deploy:
       replicas: 1
       placement:
@@ -127,12 +133,6 @@ services:
         limits:
           cpus: '0.25'
           memory: 64M
-      labels:
-        ofelia.job-run.engine-daily.schedule: "${ENGINE_SCHEDULE:-0 0 4 * * *}"
-        ofelia.job-run.engine-daily.image: "mktsum-engine:latest"
-        ofelia.job-run.engine-daily.network: "mktsum_internal"
-        ofelia.job-run.engine-daily.environment: "ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY},BACKEND_URL=http://backend:5000,NOTIFIER_URL=http://notifier:3001,NEWS_PER_TICKER=${NEWS_PER_TICKER:-10},FAILURE_NTFY_TOPIC=${FAILURE_NTFY_TOPIC:-yonsnewsletter},LLM_CONCURRENCY=${LLM_CONCURRENCY:-5}"
-        ofelia.job-run.engine-daily.no-overlap: "true"
 
 networks:
   internal:
