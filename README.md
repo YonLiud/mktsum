@@ -1,9 +1,48 @@
 # mktsum
 AI powered market summarization
 
-# Frontend:
+# Frontend
 
-<!-- Omry put ur stuff here -->
+React SPA with a sidebar layout. Supports light and dark mode. Communicates with the backend over `/v1/*` using session tokens. Fully responsive — adapts to mobile with a bottom tab bar and slide-up drawer.
+
+## Mobile
+
+On small screens the sidebar is replaced with a fixed bottom tab bar (dashboard, watchlist, more). Tapping "more" opens a slide-up drawer with secondary links (profile, notifications, dark mode, etc).
+
+| Closed | Drawer open |
+|--------|-------------|
+| ![Mobile nav](images/mobile2.png) | ![Mobile drawer](images/mobile.png) |
+
+## Screenshots
+
+### Dashboard
+The main view — shows today's AI-generated briefing with a short summary and source tickers, plus a history of past briefings.
+
+| Light | Dark |
+|-------|------|
+| ![Dashboard light](images/home.jpg) | ![Dashboard dark](images/darktheme.jpg) |
+
+### Watchlist
+Manage the tickers included in your daily briefing. Add by symbol; the backend resolves the company name via Yahoo Finance. Up to 15 tickers per user.
+
+![Watchlist](images/watchlist.jpg)
+
+### Profile
+Update your display name and ntfy topic. Toggle between light and dark mode. Manage active sessions.
+
+| Light | Dark |
+|-------|------|
+| ![Profile light](images/profile.jpg) | ![Profile dark](images/profiledarktheme.jpg) |
+
+### Notifications setup
+Step-by-step guide for connecting your ntfy topic to receive daily briefings on your phone.
+
+![Notifications](images/notifications.jpg)
+
+### Legal
+Links to Terms of Service, Privacy Policy, and Financial Disclaimer.
+
+![Legal](images/legal.jpg)
 
 # Backend:
 
@@ -33,64 +72,4 @@ git pull
 docker compose up -d --build
 ```
 
-## Services & Ports
-
-| Service | Port |
-|---------|------|
-| Backend API | 5000 |
-| PostgreSQL | internal only |
-
-## Development Workflow
-
-### Branching Strategy
-- `main` — production-ready, merges only from `dev`
-- `dev` — integration branch, merges from `feature/*` and `fix/*`
-- `feature/*` — feature branches off `dev`
-- `fix/*` — fix branches off `dev`
-
-Always create a feature branch. Never commit directly to `main` or `dev`.
-
-### Implementing a Feature
-
-1. **Create feature branch**
-   ```bash
-   git checkout dev && git pull
-   git checkout -b feature/your-feature
-   ```
-
-2. **Implement & commit** (small logical commits)
-   ```bash
-   git commit -m "feat: add login endpoint"
-   ```
-   Commit format: `feat:` (feature), `fix:` (bug), `refactor:`, `docs:`
-
-3. **Test locally**
-   - Backend: `bun test`
-   - Start services: `docker compose up -d`
-   - Hit endpoints manually or via tests
-   - Don't push until it actually works
-
-4. **Push & create PR** (especially for security-sensitive features like auth)
-   ```bash
-   git push origin feature/your-feature
-   ```
-   Create PR on GitHub, request review for auth/core features
-
-5. **Merge to dev**
-   ```bash
-   git checkout dev && git pull
-   git merge feature/your-feature
-   git push origin dev
-   ```
-
-6. **Promote to main when stable**
-   ```bash
-   git checkout main && git pull
-   git merge dev
-   git push origin main
-   ```
-
-### PR Review
-- **Auth, security changes**: always get reviewed
-- **Other features**: can skip PR if confident, just test locally first
-- Use `/review` command for Claude Code review
+For full backend documentation, API reference, and development workflow see [backend/README.md](backend/README.md).
