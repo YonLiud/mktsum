@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /dashboard
+Disallow: /watchlist
+Disallow: /profile
+Disallow: /briefings/all
+Disallow: /briefings/
+Allow: /share/
+Allow: /
+
+Sitemap: https://mktsum.yxnliu.net/sitemap.xml

@@ -1,0 +1,110 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-}
+        VITE_TURNSTILE_SITE_KEY: ${VITE_TURNSTILE_SITE_KEY:-}
+    restart: unless-stopped
+    ports:
+      - "4173:80"
+    networks:
+      - internal
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-mktsum}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-mktsum}
+    volumes:
+      - /srv/mktsum_data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mktsum}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5000:5000"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-mktsum}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-mktsum}
+      PORT: 5000
+      FRONTEND_URL: ${FRONTEND_URL:-https://mktsum.yxnliu.net}
+      TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "bun", "--eval", "fetch('http://localhost:5000/').then(()=>process.exit(0)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - internal
+
+  engine:
+    build:
+      context: ./engine
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: ["tail", "-f", "/dev/null"]
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      BACKEND_URL: http://backend:5000
+      NOTIFIER_URL: http://notifier:3001
+      NEWS_PER_TICKER: ${NEWS_PER_TICKER:-10}
+      FAILURE_NTFY_TOPIC: ${FAILURE_NTFY_TOPIC:-yonsnewsletter}
+      LLM_CONCURRENCY: ${LLM_CONCURRENCY:-5}
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - internal
+
+  notifier:
+    build:
+      context: ./notifier
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3001:3001"
+    environment:
+      BACKEND_URL: http://backend:5000
+      FRONTEND_URL: ${FRONTEND_URL:-https://mktsum.yxnliu.net}
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - internal
+
+  ofelia:
+    image: mcuadros/ofelia:latest
+    restart: unless-stopped
+    depends_on:
+      - engine
+      - notifier
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: daemon --docker
+    labels:
+      ofelia.job-exec.engine-daily.schedule: "${ENGINE_SCHEDULE:-0 0 4 * * *}"
+      ofelia.job-exec.engine-daily.container: "mktsum-engine-1"
+      ofelia.job-exec.engine-daily.command: "bun src/main.ts"
+      ofelia.job-exec.engine-daily.no-overlap: "true"
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge

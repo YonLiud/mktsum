@@ -1,0 +1,23 @@
+.card {
+  background: var(--bg-elevated);
+  border: 0.5px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.header {
+  padding: 14px 16px;
+  border-bottom: 0.5px solid var(--border-subtle);
+}
+
+.header-accent {
+  padding: 16px;
+  background: var(--bg-card-header);
+  color: var(--text-on-card);
+  border-bottom: none;
+}
+
+.body {
+  padding: 14px 16px;
+  background: var(--bg-surface);
+}

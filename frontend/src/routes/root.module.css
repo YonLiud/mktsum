@@ -1,0 +1,23 @@
+.layout {
+  display: flex;
+  min-height: 100dvh;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+}
+
+.syncNotice {
+  font-size: 0.6875rem;
+  color: var(--text-tertiary);
+  text-align: center;
+  padding: 5px 16px;
+  border-bottom: 0.5px solid var(--border-subtle);
+}
+
+@media (max-width: 767px) {
+  .main {
+    padding-bottom: 56px;
+  }
+}

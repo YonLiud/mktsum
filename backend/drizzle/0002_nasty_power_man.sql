@@ -1,0 +1,1 @@
+ALTER TABLE "users" ALTER COLUMN "ntfy_topic" DROP NOT NULL;

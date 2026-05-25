@@ -1,0 +1,82 @@
+import type { Context } from 'hono'
+import { briefingService } from '../services/briefings'
+import { createBriefingSchema, bulkCreateBriefingSchema } from '../validators/briefings'
+
+export const briefingController = {
+  getById: async (c: Context) => {
+    const id = c.req.param('id')!
+    const briefing = await briefingService.getById(id)
+    if (!briefing) return c.json({ error: 'Briefing not found' }, 404)
+
+    if (!briefing.is_public) {
+      const caller = c.get('user') as { user_id: string; role: string } | undefined
+      if (!caller) return c.json({ error: 'Unauthorized' }, 401)
+      if (caller.user_id !== briefing.user_id && caller.role !== 'admin') {
+        return c.json({ error: 'Forbidden' }, 403)
+      }
+    }
+
+    return c.json(briefing)
+  },
+
+  getByUserId: async (c: Context) => {
+    const userId = c.req.param('userId')!
+    const briefings = await briefingService.getByUserId(userId)
+    return c.json(briefings)
+  },
+
+  getLatest: async (c: Context) => {
+    const userId = c.req.param('userId')!
+    const briefing = await briefingService.getLatest(userId)
+    if (!briefing) return c.json({ error: 'No briefings found' }, 404)
+    return c.json(briefing)
+  },
+
+  getPending: async (c: Context) => {
+    const briefings = await briefingService.getPending()
+    return c.json(briefings)
+  },
+
+  create: async (c: Context) => {
+    const body = await c.req.json()
+    const result = createBriefingSchema.safeParse(body)
+    if (!result.success) return c.json({ error: result.error.flatten() }, 400)
+    const briefing = await briefingService.create(result.data)
+    return c.json(briefing, 201)
+  },
+
+  bulkCreate: async (c: Context) => {
+    const body = await c.req.json()
+    const result = bulkCreateBriefingSchema.safeParse(body)
+    if (!result.success) return c.json({ error: result.error.flatten() }, 400)
+    const briefings = await briefingService.bulkCreate(result.data)
+    return c.json(briefings, 201)
+  },
+
+  markSent: async (c: Context) => {
+    const id = c.req.param('id')!
+    const briefing = await briefingService.markSent(id)
+    if (!briefing) return c.json({ error: 'Briefing not found' }, 404)
+    return c.json(briefing)
+  },
+
+  setPublic: async (c: Context) => {
+    const id = c.req.param('id')!
+    const caller = c.get('user') as { user_id: string; role: string }
+    const existing = await briefingService.getById(id)
+    if (!existing) return c.json({ error: 'Briefing not found' }, 404)
+    if (existing.user_id !== caller.user_id && caller.role !== 'admin') {
+      return c.json({ error: 'Forbidden' }, 403)
+    }
+    const body = await c.req.json()
+    const briefing = await briefingService.setPublic(id, !!body.is_public)
+    return c.json(briefing)
+  },
+
+  delete: async (c: Context) => {
+    const id = c.req.param('id')!
+    const briefing = await briefingService.delete(id)
+    if (!briefing) return c.json({ error: 'Briefing not found' }, 404)
+    return c.json({ success: true })
+  },
+}

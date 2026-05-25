@@ -1,0 +1,80 @@
+.page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.wordmark {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  color: var(--text-primary);
+  margin: 0;
+  text-align: center;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.error {
+  font-size: 0.8125rem;
+  color: var(--negative);
+  text-align: center;
+}
+
+.switch {
+  font-size: 0.8125rem;
+  color: var(--text-tertiary);
+  text-align: center;
+  margin: 0;
+}
+
+.switchLink {
+  color: var(--text-accent);
+  text-decoration: none;
+}
+
+.switchLink:hover {
+  text-decoration: underline;
+}
+
+.terms {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.terms input[type='checkbox'] {
+  flex-shrink: 0;
+  accent-color: var(--bg-accent);
+  cursor: pointer;
+}
+
+.termsLink {
+  color: var(--text-accent);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.termsLink:hover {
+  text-decoration: underline;
+}

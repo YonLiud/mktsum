@@ -1,0 +1,79 @@
+.page {
+  max-width: 672px;
+  margin: 0 auto;
+  padding: 40px 16px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* ── header ── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.username {
+  font-size: 0.8125rem;
+  color: var(--text-tertiary);
+}
+
+/* ── view / edit sections ── */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fieldValue {
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+}
+
+.fieldEmpty {
+  font-size: 0.9375rem;
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.syncNote {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+.legalLink {
+  font-size: 0.875rem;
+  color: var(--text-accent);
+  text-decoration: none;
+  align-self: flex-start;
+}
+
+.legalLink:hover {
+  text-decoration: underline;
+}

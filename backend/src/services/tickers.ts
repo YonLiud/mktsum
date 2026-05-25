@@ -1,0 +1,70 @@
+import YahooFinance from 'yahoo-finance2'
+const yf = new YahooFinance({ suppressNotices: ['yahooSurvey'] })
+import { eq } from 'drizzle-orm'
+import { db } from '../db'
+import { tickers } from '../db/schema'
+
+export const tickersService = {
+  getAll: async () => {
+    return await db.select().from(tickers)
+  },
+
+  getBySymbol: async (symbol: string) => {
+    const [ticker] = await db.select().from(tickers).where(eq(tickers.symbol, symbol)).limit(1)
+    return ticker ?? null
+  },
+
+  getOrCreate: async (symbol: string) => {
+    const existing = await db.select().from(tickers).where(eq(tickers.symbol, symbol)).limit(1)
+    if (existing.length > 0) return existing[0]
+
+    let quote
+    try {
+      quote = await yf.quoteSummary(symbol, { modules: ['price', 'assetProfile'] })
+    } catch {
+      return null
+    }
+
+    const name = quote.price?.shortName ?? quote.price?.longName
+    if (!name) return null
+
+    const description = quote.assetProfile?.longBusinessSummary ?? null
+    const price = quote.price?.regularMarketPrice ?? null
+    const change_pct = quote.price?.regularMarketChangePercent ?? null
+
+    const [ticker] = await db
+      .insert(tickers)
+      .values({ symbol, name, description, price, change_pct })
+      .returning()
+
+    return ticker
+  },
+
+  refresh: async (symbol: string) => {
+    let quote
+    try {
+      quote = await yf.quoteSummary(symbol, { modules: ['price', 'assetProfile'] })
+    } catch {
+      return null
+    }
+    const name = quote.price?.shortName ?? quote.price?.longName
+    if (!name) return null
+
+    const description = quote.assetProfile?.longBusinessSummary ?? null
+    const price = quote.price?.regularMarketPrice ?? null
+    const change_pct = quote.price?.regularMarketChangePercent ?? null
+
+    const [ticker] = await db
+      .update(tickers)
+      .set({ name, description, price, change_pct })
+      .where(eq(tickers.symbol, symbol))
+      .returning()
+
+    return ticker ?? null
+  },
+
+  refreshAll: async () => {
+    const all = await db.select().from(tickers)
+    return await Promise.all(all.map(t => tickersService.refresh(t.symbol)))
+  },
+}

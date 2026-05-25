@@ -1,0 +1,15 @@
+.text {
+  font-family: var(--font-sans);
+  line-height: 1.6;
+}
+
+/* variants */
+.primary   { color: var(--text-primary); }
+.secondary { color: var(--text-secondary); }
+.muted     { color: var(--text-tertiary); }
+.accent    { color: var(--text-accent); }
+
+/* sizes */
+.sm { font-size: 0.75rem; }
+.md { font-size: 0.875rem; }
+.lg { font-size: 1rem; }
