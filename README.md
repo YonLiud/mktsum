@@ -1,6 +1,59 @@
 # mktsum
 AI powered market summarization
 
+### Architecture
+
+```mermaid
+graph LR
+    user(["user"])
+
+    subgraph swarm["  Docker Swarm  "]
+        nginx["nginx\nreverse proxy\nmktsum.yxnliu.net"]
+        backend["backend\nHono · Drizzle\n/v1/*"]
+        engine["engine\ndaily cron · Bun"]
+        notifier["notifier\nntfy client"]
+        pg[("postgres\nbriefings · users · tickers")]
+    end
+
+    subgraph ext["  external  "]
+        direction LR
+        rss["RSS feeds"]
+        LLM["LLM API"]
+        ntfy["ntfy"]
+        rss ~~~ LLM ~~~ ntfy
+    end
+
+    user -->|"HTTPS"| nginx
+    nginx -->|"/v1/*"| backend
+    backend <--> pg
+    engine -->|"fetch"| rss
+    rss -->|"articles"| engine
+    engine -->|"prompt"| LLM
+    LLM -->|"summary"| engine
+    engine -->|"writes briefings"| pg
+    engine --> notifier
+    notifier --> ntfy
+    ntfy -->|"push"| user
+
+    style swarm fill:transparent,stroke:#B4B2A9,stroke-dasharray:4 3
+    style ext fill:transparent,stroke:#B4B2A9,stroke-dasharray:4 3
+
+    classDef cgr fill:#F1EFE8,stroke:#888780,color:#2C2C2A
+    classDef cpu fill:#EEEDFE,stroke:#534AB7,color:#26215C
+    classDef cte fill:#E1F5EE,stroke:#0F6E56,color:#04342C
+    classDef cam fill:#FAEEDA,stroke:#854F0B,color:#412402
+    classDef cco fill:#FAECE7,stroke:#993C1D,color:#4A1B0C
+    classDef cbl fill:#E6F1FB,stroke:#185FA5,color:#042C53
+
+    class user cgr
+    class nginx cpu
+    class backend cte
+    class engine cam
+    class notifier,ntfy cco
+    class pg cbl
+    class rss,LLM cgr
+```
+
 # Frontend
 
 React SPA with a sidebar layout. Supports light and dark mode. Communicates with the backend over `/v1/*` using session tokens. Fully responsive — adapts to mobile with a bottom tab bar and slide-up drawer.
